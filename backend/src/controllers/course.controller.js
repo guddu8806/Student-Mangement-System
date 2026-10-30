@@ -5,7 +5,6 @@ const AppError = require('../utils/AppError');
 //create , read, update , delete courses
 const createCourse = async(req , res, next) =>{
     try{
-
         const saved = await courseService.createCourse(req.body);
         res.status(201).json({
             success:true,

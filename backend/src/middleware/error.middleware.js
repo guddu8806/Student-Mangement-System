@@ -15,9 +15,9 @@ const errorHandler = (err, req, res, next) => {
     message = "Invalid JSON request body";
   }
 
-  // Handle common PostgreSQL errors
+  // PostgreSQL Level DB Validation
   if (err.code === '23505') {
-    // Unique violation (e.g. duplicate email or course code)
+    // Unique violation
     statusCode = 409;
     message = err.detail || "Duplicate record already exists";
   } else if (err.code === '23503') {

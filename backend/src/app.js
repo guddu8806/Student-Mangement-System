@@ -1,11 +1,12 @@
 const express = require('express');
 const cors = require('cors');
 const pool = require('./config/db');
-const AppError = require('./utils/AppError');
 const { notFound, errorHandler } = require('./middleware/error.middleware');
 
 const studentRoutes = require('./routes/student.route');
 const courseRoutes = require('./routes/course.route');
+const enrollmentRoutes = require('./routes/enrollment.routes');
+const dashboardRoutes = require('./routes/dashboard.routes');
 
 const app = express();
 
@@ -36,14 +37,13 @@ app.get('/api/db-health', async (req, res) => {
     }
 });
 
-// Temporary test route for centralized error handling
-app.get('/api/test-error', (req, res, next) => {
-    next(new AppError('This is a test error', 400));
-});
+
 
 // API routes
 app.use('/api/students', studentRoutes);
 app.use('/api/courses', courseRoutes);
+app.use('/api/enrollment', enrollmentRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 // Handle unknown routes
 app.use(notFound);

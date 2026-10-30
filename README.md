@@ -214,19 +214,80 @@ student-management-system/
 
 
 
+## ENROLLMENT API
+### Create Enrollment
+    - Method: POST
+    - URL: http://localhost:5000/api/enrollment
+    - Body (raw JSON): {
+            "student_id": 1,
+            "course_id": 1
+        }
+
+### Get All Enrollments
+    - Method: GET
+    - URL: http://localhost:5000/api/enrollment
+    - Body (raw JSON): None
+
+### Drop Enrollment
+    - Method: DEL
+    - URL: http://localhost:5000/api/enrollment/id
+    - Body (raw JSON): None
+
+
+## DASHBOARD API
+### Dashboard stats
+    - Method: GET
+    - URL: http://localhost:5000/api/dashboard/stats
+    - Body (raw JSON): None
+### Dashboard Enrollments
+    - Method: GET
+    - URL: http://localhost:5000/api/dashboard/enrollments
+    - Body (raw JSON): None
+### Dashboard Students
+    - Method: GET
+    - URL: http://localhost:5000/api/dashboard/students
+    - Body (raw JSON): None
+### Dashboard Courses
+    - Method: GET
+    - URL: http://localhost:5000/api/dashboard/courses
+    - Body (raw JSON): None
+
+
 
 
 # Installation
 1. Clone the repository
+    - git clone https://github.com/guddu8806/Student-Mangement-System.git
+    - cd student-management-system
 
 2. Configure the database
- Create a postgreSQL database for the application
- CREATE DATABASE student_management_system;
-    run the project database schema or migration scripts to create the requiured tables
-
+    - Create a postgreSQL database for the application:
+        CREATE DATABASE student_management_system;
+    - Run the database schema or SQL queries to create the required tables:
+        - students table
+        - courses table
+        - enrollments table
 
 3. Configure the backend
-- cd backend
+    - cd backend
     - npm install
-    create .env file and add all the environment variable
+    - Create a .env file and add all the environment variables:
+        PORT=5000
+        CLIENT_URL=http://localhost:5173
+        DB_HOST=localhost
+        DB_PORT=5433
+        DB_NAME=studentmangementsystem
+        DB_USER=postgres
+        DB_PASSWORD=********** (YOUR DB PASSWORD)
+    - Start the backend server:
+        npm run dev
 
+4. Configure the frontend
+    - cd ../frontend
+    - npm install
+    - Start the frontend development server:
+        npm run dev
+
+5. Access the application
+    - Backend API: http://localhost:5000
+    - Frontend App: http://localhost:5173

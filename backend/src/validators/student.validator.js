@@ -1,5 +1,3 @@
-// const allowedfields = ['first_name', 'last_name', 'email', 'phone'];
-
 const validateStudent = (data, isUpdate = false) => {
     const errors = {};
 
@@ -39,10 +37,14 @@ const updateStudentValidation = (data) => {
     if (fields.length === 0) {
         errors.body = "No valid fields provided for update";
     }
-    for (const field of fields) {
-        if (!allowedFields.includes(field)) {
-            errors[field] = `${field} is not a valid field`;
+
+    for (const key of Object.keys(data)) {
+        if (!allowedFields.includes(key)) {
+            errors[key] = `${key} is not a valid field`;
         }
+    }
+
+    for (const field of fields) {
         if (field === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data[field])) {
             errors.email = "Invalid email format";
         }
