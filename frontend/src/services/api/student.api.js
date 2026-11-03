@@ -3,7 +3,7 @@ import apiClient from "./apiClient";
 const unwrap = (res) => res?.data?.data ?? res?.data ?? res;
 
 export const getAllStudents = async (params) => {
-    const res = await apiClient.get("/students", { params });
+    const res = await apiClient.get("/students", params ? { params } : {});
     return unwrap(res);
 };
 

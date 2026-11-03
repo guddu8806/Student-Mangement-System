@@ -11,15 +11,8 @@ const createStudent = async(studentData) => {
 }
 
 
-const getAllStudents= async(params) =>{
-    const limit = Number(params.limit) || 10;
-    const offset = Number(params.offset) || 0;
-
-    if(!Number.isInteger(limit) || limit <= 0 || limit > 100 || !Number.isInteger(offset) || offset < 0){
-        throw new AppError("Invalid query parameters", 400);
-    }
-
-    return await studentRepository.findAll({limit, offset});
+const getAllStudents = async () => {
+    return await studentRepository.findAll();
 }
 
 

@@ -43,9 +43,9 @@ function CourseTable({ courses = [], loading = false, search = "", onEdit, onDel
             >
               <td className="whitespace-nowrap px-5 py-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-600 text-xs font-bold text-white shadow-xs">
+                  {/* <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-600 text-xs font-bold text-white shadow-xs">
                     {(course.course_code || "CR").slice(0, 2).toUpperCase()}
-                  </div>
+                  </div> */}
                   <div>
                     <p className="font-semibold text-gray-900 dark:text-white">{course.course_name}</p>
                     {/* <p className="text-xs text-slate-400">ID #{course.id}</p> */}

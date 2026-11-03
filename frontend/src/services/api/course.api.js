@@ -10,7 +10,7 @@ export const createCourse = async (courseData) => {
 
 // Get All Courses
 export const getAllCourses = async (params) => {
-    const response = await apiClient.get("/courses", { params });
+    const response = await apiClient.get("/courses", params ? { params } : {});
     return unwrap(response);
 };
 

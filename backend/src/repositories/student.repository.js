@@ -11,10 +11,9 @@ const create = async (studentData) => {
 }   
 
 
-const findAll = async({limit , offset } = {}) => {
-    const query = `SELECT * FROM students ORDER BY id LIMIT $1 OFFSET $2`;
-    const value = [Number(limit) , Number(offset)];
-    const result = await pool.query(query,value);
+const findAll = async () => {
+    const query = `SELECT * FROM students ORDER BY id`;
+    const result = await pool.query(query);
     return result.rows;
 }
 
