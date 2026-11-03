@@ -1,4 +1,4 @@
-import { Users, Pencil, Trash2, Mail, Phone } from "lucide-react";
+import { Users, Pencil, Trash2 } from "lucide-react";
 
 function StudentTable({ students = [], loading = false, search = "", onEdit, onDelete }) {
   if (loading) {
@@ -45,30 +45,21 @@ function StudentTable({ students = [], loading = false, search = "", onEdit, onD
               <tr key={student.id} className="transition hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
                 <td className="px-5 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-600 text-xs font-bold text-white shadow-xs">
-                      {initials}
-                    </div>
+                    
                     <div>
                       <p className="font-semibold text-gray-900 dark:text-white">
                         {firstName} {lastName}
                       </p>
-                      {/* <p className="text-xs text-slate-400">ID #{student.id}</p> */}
                     </div>
                   </div>
                 </td>
 
                 <td className="px-5 py-4 whitespace-nowrap text-slate-600 dark:text-slate-300">
-                  <span className="flex items-center gap-2">
-                    <Mail size={14} className="text-violet-500" />
-                    <span>{student.email || "—"}</span>
-                  </span>
+                  <span>{student.email || "—"}</span>
                 </td>
 
                 <td className="px-5 py-4 whitespace-nowrap text-slate-600 dark:text-slate-300">
-                  <span className="flex items-center gap-2">
-                    <Phone size={14} className="text-slate-400" />
-                    <span>{student.phone || "—"}</span>
-                  </span>
+                  <span>{student.phone || "—"}</span>
                 </td>
 
                 <td className="px-5 py-4 whitespace-nowrap text-right">

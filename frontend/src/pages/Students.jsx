@@ -85,7 +85,7 @@ function Students() {
   });
 
   return (
-    <div className="min-h-screen flex-1 bg-slate-50 px-8 py-4 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100 sm:px-6 lg:px-16">
+    <div className="min-h-screen flex-1 bg-slate-50 px-8 py-4 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100 sm:px-6 lg:px-30">
       {error && !isModalOpen && (
         <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700 dark:border-rose-900/40 dark:bg-rose-950/30 dark:text-rose-300">
           {error}

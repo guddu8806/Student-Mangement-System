@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import {GraduationCap, LayoutDashboard, Users, BookOpen,ClipboardList, Sun, Moon, Menu, X} from "lucide-react";
+import { GraduationCap, Sun, Moon, Menu, X } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
 
 const Navbar = () => {
@@ -8,11 +8,11 @@ const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const navLinks = [
-        { name: "Home", path: "/", icon: GraduationCap },
-        { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-        { name: "Students", path: "/students", icon: Users },
-        { name: "Courses", path: "/courses", icon: BookOpen },
-        { name: "Enrollments", path: "/enrollments", icon: ClipboardList }
+        { name: "Home", path: "/",  },
+        { name: "Dashboard", path: "/dashboard",  },
+        { name: "Students", path: "/students",  },
+        { name: "Courses", path: "/courses",  },
+        { name: "Enrollments", path: "/enrollments",  }
     ];
 
     const linkClasses = ({ isActive }) =>
@@ -43,15 +43,12 @@ const Navbar = () => {
 
                 <div className="hidden items-center gap-1 lg:flex">
                     {navLinks.map((link) => {
-                        const Icon = link.icon;
-
                         return (
                             <NavLink
                                 key={link.path}
                                 to={link.path}
                                 className={linkClasses}
                             >
-                                <Icon size={17} />
                                 {link.name}
                             </NavLink>
                         );
@@ -88,8 +85,6 @@ const Navbar = () => {
                 <div className="border-t border-gray-200 bg-white px-4 py-3 dark:border-gray-800 dark:bg-gray-900 lg:hidden">
                     <div className="flex flex-col gap-1">
                         {navLinks.map((link) => {
-                            const Icon = link.icon;
-
                             return (
                                 <NavLink
                                     key={link.path}
@@ -97,7 +92,6 @@ const Navbar = () => {
                                     onClick={() => setIsMenuOpen(false)}
                                     className={linkClasses}
                                 >
-                                    <Icon size={18} />
                                     {link.name}
                                 </NavLink>
                             );

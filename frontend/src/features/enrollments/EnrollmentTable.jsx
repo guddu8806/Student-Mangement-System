@@ -1,4 +1,4 @@
-import { ClipboardList, Trash2, Calendar, BookOpen, User } from "lucide-react";
+import { ClipboardList, Trash2 } from "lucide-react";
 
 function EnrollmentTable({ enrollments = [], loading = false, search = "", onDelete }) {
   if (loading) {
@@ -47,9 +47,6 @@ function EnrollmentTable({ enrollments = [], loading = false, search = "", onDel
               >
                 <td className="whitespace-nowrap px-5 py-4">
                   <div className="flex items-center gap-2.5">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-100 text-violet-600 dark:bg-violet-950/60 dark:text-violet-400">
-                      <User size={15} />
-                    </div>
                     <div>
                       <p className="font-semibold text-gray-900 dark:text-white">{studentName}</p>
                       {item.email && <p className="text-xs text-slate-400">{item.email}</p>}
@@ -59,9 +56,6 @@ function EnrollmentTable({ enrollments = [], loading = false, search = "", onDel
 
                 <td className="whitespace-nowrap px-5 py-4">
                   <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                      <BookOpen size={15} />
-                    </div>
                     <div>
                       <p className="font-medium text-gray-900 dark:text-white">{courseName}</p>
                       {item.course_code && (
@@ -79,24 +73,22 @@ function EnrollmentTable({ enrollments = [], loading = false, search = "", onDel
                   </span>
                 </td>
 
-                <td className="whitespace-nowrap px-5 py-4 text-xs text-slate-500 dark:text-slate-400">
-                  <div className="flex items-center gap-1.5">
-                    <Calendar size={13} className="text-violet-500" />
-                    <span>
-                      {item.enrollment_date
-                        ? new Date(item.enrollment_date).toLocaleDateString()
-                        : "N/A"}
-                    </span>
-                  </div>
+                <td className="whitespace-nowrap px-5 py-4 text-slate-600 dark:text-slate-300">
+                  {item.enrollment_date
+                    ? new Date(item.enrollment_date).toLocaleDateString(undefined, {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })
+                    : "—"}
                 </td>
 
                 <td className="whitespace-nowrap px-5 py-4 text-right">
                   <button
                     type="button"
                     onClick={() => onDelete(item.enrollment_id || item.id)}
-                    aria-label={`Drop enrollment for ${studentName}`}
+                    aria-label={`Remove enrollment for ${studentName}`}
                     className="rounded-lg p-2 text-slate-500 transition hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/50 dark:hover:text-rose-400"
-                    title="Drop Enrollment"
                   >
                     <Trash2 size={16} />
                   </button>

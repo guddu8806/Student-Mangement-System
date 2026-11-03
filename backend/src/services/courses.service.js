@@ -12,15 +12,8 @@ const createCourse = async (courseData) => {
     return await courseRepository.create(courseData);
 };
 
-const getAllCourses = async (params = {}) => {
-    const limit = Number(params.limit ?? 10);
-    const offset = Number(params.offset ?? 0);
-
-    if (!Number.isInteger(limit) || limit <= 0 || limit > 100 || !Number.isInteger(offset) || offset < 0) {
-        throw new AppError("Invalid query parameters", 400);
-    }
-
-    return await courseRepository.findAll({ limit, offset });
+const getAllCourses = async () => {
+    return await courseRepository.findAll();
 };
 
 const getCourseById = async (id) => {
