@@ -1,6 +1,6 @@
 import { BookOpen, Pencil, Trash2 } from "lucide-react";
 
-function CourseTable({ courses = [], loading = false, search = "", onEdit, onDelete }) {
+const CourseTable = ({ courses = [], loading = false, search = "", onEdit, onDelete, isUser }) => {
   if (loading) {
     return (
       <div className="p-12 text-center text-sm text-slate-500 dark:text-slate-400">
@@ -25,14 +25,14 @@ function CourseTable({ courses = [], loading = false, search = "", onEdit, onDel
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full min-w-[700px] text-left text-sm">
+      <table className="w-full min-w-150 text-left text-sm">
         <thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:bg-slate-800/60 dark:text-slate-400">
           <tr>
             <th scope="col" className="px-5 py-3.5">Course</th>
             <th scope="col" className="px-5 py-3.5">Code</th>
             <th scope="col" className="px-5 py-3.5">Description</th>
             <th scope="col" className="px-5 py-3.5">Credits</th>
-            <th scope="col" className="px-5 py-3.5 text-right">Actions</th>
+            {isUser && <th scope="col" className="px-5 py-3.5 text-right">Actions</th>}
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -65,26 +65,28 @@ function CourseTable({ courses = [], loading = false, search = "", onEdit, onDel
               <td className="whitespace-nowrap px-5 py-4 text-slate-600 dark:text-slate-300">
                 {course.credits ?? "—"} Credits
               </td>
-              <td className="whitespace-nowrap px-5 py-4 text-right">
-                <div className="flex justify-end gap-1">
-                  <button
-                    type="button"
-                    onClick={() => onEdit(course)}
-                    aria-label={`Edit ${course.course_name}`}
-                    className="rounded-lg p-2 text-slate-500 transition hover:bg-violet-50 hover:text-violet-600 dark:hover:bg-violet-950 dark:hover:text-violet-300"
-                  >
-                    <Pencil size={16} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onDelete(course)}
-                    aria-label={`Delete ${course.course_name}`}
-                    className="rounded-lg p-2 text-slate-500 transition hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/50 dark:hover:text-rose-400"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </td>
+              {isUser && (
+                <td className="whitespace-nowrap px-5 py-4 text-right">
+                  <div className="flex items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onEdit(course)}
+                      aria-label={`Edit ${course.course_name}`}
+                      className="rounded-lg p-2 text-slate-500 transition hover:bg-violet-50 hover:text-violet-600 dark:hover:bg-violet-950 dark:hover:text-violet-300"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onDelete(course)}
+                      aria-label={`Delete ${course.course_name}`}
+                      className="rounded-lg p-2 text-slate-500 transition hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/50 dark:hover:text-rose-400"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

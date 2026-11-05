@@ -17,10 +17,36 @@ const findById = async (id) => {
     return result.rows[0] || null;
 };
 
-// find all enrollments
-const findAllEnrollment = async ({ limit = 10, offset = 0 } = {}) => {
-    const query = `SELECT * FROM enrollments ORDER BY id LIMIT $1 OFFSET $2`;
-    const values = [Number(limit), Number(offset)];
+// find all enrollments (with student and course details)
+const findAllEnrollment = async () => {
+    const query = `
+        SELECT  e.id, e.student_id, e.course_id, e.enrollment_date,
+                CONCAT(s.first_name, ' ', s.last_name) AS student_name,
+                s.email AS student_email,
+                c.course_name, c.course_code, c.description, c.credits
+        FROM enrollments e
+        LEFT JOIN students s ON e.student_id = s.id
+        LEFT JOIN courses c ON e.course_id = c.id
+        ORDER BY e.id DESC
+    `;
+    const result = await pool.query(query);
+    return result.rows;
+};
+
+// find enrollments for a specific student
+const findByStudentId = async (studentId) => {
+    const query = `
+        SELECT  e.id, e.student_id, e.course_id, e.enrollment_date,
+                CONCAT(s.first_name, ' ', s.last_name) AS student_name,
+                s.email AS student_email,
+                c.course_name, c.course_code, c.description, c.credits
+        FROM enrollments e
+        LEFT JOIN students s ON e.student_id = s.id
+        LEFT JOIN courses c ON e.course_id = c.id
+        WHERE e.student_id = $1
+        ORDER BY e.id DESC
+    `;
+    const values = [studentId];
     const result = await pool.query(query, values);
     return result.rows;
 };
@@ -39,9 +65,14 @@ const createEnrollment = async (studentId, courseId) => {
         throw new AppError("Student is already enrolled in this course.", 409);
     }
 
-    const query = `INSERT INTO enrollments (student_id, course_id) VALUES($1, $2) RETURNING *`;
-    const value = [sId, cId];
-    const saved = await pool.query(query, value);
+    let saved;
+    try {
+        const query = `INSERT INTO enrollments (student_id, course_id, enrollment_date) VALUES($1, $2, CURRENT_TIMESTAMP) RETURNING *`;
+        saved = await pool.query(query, [sId, cId]);
+    } catch {
+        const query = `INSERT INTO enrollments (student_id, course_id) VALUES($1, $2) RETURNING *`;
+        saved = await pool.query(query, [sId, cId]);
+    }
 
     return saved.rows[0];
 };
@@ -58,6 +89,7 @@ module.exports = {
     createEnrollment,
     findEnrollment,
     findById,
+    findByStudentId,
     dropEnrollment,
     findAllEnrollment
 };

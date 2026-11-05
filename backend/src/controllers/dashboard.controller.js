@@ -26,7 +26,7 @@ const getStudents = async(req, res, next) =>{
     }
 };
 
-const getCurses = async(req, res, next) =>{
+const getCourses = async(req, res, next) =>{
     try{
         const result = await dashboardService.getAllCourses();
         res.status(200).json({
@@ -54,5 +54,5 @@ const getEnrollments = async(req, res, next) =>{
 
 
 module.exports = {
-    getDashboardStats , getCurses , getStudents ,getEnrollments
+    getDashboardStats , getCourses , getStudents ,getEnrollments
 }

@@ -2,17 +2,27 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { GraduationCap, Sun, Moon, Menu, X } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
+import { useAuth } from "../../context/AuthContext";
 
 const Navbar = () => {
     const { theme, toggleTheme } = useTheme();
+    const { token, user } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+    const isLoggedIn = Boolean(token);
+    const isAdmin = isLoggedIn && user?.role === "admin";
+
     const navLinks = [
-        { name: "Home", path: "/",  },
-        { name: "Dashboard", path: "/dashboard",  },
-        { name: "Students", path: "/students",  },
-        { name: "Courses", path: "/courses",  },
-        { name: "Enrollments", path: "/enrollments",  }
+        ...(isLoggedIn ? []: [{ name: "Home", path: "/" },]),
+        { name: "Dashboard", path: "/dashboard" },
+        ...(isAdmin ? [{ name: "Students", path: "/students" }] : []),
+        { name: "Courses", path: "/courses" },
+        { name: "Enrollments", path: "/enrollments" },
+        ...(isLoggedIn
+            ? [{ name: "Profile", path: "/profile" }]
+            : [
+                { name: "Get Started", path: "/signup" },
+              ]),
     ];
 
     const linkClasses = ({ isActive }) =>
