@@ -1,45 +1,39 @@
-import { Users, Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 
-function StudentTable({ students = [], loading = false, search = "", onEdit, onDelete }) {
-  if (loading) {
-    return (
-      <div className="p-12 text-center text-sm text-slate-500 dark:text-slate-400">
-        Loading students...
-      </div>
-    );
-  }
-
+function StudentTable({ students = [], onEdit, onDelete }) {
   if (students.length === 0) {
     return (
-      <div className="p-12 text-center">
-        <Users size={32} className="mx-auto text-slate-400" />
-        <h3 className="mt-3 font-semibold text-gray-900 dark:text-white">
-          {search ? "No matching students found" : "No students in database yet"}
-        </h3>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          {search ? "Try searching with a different term." : "Click 'Add Student' above to add your first student record."}
+      <div className="rounded-2xl border border-dashed border-slate-300 p-12 text-center dark:border-slate-800">
+        <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+          No students registered yet.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[600px] text-left text-sm">
-        <thead className="bg-slate-50 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:bg-slate-800/60 dark:text-slate-400">
+    <div className="overflow-hidden  border border-slate-200  shadow-xs dark:border-slate-800 dark:bg-slate-900">
+      <table className="w-full text-left text-sm">
+        <thead className="border-b border-slate-200 bg-slate-50/75 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400">
           <tr>
-            <th className="px-5 py-3.5">Student</th>
-            <th className="px-5 py-3.5">Email</th>
-            <th className="px-5 py-3.5">Phone</th>
-            <th className="px-5 py-3.5 text-right">Actions</th>
+            <th scope="col" className="px-5 py-3.5">
+              Name
+            </th>
+            <th scope="col" className="px-5 py-3.5">
+              Email
+            </th>
+            <th scope="col" className="px-5 py-3.5">
+              Phone
+            </th>
+            <th scope="col" className="px-5 py-3.5 text-right">
+              Actions
+            </th>
           </tr>
         </thead>
 
         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
           {students.map((student) => {
-            const firstName = student.first_name || student.firstName || "";
-            const lastName = student.last_name || student.lastName || "";
-            const initials = `${firstName[0] || ""}${lastName[0] || ""}`.toUpperCase() || "ST";
+            
 
             return (
               <tr key={student.id} className="transition hover:bg-slate-50/80 dark:hover:bg-slate-800/40">
@@ -48,7 +42,7 @@ function StudentTable({ students = [], loading = false, search = "", onEdit, onD
                     
                     <div>
                       <p className="font-semibold text-gray-900 dark:text-white">
-                        {firstName} {lastName}
+                        {student.first_name} {student.last_name}
                       </p>
                     </div>
                   </div>

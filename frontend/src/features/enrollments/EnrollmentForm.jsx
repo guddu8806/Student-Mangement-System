@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X } from "lucide-react";
+import { X, GraduationCap } from "lucide-react";
 
 function EnrollmentForm({
   isOpen,
@@ -9,6 +9,8 @@ function EnrollmentForm({
   courses = [],
   saving = false,
   error = "",
+  isStudent = false,
+  currentUser = null,
 }) {
   const [studentId, setStudentId] = useState("");
   const [courseId, setCourseId] = useState("");
@@ -17,11 +19,17 @@ function EnrollmentForm({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!studentId || !courseId) return;
-    onSubmit({
-      student_id: Number(studentId),
-      course_id: Number(courseId),
-    });
+    if (!courseId) return;
+
+    if (isStudent) {
+      onSubmit({ course_id: Number(courseId) });
+    } else {
+      if (!studentId) return;
+      onSubmit({
+        student_id: Number(studentId),
+        course_id: Number(courseId),
+      });
+    }
   };
 
   return (
@@ -29,7 +37,7 @@ function EnrollmentForm({
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900">
         <div className="mb-5 flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-            Enroll Student in Course
+            {isStudent ? "Enroll in a Course" : "Enroll Student in Course"}
           </h2>
           <button
             type="button"
@@ -49,24 +57,38 @@ function EnrollmentForm({
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300">
-              Select Student <span className="text-rose-500">*</span>
-            </label>
-            <select
-              required
-              value={studentId}
-              onChange={(e) => setStudentId(e.target.value)}
-              className="w-full rounded-lg border border-slate-200 bg-transparent px-3 py-2.5 text-sm outline-none transition focus:border-violet-500 focus:ring-1 focus:ring-violet-500 dark:border-slate-700 dark:bg-slate-900"
-            >
-              <option value="">-- Choose a Student --</option>
-              {students.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.first_name } {s.last_name } ({s.email})
-                </option>
-              ))}
-            </select>
-          </div>
+          {isStudent ? (
+            <div className="rounded-xl border border-violet-100 bg-violet-50/60 p-3 dark:border-violet-900/40 dark:bg-violet-950/30">
+              <div className="flex items-center gap-2">
+                <GraduationCap size={16} className="text-violet-600 dark:text-violet-400" />
+                <p className="text-xs font-semibold text-violet-900 dark:text-violet-200">
+                  Enrolling as: {currentUser?.name || "Student"}
+                </p>
+              </div>
+              <p className="mt-1 text-[11px] text-violet-700 dark:text-violet-300">
+                You can drop this course within 24 hours of enrollment.
+              </p>
+            </div>
+          ) : (
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300">
+                Select Student <span className="text-rose-500">*</span>
+              </label>
+              <select
+                required
+                value={studentId}
+                onChange={(e) => setStudentId(e.target.value)}
+                className="w-full rounded-lg border border-slate-200 bg-transparent px-3 py-2.5 text-sm outline-none transition focus:border-violet-500 focus:ring-1 focus:ring-violet-500 dark:border-slate-700 dark:bg-slate-900"
+              >
+                <option value="">-- Choose a Student --</option>
+                {students.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.first_name} {s.last_name} ({s.email})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div>
             <label className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300">
@@ -98,10 +120,10 @@ function EnrollmentForm({
             </button>
             <button
               type="submit"
-              disabled={saving || !studentId || !courseId}
+              disabled={saving || (!isStudent && !studentId) || !courseId}
               className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-violet-700 disabled:opacity-50"
             >
-              {saving ? "Enrolling..." : "Enroll Student"}
+              {saving ? "Enrolling..." : isStudent ? "Confirm Enrollment" : "Enroll Student"}
             </button>
           </div>
         </form>

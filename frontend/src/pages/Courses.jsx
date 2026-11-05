@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState} from "react";
 import { Plus, RefreshCw, Search } from "lucide-react";
 import { createCourse, deleteCourse, getAllCourses, updateCourse } from "../services/api/course.api";
 import CourseForm from "../features/courses/CourseForm";
 import CourseTable from "../features/courses/CourseTable";
+import {useAuth} from "../context/AuthContext";
 
 function Courses() {
   const [courses, setCourses] = useState([]);
@@ -12,6 +13,10 @@ function Courses() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState(null);
   const [saving, setSaving] = useState(false);
+  const { user ,token } = useAuth();
+
+  const isLoggedIn = Boolean(token);
+  const isUser = isLoggedIn && user?.role === "admin";
 
   const fetchCourses = async () => {
     setLoading(true);
@@ -159,14 +164,15 @@ function Courses() {
               </div>
 
               <div className="flex items-center gap-2">
-                <button
-                  onClick={() => openModal()}
-                  className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-violet-700 sm:flex-none"
-                >
-                  <Plus size={17} />
-                  <span>Add Course</span>
-                </button>
-
+                {isUser && (
+                  <button
+                    onClick={() => openModal()}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-violet-700 sm:flex-none"
+                  >
+                    <Plus size={17} />
+                    <span>Add Course</span>
+                  </button>
+                )}
                 <button
                   onClick={fetchCourses}
                   title="Refresh list"
@@ -184,6 +190,7 @@ function Courses() {
             search={search}
             onEdit={openModal}
             onDelete={handleDelete}
+            isUser={isUser}
           />
         </section>
       </div>

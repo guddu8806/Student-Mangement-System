@@ -30,24 +30,7 @@ const validateEnrollment = (data) => {
     return errors;
 };
 
-const validateDropEnrollment = (req, res, next) => {
-    const { studentId, courseId } = req.params;
-    const errors = [];
-
-    if (!/^[1-9]\d*$/.test(studentId) || !Number.isSafeInteger(Number(studentId))) {
-        errors.push('Valid positive studentId is required');
-    }
-
-    if (!/^[1-9]\d*$/.test(courseId) || !Number.isSafeInteger(Number(courseId))) {
-        errors.push('Valid positive courseId is required');
-    }
-
-    if (errors.length > 0) {
-        return errors;
-    }
-};
 
 module.exports = {
     validateEnrollment,
-    validateDropEnrollment
 };

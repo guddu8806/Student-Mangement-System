@@ -1,12 +1,12 @@
 const enrollmentService = require("../services/enrollment.service");
 
-// find all
+// find all enrollments
 const findAllEnrollment = async (req, res, next) => {
     try {
-        const all_enrollment = await enrollmentService.findAll(req.query);
+        const all_enrollment = await enrollmentService.findAll(req.query, req.user);
         res.status(200).json({
             success: true,
-            message: "All enrollments retrieved successfully.",
+            message: "Enrollments retrieved successfully.",
             data: all_enrollment
         });
     } catch (error) {
@@ -17,8 +17,7 @@ const findAllEnrollment = async (req, res, next) => {
 // create enrollment
 const createEnroll = async (req, res, next) => {
     try {
-        const { student_id, course_id } = req.body;
-        const enroll = await enrollmentService.createEnrollment({ student_id, course_id });
+        const enroll = await enrollmentService.createEnrollment(req.body, req.user);
         res.status(201).json({
             success: true,
             message: "Enrolled successfully",
@@ -33,7 +32,7 @@ const createEnroll = async (req, res, next) => {
 const dropEnrollment = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const deleted_enrollment = await enrollmentService.dropEnrollment(id);
+        const deleted_enrollment = await enrollmentService.dropEnrollment(id, req.user);
         res.status(200).json({
             success: true,
             message: "Enrollment deleted successfully",

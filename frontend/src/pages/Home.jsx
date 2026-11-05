@@ -123,15 +123,10 @@ function Home() {
 
         <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-12 text-center md:flex-row md:text-left">
           <div className="md:w-1/2">
-            {/* <span className="inline-block rounded-full border border-violet-200 bg-violet-50/90 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-violet-700 shadow-xs dark:border-violet-800/60 dark:bg-violet-950/60 dark:text-violet-300">
-              Academic Operations & Student Management
-            </span> */}
-
             <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl md:text-5xl">
               Welcome to{" "}
               <span className="text-violet-600 dark:text-violet-400">EduCore</span>
             </h1>
-
             <p className="mt-5 max-w-xl text-base leading-relaxed text-gray-700 dark:text-gray-300 sm:text-lg">
               EduCore is an integrated web portal designed to coordinate modern
               educational administration. It unites student registration,
@@ -141,17 +136,16 @@ function Home() {
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4 md:justify-start">
               <Link
-                to="/dashboard"
+                to="/signup"
                 className="inline-flex items-center rounded-xl bg-violet-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-violet-600/25 transition hover:bg-violet-700 dark:bg-violet-600 dark:hover:bg-violet-500"
               >
-                Explore Dashboard
+                Get Started
               </Link>
-
               <Link
-                to="/students"
+                to="/Courses"
                 className="inline-flex items-center rounded-xl border border-slate-300 bg-white/90 px-6 py-3.5 text-sm font-semibold text-slate-700 shadow-xs backdrop-blur-sm transition hover:bg-slate-100 hover:text-violet-700 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-violet-400"
               >
-                View Students
+                View Courses
               </Link>
             </div>
           </div>
@@ -388,10 +382,10 @@ function Home() {
 
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
-              to="/dashboard"
+              to="/login"
               className="rounded-xl bg-white px-6 py-3 text-sm font-semibold text-violet-700 shadow-md transition hover:bg-violet-50"
             >
-              Go to Dashboard
+              Get Started
             </Link>
             <Link
               to="/courses"
