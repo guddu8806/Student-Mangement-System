@@ -21,11 +21,9 @@ function Courses() {
   const fetchCourses = async () => {
     setLoading(true);
     setError("");
-
     try {
       const response = await getAllCourses();
-      const records = Array.isArray(response) ? response : response?.data ?? [];
-      setCourses(records);
+      setCourses(response);
     } catch (requestError) {
       setError(
         requestError?.response?.data?.message ||
@@ -38,29 +36,7 @@ function Courses() {
   };
 
   useEffect(() => {
-    let active = true;
-
-    getAllCourses()
-      .then((response) => {
-        const records = Array.isArray(response) ? response : response?.data ?? [];
-        if (active) setCourses(records);
-      })
-      .catch((requestError) => {
-        if (active) {
-          setError(
-            requestError?.response?.data?.message ||
-            requestError?.message ||
-            "Failed to load courses."
-          );
-        }
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-
-    return () => {
-      active = false;
-    };
+    fetchCourses();
   }, []);
 
   const openModal = (course = null) => {
@@ -173,13 +149,6 @@ function Courses() {
                     <span>Add Course</span>
                   </button>
                 )}
-                <button
-                  onClick={fetchCourses}
-                  title="Refresh list"
-                  className="rounded-lg border border-slate-200 p-2 text-slate-600 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
-                >
-                  <RefreshCw size={17} className={loading ? "animate-spin" : ""} />
-                </button>
               </div>
             </div>
           </div>

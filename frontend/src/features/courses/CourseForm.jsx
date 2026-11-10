@@ -33,22 +33,13 @@ function CourseForm({ isOpen, onClose, onSubmit, initialData = null, saving = fa
           <h2 id="course-modal-title" className="text-lg font-bold text-gray-900 dark:text-white">
             {initialData ? "Edit Course" : "Add Course"}
           </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={saving}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 disabled:opacity-50 dark:hover:bg-slate-800"
-            aria-label="Close dialog"
-          >
+          <button className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 disabled:opacity-50 dark:hover:bg-slate-800"  aria-label="Close dialog">
             <X size={18} />
           </button>
         </div>
 
         {error && (
-          <p
-            role="alert"
-            className="mb-4 rounded-lg bg-rose-50 p-3 text-sm text-rose-700 dark:bg-rose-950/30 dark:text-rose-300"
-          >
+          <p role="alert" className="mb-4 rounded-lg bg-rose-50 p-3 text-sm text-rose-700 dark:bg-rose-950/30 dark:text-rose-300">
             {error}
           </p>
         )}

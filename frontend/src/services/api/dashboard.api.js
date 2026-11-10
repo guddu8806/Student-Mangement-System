@@ -1,6 +1,6 @@
 import apiClient from "./apiClient";
 
-const unwrap = (response) => response?.data?.data ?? response?.data ?? [];
+const unwrap = (response) => response.data.data;
 
 export const getDashboardStats = async () => {
     const response = await apiClient.get("/dashboard/stats");

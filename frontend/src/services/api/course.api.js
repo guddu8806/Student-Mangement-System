@@ -1,6 +1,6 @@
 import apiClient from "./apiClient";
 
-const unwrap = (res) => res?.data?.data ?? res?.data ?? res;
+const unwrap = (res) => res.data.data;
 
 // Create Course
 export const createCourse = async (courseData) => {

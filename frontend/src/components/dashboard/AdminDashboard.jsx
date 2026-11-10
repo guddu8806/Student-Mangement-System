@@ -27,7 +27,7 @@ function AdminDashboard() {
           statsData.recentStudents
         );
         setEnrollments(enrollmentsData);
-      } catch (requestError) {
+      } catch {
         if (active) {
           setError("Unable to Fetch the data !")
         }

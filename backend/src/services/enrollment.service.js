@@ -9,7 +9,6 @@ const getStudentIdForUser = async (user) => {
     if (user.student_id) return user.student_id;
     let student = await studentRepository.findByUserId(user.id);
     if (!student) {
-        // Fallback: look up user email to see if student record exists with same email
         const userRec = await pool.query(`SELECT email FROM users WHERE id = $1`, [user.id]);
         if (userRec.rows.length > 0 && userRec.rows[0].email) {
             const stRes = await pool.query(`SELECT * FROM students WHERE LOWER(email) = LOWER($1)`, [userRec.rows[0].email]);

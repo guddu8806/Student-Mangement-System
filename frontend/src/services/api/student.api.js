@@ -1,6 +1,6 @@
 import apiClient from "./apiClient";
 
-const unwrap = (res) => res?.data?.data ?? res?.data ?? res;
+const unwrap = (res) => res.data.data;
 
 export const getAllStudents = async (params) => {
     const res = await apiClient.get("/students", params ? { params } : {});

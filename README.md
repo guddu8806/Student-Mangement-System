@@ -33,7 +33,6 @@ This project is being developed using React for the frontend, Node.js and Expres
 ## Entity
 - User
     - Admin
-    - Mentor
     - Student
 - Courses
 - Enrollments
@@ -46,7 +45,8 @@ student-management-system/
 │   │   ├── app/
 │   │   ├── assets/
 │   │   ├── components/
-│   │   │   ├── common/
+│   │   │   ├── dashboard/
+│   │   │   ├── layout/
 │   │   │   
 │   │   ├── features/
 │   │   │   ├── courses/
@@ -54,6 +54,8 @@ student-management-system/
 │   │   │   └── students/
 │   │   ├
 │   │   ├── pages/
+│   │   ├── context/
+│   │   ├── routes/
 │   │   ├── services/
 │   │   ├── styles/
 │   │   └── main.jsx

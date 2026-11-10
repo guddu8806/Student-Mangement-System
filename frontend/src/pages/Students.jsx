@@ -18,7 +18,7 @@ function Students() {
     setError("");
     try {
       const data = await getAllStudents();
-      setStudents(Array.isArray(data) ? data : []);
+      setStudents(data);
     } catch (err) {
       setError(err?.response?.data?.message || "Failed to load students from backend.");
     } finally {
@@ -27,10 +27,7 @@ function Students() {
   };
 
   useEffect(() => {
-    getAllStudents()
-      .then((data) => setStudents(Array.isArray(data) ? data : []))
-      .catch((err) => setError(err?.response?.data?.message || "Failed to load students."))
-      .finally(() => setLoading(false));
+    fetchStudents();
   }, []);
 
   const openModal = (student = null) => {
@@ -120,14 +117,6 @@ function Students() {
               >
                 <UserPlus size={17} />
                 <span>Add Student</span>
-              </button>
-
-              <button
-                onClick={fetchStudents}
-                title="Refresh list"
-                className="rounded-lg border border-slate-200 p-2 text-slate-600 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
-              >
-                <RefreshCw size={17} className={loading ? "animate-spin" : ""} />
               </button>
             </div>
           </div>

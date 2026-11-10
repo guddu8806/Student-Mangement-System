@@ -1,6 +1,6 @@
 import apiClient from "./apiClient";
 
-const unwrap = (res) => res?.data?.data ?? res?.data ?? res;
+const unwrap = (res) => res.data.data;
 
 export const register = async (userData) => {
     const res = await apiClient.post("/auth/register", userData);

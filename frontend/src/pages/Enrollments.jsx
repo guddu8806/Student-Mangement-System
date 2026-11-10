@@ -22,35 +22,22 @@ function Enrollments() {
 
   useEffect(() => {
     let active = true;
-
     async function loadData() {
       try {
         if (isStudent) {
-          const [enrollRes, courseRes] = await Promise.all([
-            getAllEnrollments(),
-            getAllCourses(),
-          ]);
-          if (!active) return;
-          setEnrollments(Array.isArray(enrollRes) ? enrollRes : enrollRes?.data ?? []);
-          setCourses(Array.isArray(courseRes) ? courseRes : courseRes?.data ?? []);
+          const [enrollRes, courseRes] = await Promise.all([ getAllEnrollments(),getAllCourses(),]);
+          setEnrollments(enrollRes);
+          setCourses(courseRes);
         } else {
-          const [enrollRes, studentRes, courseRes] = await Promise.all([
-            getAllEnrollments(),
-            getAllStudents(),
-            getAllCourses(),
-          ]);
+          const [enrollRes, studentRes, courseRes] = await Promise.all([ getAllEnrollments(), getAllStudents(), getAllCourses() ]);
           if (!active) return;
-          setEnrollments(Array.isArray(enrollRes) ? enrollRes : enrollRes?.data ?? []);
-          setStudents(Array.isArray(studentRes) ? studentRes : studentRes?.data ?? []);
-          setCourses(Array.isArray(courseRes) ? courseRes : courseRes?.data ?? []);
+          setEnrollments(enrollRes);
+          setStudents(studentRes);
+          setCourses(courseRes);
+          // console.log("enrollment: " , courseRes);
         }
       } catch (err) {
-        if (!active) return;
-        setError(
-          err?.response?.data?.message ||
-          err?.message ||
-          "Failed to load enrollment records."
-        );
+        setError("Failed to load enrollment records.");
       } finally {
         if (active) setLoading(false);
       }
@@ -63,38 +50,6 @@ function Enrollments() {
     };
   }, [isStudent]);
 
-  const handleRefresh = async () => {
-    setLoading(true);
-    setError("");
-
-    try {
-      if (isStudent) {
-        const [enrollRes, courseRes] = await Promise.all([
-          getAllEnrollments(),
-          getAllCourses(),
-        ]);
-        setEnrollments(Array.isArray(enrollRes) ? enrollRes : enrollRes?.data ?? []);
-        setCourses(Array.isArray(courseRes) ? courseRes : courseRes?.data ?? []);
-      } else {
-        const [enrollRes, studentRes, courseRes] = await Promise.all([
-          getAllEnrollments(),
-          getAllStudents(),
-          getAllCourses(),
-        ]);
-        setEnrollments(Array.isArray(enrollRes) ? enrollRes : enrollRes?.data ?? []);
-        setStudents(Array.isArray(studentRes) ? studentRes : studentRes?.data ?? []);
-        setCourses(Array.isArray(courseRes) ? courseRes : courseRes?.data ?? []);
-      }
-    } catch (err) {
-      setError(
-        err?.response?.data?.message ||
-        err?.message ||
-        "Failed to load enrollment records."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const openModal = () => {
     setError("");
@@ -112,17 +67,11 @@ function Enrollments() {
 
     try {
       await createEnrollment(formData);
-      // Re-fetch all data to get updated joins with student & course details
       const updated = await getAllEnrollments();
-      setEnrollments(Array.isArray(updated) ? updated : updated?.data ?? []);
+      setEnrollments(updated);
       closeModal();
     } catch (err) {
-      const resMsg = err?.response?.data?.message;
-      const message =
-        typeof resMsg === "object" && resMsg !== null
-          ? Object.values(resMsg).join(", ")
-          : resMsg || err?.message || "Failed to create enrollment. Already enrolled in this course.";
-      setError(message);
+      setError("Failed to create enrollment. Already enrolled in this course.");
     } finally {
       setSaving(false);
     }
@@ -213,14 +162,6 @@ function Enrollments() {
                 >
                   <Plus size={16} />
                   <span>{isStudent ? "Enroll in Course" : "Enroll Student"}</span>
-                </button>
-
-                <button
-                  onClick={handleRefresh}
-                  title="Refresh list"
-                  className="rounded-lg border border-slate-200 p-2 text-slate-600 transition hover:bg-slate-100 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
-                >
-                  <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
                 </button>
               </div>
             </div>
