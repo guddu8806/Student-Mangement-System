@@ -42,15 +42,15 @@ function Login() {
       navigate("/dashboard");
     } catch (err) {
       const resMsg = err.message;
-      const message =
-        typeof resMsg === "object" && resMsg !== null
-          ? Object.values(resMsg).join(", ")
-          : resMsg || err.message || "Invalid email or password. Please try again.";
-      setError(message);
+      setError(resMsg);
     } finally {
       setLoading(false);
     }
   };
+  // useEffect(() => {
+  //   handleSubmit();
+  // }, [])
+  
 
   return (
     <div className="flex flex-1 items-center justify-center px-4 py-12 sm:px-6 lg:px-8">

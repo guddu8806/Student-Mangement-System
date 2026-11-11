@@ -32,6 +32,7 @@ const CourseTable = ({ courses = [], loading = false, search = "", onEdit, onDel
             <th scope="col" className="px-5 py-3.5">Code</th>
             <th scope="col" className="px-5 py-3.5">Description</th>
             <th scope="col" className="px-5 py-3.5">Credits</th>
+            <th scope="col" className="px-5 py-3.5">Seats</th>
             {isUser && <th scope="col" className="px-5 py-3.5 text-right">Actions</th>}
           </tr>
         </thead>
@@ -65,6 +66,23 @@ const CourseTable = ({ courses = [], loading = false, search = "", onEdit, onDel
               <td className="whitespace-nowrap px-5 py-4 text-slate-600 dark:text-slate-300">
                 {course.credits ?? "—"} Credits
               </td>
+              <td className="whitespace-nowrap px-5 py-4">
+                <span
+                  className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${
+                    course.available_seats === 0
+                      ? "bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300"
+                      : course.available_seats !== undefined && course.available_seats <= 5
+                      ? "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300"
+                      : "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300"
+                  }`}
+                >
+                  {course.available_seats === 0
+                    ? "Full (0 left)"
+                    : course.available_seats !== undefined
+                    ? `${course.available_seats}/${course.capacity || 30} left`
+                    : `${course.capacity || 30} seats`}
+                </span>
+              </td>
               {isUser && (
                 <td className="whitespace-nowrap px-5 py-4 text-right">
                   <div className="flex items-center justify-end gap-2">
@@ -72,7 +90,7 @@ const CourseTable = ({ courses = [], loading = false, search = "", onEdit, onDel
                       type="button"
                       onClick={() => onEdit(course)}
                       aria-label={`Edit ${course.course_name}`}
-                      className="rounded-lg p-2 text-slate-500 transition hover:bg-violet-50 hover:text-violet-600 dark:hover:bg-violet-950 dark:hover:text-violet-300"
+                      className="cursor-pointer rounded-lg p-2 text-slate-500 transition hover:bg-violet-50 hover:text-violet-600 dark:hover:bg-violet-950 dark:hover:text-violet-300"
                     >
                       <Pencil size={16} />
                     </button>
@@ -80,7 +98,7 @@ const CourseTable = ({ courses = [], loading = false, search = "", onEdit, onDel
                       type="button"
                       onClick={() => onDelete(course)}
                       aria-label={`Delete ${course.course_name}`}
-                      className="rounded-lg p-2 text-slate-500 transition hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/50 dark:hover:text-rose-400"
+                      className=" cursor-pointer rounded-lg p-2 text-slate-500 transition hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/50 dark:hover:text-rose-400"
                     >
                       <Trash2 size={16} />
                     </button>

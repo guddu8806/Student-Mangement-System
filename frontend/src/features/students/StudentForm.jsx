@@ -26,7 +26,7 @@ function StudentForm({ isOpen, onClose, onSubmit, initialData = null, saving = f
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800"
+            className="cursor-pointer rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800"
             aria-label="Close modal"
           >
             <X size={18} />
@@ -100,14 +100,14 @@ function StudentForm({ isOpen, onClose, onSubmit, initialData = null, saving = f
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              className="cursor-pointer rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white shadow-xs transition hover:bg-violet-700 disabled:opacity-50"
+              className="cursor-pointer rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white shadow-xs transition hover:bg-violet-700 disabled:opacity-50"
             >
               {saving ? "Saving..." : initialData ? "Save Changes" : "Create Student"}
             </button>

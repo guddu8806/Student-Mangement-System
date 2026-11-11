@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { UserPlus, Search, RefreshCw } from "lucide-react";
+import { UserPlus, Search } from "lucide-react";
 import { createStudent, deleteStudent, getAllStudents, updateStudent } from "../services/api/student.api";
 import StudentForm from "../features/students/StudentForm";
 import StudentTable from "../features/students/StudentTable";
@@ -13,21 +13,22 @@ function Students() {
   const [editingStudent, setEditingStudent] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  const fetchStudents = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const data = await getAllStudents();
-      setStudents(data);
-    } catch (err) {
-      setError(err?.response?.data?.message || "Failed to load students from backend.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchStudents();
+    let active = true;
+    async function load() {
+      try {
+        const data = await getAllStudents();
+        if (active) setStudents(data);
+      } catch (err) {
+        if (active) setError(err?.response?.data?.message || "Failed to load students from backend.");
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+    load();
+    return () => {
+      active = false;
+    };
   }, []);
 
   const openModal = (student = null) => {
@@ -113,7 +114,7 @@ function Students() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => openModal()}
-                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-violet-700 sm:flex-none"
+                className="cursor-pointer flex flex-1 items-center justify-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-violet-700 sm:flex-none"
               >
                 <UserPlus size={17} />
                 <span>Add Student</span>

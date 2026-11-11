@@ -4,7 +4,6 @@ const studentRepository = require("../repositories/student.repository");
 const AppError = require("../utils/AppError");
 const { validateEnrollment } = require("../validators/enrollment.validator");
 
-// Helper to resolve student_id from logged-in user
 const getStudentIdForUser = async (user) => {
     if (user.student_id) return user.student_id;
     let student = await studentRepository.findByUserId(user.id);
@@ -52,6 +51,19 @@ const createEnrollment = async (data, user) => {
     const errors = validateEnrollment(payload);
     if (Object.keys(errors).length > 0) {
         throw new AppError(errors, 400);
+    }
+
+    // Check course capacity and available seats
+    const courseStatus = await enrollmentRepository.getCourseCapacityStatus(payload.course_id);
+    if (!courseStatus) {
+        throw new AppError("Course not found", 404);
+    }
+
+    if (courseStatus.enrolled_count >= courseStatus.capacity) {
+        throw new AppError(
+            `Course '${courseStatus.course_name}' has reached its maximum enrollment capacity (${courseStatus.capacity}/${courseStatus.capacity} seats filled).`,
+            400
+        );
     }
 
     return await enrollmentRepository.createEnrollment(payload.student_id, payload.course_id);

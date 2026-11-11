@@ -22,7 +22,7 @@ function NotFound() {
         </div>
 
         {/* Error Code */}
-        <h1 className="mt-7 bg-gradient-to-r from-violet-600 to-purple-500 bg-clip-text text-8xl font-black tracking-tight text-transparent sm:text-9xl">
+        <h1 className="mt-7 bg-linear-to-r from-violet-600 to-purple-500 bg-clip-text text-2xl font-black tracking-tight text-transparent sm:text-6xl">
           404
         </h1>
 

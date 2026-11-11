@@ -15,6 +15,7 @@ import Signup from "../pages/auth/signup";
 
 import ProtectedRoute from "../routes/ProtectedRoute";
 import PublicRoute from "../routes/PublicRoute";
+import Unauthorized from "../pages/Unauthorized";
 
 function App() {
     return (
@@ -42,6 +43,7 @@ function App() {
                             <Route path="/students" element={<Students />} />
                         </Route>
 
+                        <Route path="/unauthorized" element={<Unauthorized />} />
                         <Route path="*" element={<NotFound />} />
                     </Routes>
 

@@ -1,7 +1,7 @@
 
 const validateCourse = (data) => {
     const errors = {};
-    const allowedFields = ['course_name', 'course_code', 'description', 'credits'];
+    const allowedFields = ['course_name', 'course_code', 'description', 'credits', 'capacity'];
 
     if (!data || typeof data !== 'object' || Array.isArray(data)) {
         return { body: 'Invalid request body' };
@@ -33,12 +33,19 @@ const validateCourse = (data) => {
         errors.description = 'Description must be a string';
     }
 
+    if (
+        data.capacity !== undefined &&
+        (!Number.isInteger(Number(data.capacity)) || Number(data.capacity) <= 0)
+    ) {
+        errors.capacity = 'Capacity must be a positive integer';
+    }
+
     return errors;
 };
 
 const updateCourseValidation = (data) => {
     const errors = {};
-    const allowedFields = ['course_name', 'course_code', 'description', 'credits'];
+    const allowedFields = ['course_name', 'course_code', 'description', 'credits', 'capacity'];
 
     if (!data || typeof data !== 'object' || Array.isArray(data)) {
         return { body: 'Invalid request body' };
@@ -73,6 +80,11 @@ const updateCourseValidation = (data) => {
     if (data.credits !== undefined &&
         (!Number.isInteger(Number(data.credits)) || Number(data.credits) <= 0)) {
         errors.credits = 'Credits must be a positive integer';
+    }
+
+    if (data.capacity !== undefined &&
+        (!Number.isInteger(Number(data.capacity)) || Number(data.capacity) <= 0)) {
+        errors.capacity = 'Capacity must be a positive integer';
     }
 
     return errors;

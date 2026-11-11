@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Plus, RefreshCw, Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { getAllEnrollments, createEnrollment, deleteEnrollment } from "../services/api/enrollment.api";
 import { getAllStudents } from "../services/api/student.api";
@@ -36,7 +36,7 @@ function Enrollments() {
           setCourses(courseRes);
           // console.log("enrollment: " , courseRes);
         }
-      } catch (err) {
+      } catch {
         setError("Failed to load enrollment records.");
       } finally {
         if (active) setLoading(false);
@@ -67,11 +67,16 @@ function Enrollments() {
 
     try {
       await createEnrollment(formData);
-      const updated = await getAllEnrollments();
-      setEnrollments(updated);
+      const [updatedEnroll, updatedCourses] = await Promise.all([
+        getAllEnrollments(),
+        getAllCourses(),
+      ]);
+      setEnrollments(updatedEnroll);
+      setCourses(updatedCourses);
       closeModal();
     } catch (err) {
-      setError("Failed to create enrollment. Already enrolled in this course.");
+      const resMsg = err?.response?.data?.message;
+      setError(resMsg);
     } finally {
       setSaving(false);
     }
@@ -158,7 +163,7 @@ function Enrollments() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={openModal}
-                  className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-xs transition hover:bg-violet-700 sm:flex-none"
+                  className=" cursor-pointer flex flex-1 items-center justify-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-xs transition hover:bg-violet-700 sm:flex-none"
                 >
                   <Plus size={16} />
                   <span>{isStudent ? "Enroll in Course" : "Enroll Student"}</span>

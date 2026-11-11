@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {Area, AreaChart, Bar, BarChart, CartesianGrid, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 import { getDashboardCourses, getDashboardEnrollments, getDashboardStats, getDashboardStudents,} from "../../services/api/dashboard.api";
+import { useAuth } from "../../context/AuthContext";
+import WelcomeSection from "./WelcomeSection";
 
 function AdminDashboard() {
   const [stats, setStats] = useState({ students: 0, courses: 0, enrollments: 0 });
@@ -9,6 +11,7 @@ function AdminDashboard() {
   const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const {user} = useAuth();
 
   useEffect(() => {
     let active = true;
@@ -90,7 +93,9 @@ function AdminDashboard() {
           </p>
         )}
 
-        <section aria-label="Summary" className="grid gap-4 sm:grid-cols-3">
+        <WelcomeSection user={user}/>
+
+        <section aria-label="Summary" className="grid gap-4 sm:grid-cols-3 mt-4 mb-2">
           {metricCards.map(({ label, value, link }) => (
             <Link to={link}  key={label} className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-xs transition hover:border-violet-300 hover:shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:hover:border-violet-500/40">
               <div className="flex items-center justify-between">
