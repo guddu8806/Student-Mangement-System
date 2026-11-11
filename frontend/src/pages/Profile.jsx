@@ -23,17 +23,14 @@ const Profile = () => {
     let active = true;
     async function loadData() {
       try {
-        const [data, enrollmentsData] = await Promise.all([
-          getProfile(),
-          getAllEnrollments(),
-        ]);
+        const [data, enrollmentsData] = await Promise.all([getProfile(), getAllEnrollments(),]);
         if (!active) return;
         setEnrollments(enrollmentsData);
         const user = data?.user || {};
         const phone = data?.student?.phone || "";
         setProfile({ ...user, phone });
         setFormData({ name: user?.name || "", phone });
-      } catch (err) {
+      } catch {
         if (!active) return;
         setMessage("Failed to load profile.");
       } finally {
@@ -134,14 +131,14 @@ const Profile = () => {
                 type="button"
                 onClick={() => (isEditing ? cancelEditing() : setIsEditing(true))}
                 disabled={saving}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+                className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
               >
                 {isEditing ? "Cancel" : "Edit Profile"}
               </button>
               <button
                 type="button"
                 onClick={() => { logout(); navigate("/login"); }}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+                className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
               >
                 Log Out
               </button>

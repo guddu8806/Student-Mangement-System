@@ -1,5 +1,5 @@
 import { useEffect, useState} from "react";
-import { Plus, RefreshCw, Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { createCourse, deleteCourse, getAllCourses, updateCourse } from "../services/api/course.api";
 import CourseForm from "../features/courses/CourseForm";
 import CourseTable from "../features/courses/CourseTable";
@@ -18,25 +18,22 @@ function Courses() {
   const isLoggedIn = Boolean(token);
   const isUser = isLoggedIn && user?.role === "admin";
 
-  const fetchCourses = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const response = await getAllCourses();
-      setCourses(response);
-    } catch (requestError) {
-      setError(
-        requestError?.response?.data?.message ||
-        requestError?.message ||
-        "Failed to load courses from backend."
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchCourses();
+    let active = true;
+    async function load() {
+      try {
+        const response = await getAllCourses();
+        if (active) setCourses(response);
+      } catch {
+        if (active) setError("Failed to load courses from backend.");
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+    load();
+    return () => {
+      active = false;
+    };
   }, []);
 
   const openModal = (course = null) => {
@@ -143,7 +140,7 @@ function Courses() {
                 {isUser && (
                   <button
                     onClick={() => openModal()}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-violet-700 sm:flex-none"
+                    className="cursor-pointer flex flex-1 items-center justify-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-violet-700 sm:flex-none"
                   >
                     <Plus size={17} />
                     <span>Add Course</span>

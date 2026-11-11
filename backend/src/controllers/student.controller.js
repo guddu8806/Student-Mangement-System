@@ -13,7 +13,10 @@ const createStudent = async (req, res, next) => {
             data: newStudent
         });
     } catch (error) {
-        next(error);
+        if(error.code === "23505"){
+            throw new AppError("Students already exists. Please use different email address. " , 409);
+        }
+        throw error;
     }
 }
 

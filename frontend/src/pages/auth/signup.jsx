@@ -47,11 +47,8 @@ function Signup() {
       navigate("/dashboard");
     } catch (err) {
       const resMsg = err?.response?.data?.message;
-      const message =
-        typeof resMsg === "object" && resMsg !== null
-          ? Object.values(resMsg).join(", ")
-          : resMsg || err.message || "Failed to create account. Please try again.";
-      setError(message);
+      console.log(resMsg);
+      setError(resMsg);
     } finally {
       setLoading(false);
     }

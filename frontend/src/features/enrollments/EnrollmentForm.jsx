@@ -43,7 +43,7 @@ function EnrollmentForm({
             type="button"
             onClick={onClose}
             disabled={saving}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 disabled:opacity-50 dark:hover:bg-slate-800"
+            className="cursor-pointer rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 disabled:opacity-50 dark:hover:bg-slate-800"
             aria-label="Close dialog"
           >
             <X size={18} />
@@ -101,11 +101,20 @@ function EnrollmentForm({
               className="w-full rounded-lg border border-slate-200 bg-transparent px-3 py-2.5 text-sm outline-none transition focus:border-violet-500 focus:ring-1 focus:ring-violet-500 dark:border-slate-700 dark:bg-slate-900"
             >
               <option value="">-- Choose a Course --</option>
-              {courses.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.course_code ? `[${c.course_code}] ` : ""}{c.course_name} ({c.credits ?? 3} Credits)
-                </option>
-              ))}
+              {courses.map((c) => {
+                const isFull = c.available_seats !== undefined && c.available_seats <= 0;
+                const seatInfo = c.available_seats !== undefined
+                  ? isFull
+                    ? "FULL (0 seats left)"
+                    : `${c.available_seats}/${c.capacity || 30} seats left`
+                  : `${c.credits ?? 3} Credits`;
+
+                return (
+                  <option key={c.id} value={c.id} disabled={isFull}>
+                    {c.course_code ? `[${c.course_code}] ` : ""}{c.course_name} ({seatInfo})
+                  </option>
+                );
+              })}
             </select>
           </div>
 
@@ -114,14 +123,14 @@ function EnrollmentForm({
               type="button"
               onClick={onClose}
               disabled={saving}
-              className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              className="cursor-pointer rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving || (!isStudent && !studentId) || !courseId}
-              className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-violet-700 disabled:opacity-50"
+              className="cursor-pointer rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-violet-700 disabled:opacity-50"
             >
               {saving ? "Enrolling..." : isStudent ? "Confirm Enrollment" : "Enroll Student"}
             </button>

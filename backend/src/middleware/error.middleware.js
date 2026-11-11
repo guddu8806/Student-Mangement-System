@@ -15,20 +15,17 @@ const errorHandler = (err, req, res, next) => {
     message = "Invalid JSON request body";
   }
 
-  // PostgreSQL Level DB Validation
-  if (err.code === '23505') {
-    // Unique violation
+  // PostgreSQL errors
+  if (err.code === "23505") {
     statusCode = 409;
-    message = err.detail || "Duplicate record already exists";
-  } else if (err.code === '23503') {
-    // Foreign key violation
-    statusCode = 400;
-    message = err.detail || "Referenced record does not exist or is currently in use";
+    message = "This record already exists. Please check your details.";
   }
 
-  if (statusCode >= 500) {
-    console.error(err);
+  if (err.code === "23503") {
+    statusCode = 400;
+    message = "Related record does not exist or is currently in use.";
   }
+
 
   const response = {
     success: false,

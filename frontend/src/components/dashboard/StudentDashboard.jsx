@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import {Trash2 } from "lucide-react";
 import { getAllCourses } from "../../services/api/course.api";
 import { getAllEnrollments, deleteEnrollment } from "../../services/api/enrollment.api";
+import { useAuth } from "../../context/AuthContext";
+import WelcomeSection from "./WelcomeSection";
 
 function checkDropStatus(dateStr, now) {
   if (!dateStr) return { eligible: true, text: "Eligible to drop" };
@@ -32,7 +34,9 @@ const StudentDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentTime] = useState(() => Date.now());
+  const {user} = useAuth();
 
+  console.log(user);
   useEffect(() => {
     let active = true;
     async function loadStudentData() {
@@ -90,7 +94,9 @@ const StudentDashboard = () => {
           </p>
         )}
 
-        <section className="flex flex-row mb-4">
+        <WelcomeSection user={user}/>
+
+        <section className="flex flex-row my-4">
           <div className="w-1/2 mr-2 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs transition hover:border-violet-300 dark:border-slate-800 dark:bg-slate-900">
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -242,9 +248,16 @@ const StudentDashboard = () => {
                       <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                         {course.course_code}
                       </span>
-                      <span className="text-xs font-semibold text-violet-600 dark:text-violet-400">
-                        {course.credits} Credits
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-violet-600 dark:text-violet-400">
+                          {course.credits} Credits
+                        </span>
+                        {course.available_seats !== undefined && (
+                          <span className={`text-[11px] font-medium ${course.available_seats <= 0 ? "text-rose-500" : "text-emerald-600 dark:text-emerald-400"}`}>
+                            • {course.available_seats <= 0 ? "Full" : `${course.available_seats} seats left`}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     <h3 className="mt-2 text-sm font-bold text-gray-900 dark:text-white">

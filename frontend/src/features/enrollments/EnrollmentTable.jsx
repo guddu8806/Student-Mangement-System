@@ -172,7 +172,7 @@ function EnrollmentTable({
                       type="button"
                       onClick={() => onDelete(item.enrollment_id || item.id)}
                       aria-label={`Remove enrollment for ${studentName}`}
-                      className="rounded-lg p-2 text-slate-500 transition hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/50 dark:hover:text-rose-400"
+                      className="cursor-pointer rounded-lg p-2 text-slate-500 transition hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/50 dark:hover:text-rose-400"
                       title="Admin Delete Enrollment"
                     >
                       <Trash2 size={16} />

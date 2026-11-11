@@ -12,7 +12,10 @@ const createCourse = async(req , res, next) =>{
             data: saved
         });
     }catch(error){
-        next(error);
+        if(error.code === "23505"){
+            throw new AppError("Course Code must be unique. Please use different code." , 409);
+        }
+        throw error;
     }
 };
 

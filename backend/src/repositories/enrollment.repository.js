@@ -77,6 +77,19 @@ const createEnrollment = async (studentId, courseId) => {
     return saved.rows[0];
 };
 
+// get course capacity and active enrolled count
+const getCourseCapacityStatus = async (courseId) => {
+    const query = `
+        SELECT c.id, c.course_name, c.course_code, COALESCE(c.capacity, 30)::int AS capacity, COUNT(e.id)::int AS enrolled_count
+        FROM courses c
+        LEFT JOIN enrollments e ON c.id = e.course_id
+        WHERE c.id = $1
+        GROUP BY c.id
+    `;
+    const result = await pool.query(query, [courseId]);
+    return result.rows[0] || null;
+};
+
 // drop enrollment
 const dropEnrollment = async (id) => {
     const query = `DELETE FROM enrollments WHERE id = $1 RETURNING *`;
@@ -90,6 +103,7 @@ module.exports = {
     findEnrollment,
     findById,
     findByStudentId,
+    getCourseCapacityStatus,
     dropEnrollment,
     findAllEnrollment
 };

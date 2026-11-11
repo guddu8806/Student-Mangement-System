@@ -60,14 +60,14 @@ function StudentTable({ students = [], onEdit, onDelete }) {
                   <div className="flex justify-end gap-1">
                     <button
                       onClick={() => onEdit(student)}
-                      className="rounded-lg p-2 text-slate-500 transition hover:bg-violet-50 hover:text-violet-600 dark:hover:bg-violet-950 dark:hover:text-violet-300"
+                      className="cursor-pointer rounded-lg p-2 text-slate-500 transition hover:bg-violet-50 hover:text-violet-600 dark:hover:bg-violet-950 dark:hover:text-violet-300"
                       title="Edit Student"
                     >
                       <Pencil size={16} />
                     </button>
                     <button
                       onClick={() => onDelete(student.id)}
-                      className="rounded-lg p-2 text-slate-500 transition hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/50 dark:hover:text-rose-400"
+                      className="cursor-pointer rounded-lg p-2 text-slate-500 transition hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/50 dark:hover:text-rose-400"
                       title="Delete Student"
                     >
                       <Trash2 size={16} />

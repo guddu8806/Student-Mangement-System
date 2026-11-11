@@ -1,4 +1,5 @@
 const enrollmentService = require("../services/enrollment.service");
+const AppError = require("../utils/AppError");
 
 // find all enrollments
 const findAllEnrollment = async (req, res, next) => {
@@ -24,6 +25,9 @@ const createEnroll = async (req, res, next) => {
             data: enroll
         });
     } catch (error) {
+        if(error.code === "23505"){
+            return next(new AppError("Student is already enrolled in this course." , 409));
+        }
         next(error);
     }
 };
