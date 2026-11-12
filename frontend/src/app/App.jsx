@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "../context/AuthContext";
+import { NotificationProvider } from "../context/NotificationContext";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 
@@ -20,36 +21,38 @@ import Unauthorized from "../pages/Unauthorized";
 function App() {
     return (
         <AuthProvider>
-            <BrowserRouter>
-                <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 transition-colors dark:bg-gray-950 dark:text-slate-100">
-                    <Navbar />
+            <NotificationProvider>
+                <BrowserRouter>
+                    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 transition-colors dark:bg-gray-950 dark:text-slate-100">
+                        <Navbar />
 
-                    <Routes>
-                        <Route path="/" element={<Home />} />
+                        <Routes>
+                            <Route path="/" element={<Home />} />
 
-                        <Route element={<PublicRoute />}>
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/signup" element={<Signup />} />
-                        </Route>
+                            <Route element={<PublicRoute />}>
+                                <Route path="/login" element={<Login />} />
+                                <Route path="/signup" element={<Signup />} />
+                            </Route>
 
-                        <Route element={<ProtectedRoute />}>
-                            <Route path="/dashboard" element={<Dashboard />} />
-                            <Route path="/courses" element={<Courses />} />
-                            <Route path="/enrollments" element={<Enrollments />} />
-                            <Route path="/profile" element={<Profile />} />
-                        </Route>
+                            <Route element={<ProtectedRoute />}>
+                                <Route path="/dashboard" element={<Dashboard />} />
+                                <Route path="/courses" element={<Courses />} />
+                                <Route path="/enrollments" element={<Enrollments />} />
+                                <Route path="/profile" element={<Profile />} />
+                            </Route>
 
-                        <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
-                            <Route path="/students" element={<Students />} />
-                        </Route>
+                            <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+                                <Route path="/students" element={<Students />} />
+                            </Route>
 
-                        <Route path="/unauthorized" element={<Unauthorized />} />
-                        <Route path="*" element={<NotFound />} />
-                    </Routes>
+                            <Route path="/unauthorized" element={<Unauthorized />} />
+                            <Route path="*" element={<NotFound />} />
+                        </Routes>
 
-                    <Footer />
-                </div>
-            </BrowserRouter>
+                        <Footer />
+                    </div>
+                </BrowserRouter>
+            </NotificationProvider>
         </AuthProvider>
     );
 }

@@ -1,6 +1,7 @@
 const pool = require("../config/db");
 const enrollmentRepository = require("../repositories/enrollment.repository");
 const studentRepository = require("../repositories/student.repository");
+const notificationService = require("./notification.service");
 const AppError = require("../utils/AppError");
 const { validateEnrollment } = require("../validators/enrollment.validator");
 
@@ -66,7 +67,30 @@ const createEnrollment = async (data, user) => {
         );
     }
 
-    return await enrollmentRepository.createEnrollment(payload.student_id, payload.course_id);
+    const newEnrollment = await enrollmentRepository.createEnrollment(payload.student_id, payload.course_id);
+
+    try {
+        const student = await studentRepository.findById(payload.student_id);
+        const studentUserId = student?.user_id || (user?.role === 'student' ? user.id : null);
+        const studentName = student ? `${student.first_name} ${student.last_name}`.trim() : 'A student';
+
+        if (studentUserId) {
+            await notificationService.notifyUser(studentUserId, {
+                title: "Enrollment Confirmed",
+                message: `You have successfully enrolled in ${courseStatus.course_name}`,
+                type: "enrollment"
+            });
+        }
+        await notificationService.notifyAdmins({
+            title: "New Student Enrollment",
+            message: `${studentName} enrolled in ${courseStatus.course_name}`,
+            type: "enrollment"
+        });
+    } catch (err) {
+        console.error("Notification error:", err.message);
+    }
+
+    return newEnrollment;
 };
 
 const dropEnrollment = async (id, user) => {
@@ -101,6 +125,27 @@ const dropEnrollment = async (id, user) => {
     const dropped = await enrollmentRepository.dropEnrollment(enroll_id);
     if (!dropped) {
         throw new AppError("Enrollment could not be dropped", 400);
+    }
+
+    try {
+        const student = await studentRepository.findById(existing.student_id);
+        const studentUserId = student?.user_id || (user?.role === 'student' ? user.id : null);
+        const studentName = student ? `${student.first_name} ${student.last_name}`.trim() : 'A student';
+
+        if (studentUserId) {
+            await notificationService.notifyUser(studentUserId, {
+                title: "Course Dropped",
+                message: "Your course enrollment has been dropped",
+                type: "enrollment"
+            });
+        }
+        await notificationService.notifyAdmins({
+            title: "Course Dropped",
+            message: `${studentName}'s course enrollment was dropped`,
+            type: "enrollment"
+        });
+    } catch (err) {
+        console.error("Notification error:", err.message);
     }
 
     return dropped;

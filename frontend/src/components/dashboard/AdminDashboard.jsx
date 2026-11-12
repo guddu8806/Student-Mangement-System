@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {Area, AreaChart, Bar, BarChart, CartesianGrid, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
+import { Megaphone } from "lucide-react";
 import { getDashboardCourses, getDashboardEnrollments, getDashboardStats, getDashboardStudents,} from "../../services/api/dashboard.api";
 import { useAuth } from "../../context/AuthContext";
 import WelcomeSection from "./WelcomeSection";
+import AnnouncementModal from "../notifications/AnnouncementModal";
 
 function AdminDashboard() {
   const [stats, setStats] = useState({ students: 0, courses: 0, enrollments: 0 });
@@ -11,6 +13,7 @@ function AdminDashboard() {
   const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isAnnouncementOpen, setIsAnnouncementOpen] = useState(false);
   const {user} = useAuth();
 
   useEffect(() => {
@@ -95,7 +98,20 @@ function AdminDashboard() {
 
         <WelcomeSection user={user}/>
 
-        <section aria-label="Summary" className="grid gap-4 sm:grid-cols-3 mt-4 mb-2">
+        <div className="flex items-center justify-between mt-4 mb-2">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            System Overview
+          </h2>
+          <button
+            type="button"
+            onClick={() => setIsAnnouncementOpen(true)}
+            className="flex items-center gap-2 rounded-xl bg-violet-600 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-violet-700 transition cursor-pointer"
+          >
+            <Megaphone size={15} /> Broadcast Announcement
+          </button>
+        </div>
+
+        <section aria-label="Summary" className="grid gap-4 sm:grid-cols-3 mb-2">
           {metricCards.map(({ label, value, link }) => (
             <Link to={link}  key={label} className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-xs transition hover:border-violet-300 hover:shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:hover:border-violet-500/40">
               <div className="flex items-center justify-between">
@@ -247,6 +263,10 @@ function AdminDashboard() {
           )}
         </section>
 
+        <AnnouncementModal
+          isOpen={isAnnouncementOpen}
+          onClose={() => setIsAnnouncementOpen(false)}
+        />
       </div>
     </main>
   );

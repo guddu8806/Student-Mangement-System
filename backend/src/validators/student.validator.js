@@ -1,4 +1,4 @@
-const validateStudent = (data, isUpdate = false) => {
+const validateStudent = (data) => {
     const errors = {};
 
     if (!data || typeof data !== 'object' || Array.isArray(data)) {

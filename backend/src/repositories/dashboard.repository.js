@@ -38,7 +38,6 @@ const getAllCourses = async() =>{
 };
 
 const getAllEnrollments = async() =>{
-    const total_enrollments = `SELECT COUNT(*) AS total FROM enrollments`;
     const enrollment_table = `
         SELECT
             e.id AS enrollment_id,

@@ -10,7 +10,7 @@ router.post("/", enrollmentController.createEnroll);
 
 // View enrollments: student gets their own enrollments; admin gets all
 router.get("/", enrollmentController.findAllEnrollment);
-router.get("/me", enrollmentController.findAllEnrollment);
+
 
 router.delete("/:id", enrollmentController.dropEnrollment);
 
