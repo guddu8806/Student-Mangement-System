@@ -33,21 +33,9 @@ const requireAdmin = (req, res, next) => {
     next();
 };
 
-// Generic role authorization (e.g. authorizeRoles('admin', 'mentor'))
-const authorizeRoles = (...roles) => {
-    return (req, res, next) => {
-        if (!req.user || !roles.includes(req.user.role)) {
-            return res.status(403).json({
-                success: false,
-                message: `Forbidden: Access denied. Allowed roles: ${roles.join(', ')}`,
-            });
-        }
-        next();
-    };
-};
+
 
 module.exports = {
     verifyToken,
     requireAdmin,
-    authorizeRoles,
 };

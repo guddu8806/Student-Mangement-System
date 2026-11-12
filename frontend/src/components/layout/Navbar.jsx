@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import { GraduationCap, Sun, Moon, Menu, X } from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
+import NotificationBell from "../notifications/NotificationBell";
 
 const Navbar = () => {
     const { theme, toggleTheme } = useTheme();
@@ -66,6 +67,8 @@ const Navbar = () => {
                 </div>
 
                 <div className="flex items-center gap-2">
+                    {isLoggedIn && <NotificationBell />}
+
                     <button
                         onClick={toggleTheme}
                         type="button"

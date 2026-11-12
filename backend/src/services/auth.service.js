@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const authRepository = require('../repositories/auth.repository');
 const studentRepository = require('../repositories/student.repository');
+const notificationService = require('./notification.service');
 const authValidator = require('../validators/auth.validator');
 const generateToken = require('../utils/generateToken');
 const AppError = require('../utils/AppError');
@@ -54,6 +55,21 @@ const registerUser = async (userData) => {
     }
 
     const token = generateToken(newUser);
+
+    try {
+        await notificationService.notifyUser(newUser.id, {
+            title: "Welcome to EduCore",
+            message: "Your account has been created successfully",
+            type: "welcome"
+        });
+        await notificationService.notifyAdmins({
+            title: "New User Registered",
+            message: `${newUser.name} registered as a ${role}`,
+            type: "user"
+        });
+    } catch (err) {
+        console.error("Notification error:", err.message);
+    }
 
     return {
         user: newUser,
@@ -164,6 +180,16 @@ const updateProfile = async (userId, updateData) => {
         } else {
             updatedStudent = await studentRepository.findByUserId(userId);
         }
+    }
+
+    try {
+        await notificationService.notifyUser(newUser.id, {
+            title: "Profile Update",
+            message: "Your account has been updated successfully",
+            type: "Update"
+        });
+    } catch (err) {
+        console.error("Notification error:", err.message);
     }
 
     return {
