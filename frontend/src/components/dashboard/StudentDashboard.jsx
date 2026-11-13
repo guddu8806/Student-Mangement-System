@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import {Trash2 } from "lucide-react";
+import { Trash2, Megaphone } from "lucide-react";
 import { getAllCourses } from "../../services/api/course.api";
 import { getAllEnrollments, deleteEnrollment } from "../../services/api/enrollment.api";
 import { useAuth } from "../../context/AuthContext";
+import { useNotifications } from "../../context/NotificationContext";
 import WelcomeSection from "./WelcomeSection";
 
 function checkDropStatus(dateStr, now) {
@@ -35,6 +36,11 @@ const StudentDashboard = () => {
   const [error, setError] = useState("");
   const [currentTime] = useState(() => Date.now());
   const {user} = useAuth();
+  const { notifications } = useNotifications();
+
+  const announcements = notifications.filter(
+    (n) => (n.type || "").toLowerCase().includes("announcement")
+  );
 
   console.log(user);
   useEffect(() => {
@@ -96,7 +102,44 @@ const StudentDashboard = () => {
 
         <WelcomeSection user={user}/>
 
-        <section className="flex flex-row my-4">
+        {announcements.length > 0 && (
+          <section className="rounded-2xl border border-violet-200 bg-linear-to-r from-violet-50/70 to-indigo-50/50 p-5 shadow-xs dark:border-violet-900/40 dark:from-slate-900 dark:to-violet-950/20 mb-2 mt-4 ">
+            <div className="flex items-center gap-2 mb-3 text-violet-700 dark:text-violet-400">
+              <div className="rounded-lg bg-violet-600/10 p-1.5 dark:bg-violet-500/20">
+                <Megaphone size={16} />
+              </div>
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+                Campus Notices & Announcements
+              </h2>
+              <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-bold text-violet-700 dark:bg-violet-900/60 dark:text-violet-300">
+                {announcements.length}
+              </span>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              {announcements.slice(0, 2).map((item) => (
+                <div
+                  key={item.id}
+                  className="rounded-xl border border-slate-200/80 bg-white/90 p-4 shadow-xs dark:border-slate-800 dark:bg-slate-800/80"
+                >
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xs font-bold text-slate-900 dark:text-white">
+                      {item.title}
+                    </h3>
+                    <span className="text-[10px] text-slate-400">
+                      {new Date(item.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs text-slate-600 dark:text-slate-300 line-clamp-3">
+                    {item.message}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section className="flex flex-row my-4 ">
           <div className="w-1/2 mr-2 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs transition hover:border-violet-300 dark:border-slate-800 dark:bg-slate-900">
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">

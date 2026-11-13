@@ -96,19 +96,23 @@ function AdminDashboard() {
           </p>
         )}
 
-        <WelcomeSection user={user}/>
+        <WelcomeSection
+          user={user}
+          action={
+            <button
+              type="button"
+              onClick={() => setIsAnnouncementOpen(true)}
+              className="flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-xs font-semibold text-white shadow-md shadow-violet-600/20 hover:bg-violet-700 transition cursor-pointer"
+            >
+              <Megaphone size={15} /> Broadcast Announcement
+            </button>
+          }
+        />
 
         <div className="flex items-center justify-between mt-4 mb-2">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             System Overview
           </h2>
-          <button
-            type="button"
-            onClick={() => setIsAnnouncementOpen(true)}
-            className="flex items-center gap-2 rounded-xl bg-violet-600 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-violet-700 transition cursor-pointer"
-          >
-            <Megaphone size={15} /> Broadcast Announcement
-          </button>
         </div>
 
         <section aria-label="Summary" className="grid gap-4 sm:grid-cols-3 mb-2">

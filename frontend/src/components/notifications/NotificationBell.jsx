@@ -20,12 +20,12 @@ const NotificationBell = () =>{
     },[]);
 
     return(
-        <div className="relative" ref = {bellRef}>
+        <div className="relative " ref = {bellRef} >
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 type="button"
                 aria-label="View notifications"
-                className="relative rounded-lg border border-gray-200 p-2 text-gray-600 transition-colors hover:border-violet-300 hover:bg-violet-50 hover:text-violet-600 dark:border-gray-700 dark:text-gray-300 dark:hover:border-violet-500/30 dark:hover:bg-gray-800 dark:hover:text-violet-400"
+                className="relative cursor-pointer rounded-lg border border-gray-200 p-2 text-gray-600 transition-colors hover:border-violet-300 hover:bg-violet-50 hover:text-violet-600 dark:border-gray-700 dark:text-gray-300 dark:hover:border-violet-500/30 dark:hover:bg-gray-800 dark:hover:text-violet-400"
             >
                 <Bell size={19} />
                 {unreadCount > 0 && (

@@ -73,7 +73,7 @@ const Navbar = () => {
                         onClick={toggleTheme}
                         type="button"
                         aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-                        className="rounded-lg border border-gray-200 p-2 text-gray-600 transition-colors hover:border-violet-300 hover:bg-violet-50 hover:text-violet-600 dark:border-gray-700 dark:text-gray-300 dark:hover:border-violet-500/30 dark:hover:bg-gray-800 dark:hover:text-violet-400"
+                        className="cursor-pointer rounded-lg border border-gray-200 p-2 text-gray-600 transition-colors hover:border-violet-300 hover:bg-violet-50 hover:text-violet-600 dark:border-gray-700 dark:text-gray-300 dark:hover:border-violet-500/30 dark:hover:bg-gray-800 dark:hover:text-violet-400"
                     >
                         {theme === "light" ? (
                             <Moon size={19} />
