@@ -6,6 +6,7 @@ import Footer from "../components/layout/Footer";
 
 import Home from "../pages/Home";
 import Dashboard from "../pages/Dashboard";
+import Reports from "../pages/Reports";
 import Students from "../pages/Students";
 import Courses from "../pages/Courses";
 import Enrollments from "../pages/Enrollments";
@@ -43,6 +44,7 @@ function App() {
 
                             <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
                                 <Route path="/students" element={<Students />} />
+                                <Route path="/reports" element={<Reports />} />
                             </Route>
 
                             <Route path="/unauthorized" element={<Unauthorized />} />

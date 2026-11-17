@@ -72,7 +72,20 @@ const deleteStudent = async(req, res, next) =>{
     }catch(error){
         next(error);
     }
-}
+};
+
+const notEnrolledStudents = async(req, res,next) =>{
+    try{
+        const result = await studentService.notEnrolledStudents();
+        res.status(200).json({
+            success:true,
+            message:"These students are not enrolled in any courses.",
+            data:result
+        });
+    }catch(error){
+        next(error);
+    }
+};
 
 
 module.exports = {
@@ -80,5 +93,6 @@ module.exports = {
     getAllStudents,
     getStudentById,
     updateStudent,
-    deleteStudent
+    deleteStudent,
+    notEnrolledStudents
 }

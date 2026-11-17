@@ -125,6 +125,17 @@ const deleteById = async (id) => {
     return result.rowCount > 0;
 };
 
+const notEnrolledStudent = async() =>{
+//  not_enrolled
+    const query = `SELECT s.id , s.first_name , s.last_name, s.email, s.phone, s.created_at FROM students s
+        WHERE NOT EXISTS(
+        SELECT 1 FROM enrollments e WHERE e.student_id = s.id
+    )`;
+
+    const result = await pool.query(query);
+    return result.rows;
+};
+
 module.exports = {
     create,
     findAll,
@@ -133,4 +144,5 @@ module.exports = {
     update,
     updateByUserId,
     deleteById,
+    notEnrolledStudent
 };

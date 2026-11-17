@@ -58,7 +58,11 @@ const deleteStudent = async (id) => {
         throw new AppError("Student not found", 404);
     }
     return { message: "Student deleted successfully" };
-}
+};
+
+const notEnrolledStudents = async() =>{
+    return await studentRepository.notEnrolledStudent();
+};
 
 
 module.exports = {
@@ -66,5 +70,6 @@ module.exports = {
     getAllStudents,
     getStudentById,
     updateStudent,
-    deleteStudent
+    deleteStudent,
+    notEnrolledStudents
 }
