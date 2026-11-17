@@ -16,7 +16,7 @@ const Navbar = () => {
     const navLinks = [
         ...(isLoggedIn ? []: [{ name: "Home", path: "/" },]),
         { name: "Dashboard", path: "/dashboard" },
-        ...(isAdmin ? [{ name: "Students", path: "/students" }] : []),
+        ...(isAdmin ? [{name:"Reports" , path:"/reports"},{ name: "Students", path: "/students" }] : []),
         { name: "Courses", path: "/courses" },
         { name: "Enrollments", path: "/enrollments" },
         ...(isLoggedIn

@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
-import { UserPlus, Search } from "lucide-react";
-import { createStudent, deleteStudent, getAllStudents, updateStudent } from "../services/api/student.api";
+import { UserPlus, Search, FileSpreadsheet } from "lucide-react";
+import { createStudent, deleteStudent, getAllStudents, updateStudent, notEnrolledStudents as notEnrollApi } from "../services/api/student.api";
 import StudentForm from "../features/students/StudentForm";
 import StudentTable from "../features/students/StudentTable";
+import { getAllCourses } from "../services/api/course.api";
+import { getAllEnrollments } from "../services/api/enrollment.api";
+import exportToCsv from "../config/exportoCsv";
 
 function Students() {
   const [students, setStudents] = useState([]);
@@ -12,13 +15,23 @@ function Students() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [notEnrolledStudents, setNotEnrolledStudent] = useState([]);
+  const [enrollmentFilter, setEnrollmentFilter] = useState("all");
+  const [courses, setCourses] = useState([]);
+  const [enrollments, setEnrollments] = useState([]);
 
   useEffect(() => {
     let active = true;
     async function load() {
       try {
-        const data = await getAllStudents();
-        if (active) setStudents(data);
+        const [data, notEnrolledData, courseData, enrollmentData] = await Promise.all([getAllStudents(), notEnrollApi(), getAllCourses(), getAllEnrollments()]);
+        console.log("Not Enrolled data", notEnrolledData);
+        if (active) {
+          setStudents(data);
+          setNotEnrolledStudent(notEnrolledData);
+          setCourses(courseData);
+          setEnrollments(enrollmentData);
+        }
       } catch (err) {
         if (active) setError(err?.response?.data?.message || "Failed to load students from backend.");
       } finally {
@@ -69,12 +82,28 @@ function Students() {
     try {
       await deleteStudent(id);
       setStudents((prev) => prev.filter((s) => s.id !== id));
+      setNotEnrolledStudent((prev) => prev.filter((s) => (s.id ?? s.student_id) !== id));
     } catch (err) {
       setError(err?.response?.data?.message || "Failed to delete student.");
     }
   };
 
-  const filteredStudents = students.filter((student) => {
+  const unenrolledIdSet = new Set(
+    notEnrolledStudents.map((s) => s.id ?? s.student_id)
+  );
+
+  const studentsByStatus = (students || []).filter((student) => {
+    if (enrollmentFilter === "all") return true;
+    if (enrollmentFilter === "not_enrolled") return unenrolledIdSet.has(student.id);
+    if (enrollmentFilter === "enrolled") return !unenrolledIdSet.has(student.id);
+    return enrollments.some(
+      (e) =>
+        String(e.course_id) === String(enrollmentFilter) &&
+        String(e.student_id) === String(student.id)
+    );
+  });
+
+  const filteredStudents = studentsByStatus.filter((student) => {
     const query = search.toLowerCase();
     const fullName = `${student.first_name || student.firstName || ""} ${student.last_name || student.lastName || ""}`.toLowerCase();
     const email = (student.email || "").toLowerCase();
@@ -83,7 +112,7 @@ function Students() {
   });
 
   return (
-    <div className="min-h-screen flex-1 bg-slate-50 px-8 py-4 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100 sm:px-6 lg:px-30">
+    <div className="min-h-screen flex-1 bg-slate-50 px-4 py-4 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100 sm:px-6 lg:px-30">
       {error && !isModalOpen && (
         <div className="mb-4 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700 dark:border-rose-900/40 dark:bg-rose-950/30 dark:text-rose-300">
           {error}
@@ -92,14 +121,19 @@ function Students() {
 
       <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs dark:border-slate-800 dark:bg-slate-900">
         <div className="flex flex-col gap-4 border-b border-slate-200 p-4 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="font-semibold text-gray-900 dark:text-white">All Students</h2>
+          <div className="w-1/2">
+            <h2 className="font-semibold text-gray-900 dark:text-white">
+              {enrollmentFilter === "all"
+                ? "All Students"
+                : enrollmentFilter === "enrolled"
+                  ? "Enrolled Students"
+                  : "Not Enrolled Students"}
+            </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              {students.length} student{students.length === 1 ? "" : "s"} total
+              Showing {filteredStudents.length} of {students.length} student{students.length === 1 ? "" : "s"}
             </p>
           </div>
-
-          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+          <div className="flex w-1/2 flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
             <div className="relative w-full sm:w-64">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
@@ -111,7 +145,30 @@ function Students() {
               />
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className=" sm:w-auto">
+              <select
+                value={enrollmentFilter}
+                onChange={(e) => setEnrollmentFilter(e.target.value)}
+                className="w-full cursor-pointer rounded-lg border border-slate-200 bg-white py-2 px-3 text-sm font-medium text-slate-700 outline-none transition focus:border-violet-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+              >
+                <optgroup label="General Status" className="font-semibold text-slate-500">
+                  <option value="all">All Students</option>
+                  <option value="enrolled">Enrolled in Any Course</option>
+                  <option value="not_enrolled">Not Enrolled in Any Course</option>
+                </optgroup>
+                {courses.length > 0 && (
+                  <optgroup label="Enrolled In Course" className="font-semibold text-slate-500">
+                    {courses.map((course) => (
+                      <option key={course.id} value={course.id}>
+                         {course.course_name}
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2 mr-10">
               <button
                 onClick={() => openModal()}
                 className="cursor-pointer flex flex-1 items-center justify-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-violet-700 sm:flex-none"

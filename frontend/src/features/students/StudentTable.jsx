@@ -1,6 +1,14 @@
 import { Pencil, Trash2 } from "lucide-react";
 
-function StudentTable({ students = [], onEdit, onDelete }) {
+function StudentTable({ students = [], loading = false, onEdit, onDelete }) {
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="h-7 w-7 animate-spin rounded-full border-3 border-violet-600 border-t-transparent"></div>
+      </div>
+    );
+  }
+
   if (students.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-slate-300 p-12 text-center dark:border-slate-800">

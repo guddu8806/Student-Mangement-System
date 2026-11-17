@@ -9,6 +9,8 @@ const enrollmentRoutes = require('./routes/enrollment.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
 const authRoutes = require("./routes/auth.routes");
 const notificationRoutes = require('./routes/notification.routes');
+const reportRoutes = require('./routes/report.routes');
+
 
 const app = express();
 
@@ -49,6 +51,7 @@ app.use('/api/courses', courseRoutes);
 app.use('/api/enrollment', enrollmentRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/reports", reportRoutes);
 
 // Handle unknown routes
 app.use(notFound);

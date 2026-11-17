@@ -93,7 +93,7 @@ const Profile = () => {
   }
 
   return (
-    <main className="mx-auto w-10/12 space-y-6 py-4 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100 sm:px-6">
+    <main className="mx-auto w-10/12 space-y-6 py-4 text-slate-900 transition-colors  dark:text-slate-100 sm:px-6">
       {message.text && (
         <div
           role="alert"

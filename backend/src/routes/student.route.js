@@ -10,10 +10,13 @@ router.post('/', studentController.createStudent);
 
 router.get('/', studentController.getAllStudents);
 
+router.get("/not_enrolled", studentController.notEnrolledStudents);
+
 router.get('/:id', studentController.getStudentById);
 
 router.put('/:id', studentController.updateStudent);
 
 router.delete('/:id', studentController.deleteStudent);
+
 
 module.exports = router;
