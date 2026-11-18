@@ -25,22 +25,7 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// app.get('/api/db-health', async (req, res) => {
-//     try {
-//         const result = await pool.query('SELECT NOW() AS current_time');
-//         return res.status(200).json({
-//             message: 'PostgreSQL connected successfully!',
-//             time: result.rows[0].current_time,
-//         });
-//     } catch (error) {
-//         console.error('Database error:', error.message);
-//         return res.status(500).json({
-//             message: 'Database connection failed',
-//             error: error.message,
-//             code: error.code || 'UNKNOWN',
-//         });
-//     }
-// });
+
 
 
 

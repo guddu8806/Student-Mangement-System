@@ -12,19 +12,28 @@ This project is being developed using React for the frontend, Node.js and Expres
 - Axios
 - React Router
 - Lucide React
+- Recharts
+- Socket.IO Client
 
 ### Backend
 - Node.js
 - Express.js
 - PostgreSQL
 - node-postgres (`pg`)
+- Socket.IO
+- JSON Web Token (`jsonwebtoken`)
+- bcryptjs
 
 ## Features
-- Student Information Management (CRUD - Create, Read, Update, Delete)
-- Course Management (CRUD - Course codes, credit limits, descriptions)
-- Enrollment System (Assign students to courses with duplicate prevention)
-- Enrollment Drop Policy (Enforces 24-hour drop window from enrollment time)
-- Dashboard Metrics & Analytics (Total students, active courses, recent registrations)
+- Role-Based Authentication & Authorization (JWT authentication for Admin & Student roles, profile management)
+- Student Information Management (CRUD - Create, Read, Update, Delete, enrollment status & course filtering, unenrolled student lookup)
+- Course Management (CRUD - Course codes, credit limits, seat capacities, live seat availability, descriptions)
+- Enrollment System (Assign students to courses with duplicate prevention and course capacity enforcement)
+- Enrollment Drop Policy (Enforces 24-hour drop window from enrollment time for students; Admins can drop anytime)
+- Real-Time Notifications & Announcements (Socket.IO push notifications, unread tracking, mark as read/delete, Admin broadcasts to all students or course enrollees)
+- Reports & Analytics (KPIs, top courses, monthly registration vs enrollment history, filterable detailed roster, CSV export)
+- Dashboard Metrics & Analytics (Admin dashboard with Recharts visualizations; Student dashboard with enrolled courses, credits & campus announcements)
+- Light & Dark Mode Support (Persistent theme switcher across the application)
 - Centralized Error Handling & PostgreSQL validation (Duplicate record `23505`, Foreign key `23503`)
 - Layered 3-Tier Architecture (Controller -> Service -> Repository)
 - REST API for frontend-backend communication
@@ -36,6 +45,7 @@ This project is being developed using React for the frontend, Node.js and Expres
     - Student
 - Courses
 - Enrollments
+- Notifications
 
 ## Project Structure
 student-management-system/
@@ -47,13 +57,15 @@ student-management-system/
 │   │   ├── components/
 │   │   │   ├── dashboard/
 │   │   │   ├── layout/
-│   │   │   
+│   │   │   └── notifications/
+│   │   ├── config/
 │   │   ├── features/
 │   │   │   ├── courses/
 │   │   │   ├── enrollments/
+│   │   │   ├── reports/
 │   │   │   └── students/
-│   │   ├
 │   │   ├── pages/
+│   │   │   └── auth/
 │   │   ├── context/
 │   │   ├── routes/
 │   │   ├── services/
@@ -97,13 +109,16 @@ student-management-system/
 | DB_USER | Database username |
 | DB_PASSWORD | Database password |
 | PORT | Backend server port |
+| CLIENT_URL | Frontend origin URL for Socket.IO CORS (e.g., http://localhost:5173) |
 | JWT_SECRET | Secret key for JWT signing |
 | JWT_EXPIRES_IN | JWT token expiration duration (e.g., 5d) |
+| VITE_API_BASE_URL | Frontend API base URL (e.g., http://localhost:5000/api) |
+| VITE_SOCKET_URL | Frontend Socket.IO server URL (e.g., http://localhost:5000) |
 
 
 
 ## Database Design
-- The application uses a relational database with four main tables
+- The application uses a relational database with five main tables
 
 ### Users
 - Stores user credentials and authentication roles
@@ -122,17 +137,18 @@ student-management-system/
     - last_name
     - email (Unique)
     - phone
-    - user_id - Foreign key referencing users(id) ON DELETE CASCADE
+    - user_id - Foreign key referencing users(id) ON DELETE SET NULL
     - created_at
     - updated_at
 
 ### Courses
-- Stores course information, including its unique identifier
+- Stores course information, including its unique identifier and seat capacity
     - id - primary key
     - course_code (Unique)
     - course_name
     - description
     - credits
+    - capacity (Default 30, CHECK capacity > 0)
     - created_at
     - updated_at
 
@@ -140,10 +156,20 @@ student-management-system/
 ### Enrollments
 - Connects students and courses using foreign keys
     - id - primary key
-    - student_id - Foreign key referencing the students table
-    - course_id - Foreign key referencing the courses table
+    - student_id - Foreign key referencing the students table (ON DELETE CASCADE)
+    - course_id - Foreign key referencing the courses table (ON DELETE CASCADE)
     - enrollment_date
-    - status
+
+
+### Notifications
+- Stores user notifications and admin broadcast announcements
+    - id - primary key
+    - user_id - Foreign key referencing users(id) (ON DELETE CASCADE)
+    - title
+    - message
+    - type
+    - is_read (Default false)
+    - created_at
 
 
 ### Relationships
@@ -151,6 +177,7 @@ student-management-system/
 - One course can have multiple enrollments
 - Students and courses have a many-to-many relationship through the enrollments table
 - A unique constraint on (student_id, course_id) prevents duplicate enrollments.
+- One User can have multiple notifications (deleted automatically when the user is deleted)
 
 
 
@@ -160,11 +187,6 @@ student-management-system/
 ## Health 
     - Method: GET
     - URL: http://localhost:5000/api/health
-    - Body: None
-
-## DB Health
-    - Method: GET
-    - URL: http://localhost:5000/api/db-health
     - Body: None
 
 ## Authentication API
@@ -200,6 +222,12 @@ student-management-system/
 ### View Profile
     - Method: GET
     - URL: http://localhost:5000/api/auth/profile
+    - Headers: Authorization: Bearer <TOKEN>
+    - Body (raw JSON): None
+
+### View Current User Alias
+    - Method: GET
+    - URL: http://localhost:5000/api/auth/me
     - Headers: Authorization: Bearer <TOKEN>
     - Body (raw JSON): None
 
@@ -250,6 +278,12 @@ student-management-system/
     - Headers: Authorization: Bearer <ADMIN_TOKEN>
     - Body (raw JSON): None
 
+### GET Not Enrolled Students
+    - Method: GET
+    - URL: http://localhost:5000/api/students/not_enrolled
+    - Headers: Authorization: Bearer <ADMIN_TOKEN>
+    - Body (raw JSON): None
+
 ### UPDATE Student
     - Method: PUT
     - URL: http://localhost:5000/api/students/:id
@@ -277,7 +311,8 @@ student-management-system/
             "course_name": "Data Structures & Algorithms",
             "course_code": "CS201",
             "description": "Core computer science course covering trees, graphs, and sorting.",
-            "credits": 4
+            "credits": 4,
+            "capacity": 30
         }
 
 ### Get Course By ID (Admin & Student)
@@ -298,7 +333,8 @@ student-management-system/
     - Headers: Authorization: Bearer <ADMIN_TOKEN>
     - Body (raw JSON): {
             "course_name": "Advanced Data Structures & Algorithms",
-            "credits": 4
+            "credits": 4,
+            "capacity": 40
         }
 
 ### Delete Course (Admin Only)
@@ -327,7 +363,7 @@ student-management-system/
             "course_id": 1
         }
 
-### Get All Enrollments (Student views own; Admin views all)
+### Get All Enrollments (Student views own; Admin views all or filters by ?student_id=:id)
     - Method: GET
     - URL: http://localhost:5000/api/enrollment
     - Headers: Authorization: Bearer <TOKEN>
@@ -341,25 +377,93 @@ student-management-system/
 
 
 
-## DASHBOARD API
+## DASHBOARD API (Admin Only)
 ### Dashboard stats
     - Method: GET
     - URL: http://localhost:5000/api/dashboard/stats
+    - Headers: Authorization: Bearer <ADMIN_TOKEN>
     - Body (raw JSON): None
 
 ### Dashboard Enrollments
     - Method: GET
     - URL: http://localhost:5000/api/dashboard/enrollments
+    - Headers: Authorization: Bearer <ADMIN_TOKEN>
     - Body (raw JSON): None
 
 ### Dashboard Students
     - Method: GET
     - URL: http://localhost:5000/api/dashboard/students
+    - Headers: Authorization: Bearer <ADMIN_TOKEN>
     - Body (raw JSON): None
 
 ### Dashboard Courses
     - Method: GET
     - URL: http://localhost:5000/api/dashboard/courses
+    - Headers: Authorization: Bearer <ADMIN_TOKEN>
+    - Body (raw JSON): None
+
+
+
+## NOTIFICATIONS API
+### Get User Notifications (Optional ?unreadOnly=true)
+    - Method: GET
+    - URL: http://localhost:5000/api/notifications
+    - Headers: Authorization: Bearer <TOKEN>
+    - Body (raw JSON): None
+
+### Get Unread Notification Count
+    - Method: GET
+    - URL: http://localhost:5000/api/notifications/unread-count
+    - Headers: Authorization: Bearer <TOKEN>
+    - Body (raw JSON): None
+
+### Mark Notification As Read
+    - Method: PATCH
+    - URL: http://localhost:5000/api/notifications/:id/read
+    - Headers: Authorization: Bearer <TOKEN>
+    - Body (raw JSON): None
+
+### Mark All Notifications As Read
+    - Method: PATCH
+    - URL: http://localhost:5000/api/notifications/read-all
+    - Headers: Authorization: Bearer <TOKEN>
+    - Body (raw JSON): None
+
+### Delete Notification
+    - Method: DELETE
+    - URL: http://localhost:5000/api/notifications/:id
+    - Headers: Authorization: Bearer <TOKEN>
+    - Body (raw JSON): None
+
+### Broadcast Announcement (Admin Only - omit courseId for all students)
+    - Method: POST
+    - URL: http://localhost:5000/api/notifications/announcement
+    - Headers: Authorization: Bearer <ADMIN_TOKEN>
+    - Body (raw JSON): {
+            "title": "[EXAM] Midterm Schedule",
+            "message": "Midterm exams begin next Monday.",
+            "courseId": 1
+        }
+
+
+
+## REPORTS API (Admin Only)
+### Get Analytics Overview (KPIs, Course Enrollment Breakdown & Monthly History)
+    - Method: GET
+    - URL: http://localhost:5000/api/reports/analytics
+    - Headers: Authorization: Bearer <ADMIN_TOKEN>
+    - Body (raw JSON): None
+
+### Get Detailed Enrollment Roster (Optional ?courseId=&startDate=&endDate=)
+    - Method: GET
+    - URL: http://localhost:5000/api/reports/roster
+    - Headers: Authorization: Bearer <ADMIN_TOKEN>
+    - Body (raw JSON): None
+
+### Export Enrollment Roster as CSV (Optional ?courseId=&startDate=&endDate=)
+    - Method: GET
+    - URL: http://localhost:5000/api/reports/export/csv
+    - Headers: Authorization: Bearer <ADMIN_TOKEN>
     - Body (raw JSON): None
 
 
@@ -391,7 +495,7 @@ student-management-system/
             last_name VARCHAR(50) NOT NULL,
             email VARCHAR(100) UNIQUE NOT NULL,
             phone VARCHAR(20),
-            user_id INT UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+            user_id INT UNIQUE REFERENCES users(id) ON DELETE SET NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
@@ -402,6 +506,7 @@ student-management-system/
             course_name VARCHAR(100) NOT NULL,
             description TEXT,
             credits INT NOT NULL DEFAULT 3,
+            capacity INT NOT NULL DEFAULT 30 CHECK (capacity > 0),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
@@ -411,8 +516,17 @@ student-management-system/
             student_id INT NOT NULL REFERENCES students(id) ON DELETE CASCADE,
             course_id INT NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
             enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            status VARCHAR(20) DEFAULT 'enrolled',
             CONSTRAINT unique_student_course UNIQUE (student_id, course_id)
+        );
+
+        CREATE TABLE notifications (
+            id SERIAL PRIMARY KEY,
+            user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            title VARCHAR(255) NOT NULL,
+            message TEXT NOT NULL,
+            type VARCHAR(50) NOT NULL,
+            is_read BOOLEAN DEFAULT FALSE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         ```
 
@@ -437,6 +551,7 @@ student-management-system/
     - npm install
     - Create a .env file:
         VITE_API_BASE_URL=http://localhost:5000/api
+        VITE_SOCKET_URL=http://localhost:5000
     - Start the frontend development server:
         npm run dev
 

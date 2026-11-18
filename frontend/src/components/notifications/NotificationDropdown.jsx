@@ -99,7 +99,7 @@ const NotificationDropdown = ({ onClose }) => {
                 {unreadCount > 0 && (
                     <button
                         onClick={markAllAsRead}
-                        className="flex items-center gap-1 text-xs font-medium text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300"
+                        className="cursor-pointer flex items-center gap-1 text-xs font-medium text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300"
                     >
                         <CheckCheck size={14} /> Mark all read
                     </button>
@@ -110,7 +110,7 @@ const NotificationDropdown = ({ onClose }) => {
             <div className="flex border-b border-gray-100 bg-gray-50/50 px-4 pt-2 dark:border-gray-700 dark:bg-gray-800/50">
                 <button
                     onClick={() => setFilter("all")}
-                    className={`pb-2 text-xs font-medium border-b-2 mr-3 transition-colors ${
+                    className={`pb-2 text-xs font-medium border-b-2 mr-3 transition-colors cursor-pointer ${
                         filter === "all"
                             ? "border-violet-600 text-violet-600 dark:border-violet-400 dark:text-violet-400"
                             : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400"
@@ -120,7 +120,7 @@ const NotificationDropdown = ({ onClose }) => {
                 </button>
                 <button
                     onClick={() => setFilter("unread")}
-                    className={`pb-2 text-xs font-medium border-b-2 mr-3 transition-colors ${
+                    className={`pb-2 text-xs font-medium border-b-2 mr-3 transition-colors cursor-pointer ${
                         filter === "unread"
                             ? "border-violet-600 text-violet-600 dark:border-violet-400 dark:text-violet-400"
                             : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400"
