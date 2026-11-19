@@ -32,6 +32,7 @@ This project is being developed using React for the frontend, Node.js and Expres
 - Enrollment Drop Policy (Enforces 24-hour drop window from enrollment time for students; Admins can drop anytime)
 - Real-Time Notifications & Announcements (Socket.IO push notifications, unread tracking, mark as read/delete, Admin broadcasts to all students or course enrollees)
 - Reports & Analytics (KPIs, top courses, monthly registration vs enrollment history, filterable detailed roster, CSV export)
+- Student & Course Activity Logs (Audit logging for admin actions on students, courses, and student enrollments/course withdrawals with date, user, activity-type filtering and pagination)
 - Dashboard Metrics & Analytics (Admin dashboard with Recharts visualizations; Student dashboard with enrolled courses, credits & campus announcements)
 - Light & Dark Mode Support (Persistent theme switcher across the application)
 - Centralized Error Handling & PostgreSQL validation (Duplicate record `23505`, Foreign key `23503`)
@@ -46,6 +47,7 @@ This project is being developed using React for the frontend, Node.js and Expres
 - Courses
 - Enrollments
 - Notifications
+- Activity Logs
 
 ## Project Structure
 student-management-system/
@@ -172,12 +174,24 @@ student-management-system/
     - created_at
 
 
+### Activity Logs
+- Stores audit logs for student, course, and enrollment actions
+    - id - primary key
+    - user_id - Foreign key referencing users(id) (ON DELETE SET NULL)
+    - action - Type of action performed (e.g., STUDENT_CREATE, COURSE_UPDATE, ENROLLMENT_DROP)
+    - entity_type - Target entity ('student', 'course', 'enrollment')
+    - entity_id - ID of the target entity
+    - description - Detailed summary of the performed action
+    - created_at
+
+
 ### Relationships
 - One Student can have multiple enrollments
 - One course can have multiple enrollments
 - Students and courses have a many-to-many relationship through the enrollments table
 - A unique constraint on (student_id, course_id) prevents duplicate enrollments.
 - One User can have multiple notifications (deleted automatically when the user is deleted)
+- One User can have multiple activity logs (logs are preserved with null user_id if the user is deleted)
 
 
 
@@ -467,6 +481,26 @@ student-management-system/
     - Body (raw JSON): None
 
 
+## Activity Logs API (Admin Only)
+### Get Activity Logs (With Pagination & Filters)
+    - Method: GET
+    - URL: http://localhost:5000/api/activity-logs?page=1&limit=10&action=&userId=&startDate=&endDate=
+    - Headers: Authorization: Bearer <ADMIN_TOKEN>
+    - Body (raw JSON): None
+
+### Get Activity Log Filter Options (Distinct Users & Actions)
+    - Method: GET
+    - URL: http://localhost:5000/api/activity-logs/filters
+    - Headers: Authorization: Bearer <ADMIN_TOKEN>
+    - Body (raw JSON): None
+
+### Get Activity Log By ID
+    - Method: GET
+    - URL: http://localhost:5000/api/activity-logs/:id
+    - Headers: Authorization: Bearer <ADMIN_TOKEN>
+    - Body (raw JSON): None
+
+
 
 
 # Installation
@@ -526,6 +560,16 @@ student-management-system/
             message TEXT NOT NULL,
             type VARCHAR(50) NOT NULL,
             is_read BOOLEAN DEFAULT FALSE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE TABLE activity_logs (
+            id SERIAL PRIMARY KEY,
+            user_id INT REFERENCES users(id) ON DELETE SET NULL,
+            action VARCHAR(50) NOT NULL,
+            entity_type VARCHAR(30) NOT NULL,
+            entity_id INT,
+            description TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         ```

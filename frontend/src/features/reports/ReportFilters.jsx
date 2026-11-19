@@ -40,7 +40,7 @@ export default function ReportFilters({ searchTerm = "", onSearchChange,selected
               placeholder="Search student or course..."
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full cursor-pointer rounded-xl border border-gray-300 bg-gray-50/50 py-2 pl-9 pr-3 text-xs focus:border-violet-500 focus:bg-white focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-violet-400"
+              className="w-full cursor-pointer rounded-xl border border-gray-300 bg-gray-50/50 py-2 pl-9 pr-3 text-xs focus:border-violet-500  focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-violet-400"
             />
           </div>
 
@@ -48,7 +48,7 @@ export default function ReportFilters({ searchTerm = "", onSearchChange,selected
             <select
               value={selectedCourse}
               onChange={(e) => onCourseChange(e.target.value)}
-              className="w-full rounded-xl cursor-pointer border border-gray-300 bg-gray-50/50 px-3 py-2 text-xs font-medium text-gray-700 focus:border-violet-500 focus:bg-white focus:outline-none dark:border-gray-700 dark:bg-gray-900  dark:focus:border-violet-400"
+              className="w-full rounded-xl cursor-pointer border border-gray-300 bg-gray-50/50 px-3 py-2 text-xs font-medium text-gray-700 focus:border-violet-500 dark:text-white focus:outline-none dark:border-gray-700 dark:bg-gray-900  dark:focus:border-violet-400"
             >
               <option value="all">All Courses</option>
               {courses.map((c) => (

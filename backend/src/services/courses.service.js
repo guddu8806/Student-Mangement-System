@@ -2,10 +2,11 @@ const courseRepository = require('../repositories/courses.repository');
 const notificationService = require('./notification.service');
 const AppError = require('../utils/AppError');
 const { validateCourse, updateCourseValidation } = require('../validators/course.validator');
+const activityLogService = require("./activityLog.service");
 
 //  create, view, update, and delete courses. 
 
-const createCourse = async (courseData) => {
+const createCourse = async (courseData ,performedByUserId) => {
     const errors = validateCourse(courseData);
     if (Object.keys(errors).length > 0) {
         throw new AppError(errors, 400);
@@ -22,6 +23,13 @@ const createCourse = async (courseData) => {
     } catch (err) {
         console.error("Notification error:", err.message);
     }
+    await activityLogService.logActivity({
+        userId: performedByUserId,
+        action: 'COURSE_CREATE',
+        entityType: 'course',
+        entityId: newCourse.id,
+        description: `Created course '${newCourse.course_name}' (${newCourse.course_code})`
+    });
 
     return newCourse;
 };
@@ -42,7 +50,7 @@ const getCourseById = async (id) => {
     return course;
 };
 
-const updateCourse = async (id, courseData) => {
+const updateCourse = async (id, courseData ,performedByUserId) => {
     const course_id = Number(id);
     if (!Number.isInteger(course_id) || course_id <= 0) {
         throw new AppError("Invalid course ID", 400);
@@ -65,11 +73,18 @@ const updateCourse = async (id, courseData) => {
     } catch (err) {
         console.error("Notification error:", err.message);
     }
+    await activityLogService.logActivity({
+        userId: performedByUserId,
+        action: 'COURSE_UPDATE',
+        entityType: 'course',
+        entityId: updatedCourse.id,
+        description: `Updated course '${updatedCourse.course_name}' (${updatedCourse.course_code})`
+    });
 
     return updatedCourse;
 };
 
-const deleteCourse = async (id) => {
+const deleteCourse = async (id ,performedByUserId) => {
     const course_id = Number(id);
     if (!Number.isInteger(course_id) || course_id <= 0) {
         throw new AppError("Invalid course ID", 400);
@@ -94,6 +109,13 @@ const deleteCourse = async (id) => {
     if (!deleted) {
         throw new AppError("Course Not Found", 404);
     }
+    await activityLogService.logActivity({
+        userId: performedByUserId,
+        action: 'COURSE_DELETE',
+        entityType: 'course',
+        entityId: course_id,
+        description: `Deleted course '${course.course_name}' (${course.course_code})`
+    });
     return { message: "Course deleted successfully" };
 };
 

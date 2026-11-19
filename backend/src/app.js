@@ -10,6 +10,7 @@ const dashboardRoutes = require('./routes/dashboard.routes');
 const authRoutes = require("./routes/auth.routes");
 const notificationRoutes = require('./routes/notification.routes');
 const reportRoutes = require('./routes/report.routes');
+const activityLogRoutes = require('./routes/activityLog.route');
 
 
 const app = express();
@@ -28,7 +29,6 @@ app.get('/api/health', (req, res) => {
 
 
 
-
 // API routes
 app.use("/api/auth", authRoutes);
 app.use('/api/students', studentRoutes);
@@ -37,6 +37,7 @@ app.use('/api/enrollment', enrollmentRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/reports", reportRoutes);
+app.use("/api/activity-logs", activityLogRoutes);
 
 // Handle unknown routes
 app.use(notFound);
