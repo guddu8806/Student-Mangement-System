@@ -88,7 +88,7 @@ export default function Reports() {
     const registrationHistory = analytics?.registrationHistory || [];
 
     return (
-        <main className="min-h-screen bg-slate-50 mt-4  text-slate-900 transition-colors dark:bg-gray-950 dark:text-slate-100 sm:px-6 lg:px-8">
+        <main className="min-h-screen bg-slate-50 mt-4  text-slate-900 transition-colors dark:bg-gray-950 dark:text-slate-100 sm:px-6 lg:px-4">
             <div className="mx-auto max-w-7xl">
                 <div className="flex flex-col  sm:flex-row sm:items-center sm:justify-between border border-gray-200 dark:border-gray-800 bg-background dark:bg-gray-900 dark:text-slate-100  p-4 rounded-2xl">
                     <div>

@@ -6,7 +6,7 @@ const AppError = require('../utils/AppError');
 const createStudent = async (req, res, next) => {
     try{
         const studentData = req.body;
-        const newStudent = await studentService.createStudent(studentData);
+        const newStudent = await studentService.createStudent(studentData , req.user.id);
         res.status(201).json({
             success: true,
             message:"Student created successfully",
@@ -50,7 +50,7 @@ const getStudentById = async (req, res, next) => {
 const updateStudent = async(req, res, next) =>{
     try{
         const { id } = req.params;
-        const updatedStudent = await studentService.updateStudent(id, req.body);
+        const updatedStudent = await studentService.updateStudent(id, req.body , req.user.id);
         res.status(200).json({
             success: true,
             message: "Student Updated Successfully",
@@ -64,7 +64,7 @@ const updateStudent = async(req, res, next) =>{
 const deleteStudent = async(req, res, next) =>{
     try{
         const {id} = req.params;
-        const deleteStudent = await studentService.deleteStudent(id);
+        const deleteStudent = await studentService.deleteStudent(id, req.user.id);
         res.status(200).json({
             success:true,
             message: "Student deleted successfully"

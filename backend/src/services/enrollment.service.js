@@ -1,9 +1,11 @@
 const pool = require("../config/db");
 const enrollmentRepository = require("../repositories/enrollment.repository");
 const studentRepository = require("../repositories/student.repository");
+const courseRepository = require("../repositories/courses.repository");
 const notificationService = require("./notification.service");
 const AppError = require("../utils/AppError");
 const { validateEnrollment } = require("../validators/enrollment.validator");
+const activityLogService = require("./activityLog.service");
 
 const getStudentIdForUser = async (user) => {
     if (user.student_id) return user.student_id;
@@ -69,10 +71,11 @@ const createEnrollment = async (data, user) => {
 
     const newEnrollment = await enrollmentRepository.createEnrollment(payload.student_id, payload.course_id);
 
+    const student = await studentRepository.findById(payload.student_id);
+    const studentName = student ? `${student.first_name} ${student.last_name}`.trim() : 'A student';
+
     try {
-        const student = await studentRepository.findById(payload.student_id);
         const studentUserId = student?.user_id || (user?.role === 'student' ? user.id : null);
-        const studentName = student ? `${student.first_name} ${student.last_name}`.trim() : 'A student';
 
         if (studentUserId) {
             await notificationService.notifyUser(studentUserId, {
@@ -89,6 +92,16 @@ const createEnrollment = async (data, user) => {
     } catch (err) {
         console.error("Notification error:", err.message);
     }
+
+    await activityLogService.logActivity({
+        userId: user.id,
+        action: 'ENROLLMENT_CREATE',
+        entityType: 'enrollment',
+        entityId: newEnrollment.id,
+        description: user.role === 'admin'
+            ? `Admin enrolled ${studentName} in course '${courseStatus.course_name}'`
+            : `${studentName} enrolled in course '${courseStatus.course_name}'`
+    });
 
     return newEnrollment;
 };
@@ -127,10 +140,13 @@ const dropEnrollment = async (id, user) => {
         throw new AppError("Enrollment could not be dropped", 400);
     }
 
+    const student = await studentRepository.findById(existing.student_id);
+    const studentName = student ? `${student.first_name} ${student.last_name}`.trim() : 'A student';
+    const course = await courseRepository.findById(existing.course_id);
+    const courseName = course ? course.course_name : `Course #${existing.course_id}`;
+
     try {
-        const student = await studentRepository.findById(existing.student_id);
         const studentUserId = student?.user_id || (user?.role === 'student' ? user.id : null);
-        const studentName = student ? `${student.first_name} ${student.last_name}`.trim() : 'A student';
 
         if (studentUserId) {
             await notificationService.notifyUser(studentUserId, {
@@ -147,6 +163,16 @@ const dropEnrollment = async (id, user) => {
     } catch (err) {
         console.error("Notification error:", err.message);
     }
+
+    await activityLogService.logActivity({
+        userId: user.id,
+        action: 'ENROLLMENT_DROP',
+        entityType: 'enrollment',
+        entityId: enroll_id,
+        description: user.role === 'admin'
+            ? `Admin dropped ${studentName} from course '${courseName}'`
+            : `${studentName} withdrew from course '${courseName}'`
+    });
 
     return dropped;
 };

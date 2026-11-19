@@ -5,8 +5,8 @@ const notificationService = require('./notification.service');
 const authValidator = require('../validators/auth.validator');
 const generateToken = require('../utils/generateToken');
 const AppError = require('../utils/AppError');
+const activityLogService = require('./activityLog.service');
 
-// 1. Register User (Automatically creates linked Student profile if role is 'student')
 const registerUser = async (userData) => {
     authValidator.validateUser(userData);
 
@@ -78,7 +78,6 @@ const registerUser = async (userData) => {
     };
 };
 
-// 2. Login User
 const loginUser = async (credentials) => {
     authValidator.validateLogin(credentials);
 
@@ -113,7 +112,6 @@ const loginUser = async (credentials) => {
     };
 };
 
-// 3. Get Logged-in Profile (Admin or Student)
 const getProfile = async (userId) => {
     const user = await authRepository.findUserById(userId);
     if (!user) {
@@ -131,7 +129,6 @@ const getProfile = async (userId) => {
     };
 };
 
-// 4. Update Profile (Admin or Student) - Email is strictly locked
 const updateProfile = async (userId, updateData) => {
     const user = await authRepository.findUserById(userId);
     if (!user) {
@@ -183,7 +180,7 @@ const updateProfile = async (userId, updateData) => {
     }
 
     try {
-        await notificationService.notifyUser(newUser.id, {
+        await notificationService.notifyUser(userId, {
             title: "Profile Update",
             message: "Your account has been updated successfully",
             type: "Update"
@@ -191,6 +188,15 @@ const updateProfile = async (userId, updateData) => {
     } catch (err) {
         console.error("Notification error:", err.message);
     }
+    await activityLogService.logActivity({
+        userId: userId,
+        action: "PROFILE_UPDATED",
+        entityType: "User",
+        entityId: updatedStudent ? updatedStudent.id : userId,
+        description: user.role === "admin"
+            ? `Admin updated their profile`
+            : `Student updated their profile`
+    });
 
     return {
         user: updatedUser,
@@ -206,6 +212,15 @@ const deleteAccount = async (userId) => {
     }
 
     await authRepository.deleteUserById(userId);
+    await activityLogService.logActivity({
+        userId: userId,
+        action: "PROFILE_DELETED",
+        entityType: "User",
+        entityId: userId,
+        description: user.role === "admin"
+            ? `Admin deleted their profile`
+            : `Student deleted their profile`
+    });
     return { message: 'User account deleted successfully' };
 };
 
