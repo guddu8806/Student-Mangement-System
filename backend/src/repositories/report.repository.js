@@ -117,11 +117,11 @@ const getDetailedEnrollmentRoster = async ({ courseId, startDate, endDate } = {}
     }
     if (startDate) {
         params.push(startDate);
-        query += ` AND e.enrollment_date >= $${params.length}`;
+        query += ` AND e.enrollment_date >= $${params.length}::date`;
     }
     if (endDate) {
         params.push(endDate);
-        query += ` AND e.enrollment_date <= $${params.length}`;
+        query += ` AND e.enrollment_date < ($${params.length}::date + INTERVAL '1 day')`;
     }
 
     query += ` ORDER BY e.enrollment_date DESC;`;

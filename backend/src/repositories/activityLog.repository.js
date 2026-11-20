@@ -19,22 +19,21 @@ const createActivityLog = async (data) => {
 };
 
 const getFilteredActivityLogs = async ({ page = 1, limit = 10, action, userId, startDate, endDate, search } = {}) => {
-    const offset = (Number(page) - 1) * Number(limit);
+    const parsedPage = Math.max(1, Number(page) || 1);
+    const parsedLimit = Math.max(1, Number(limit) || 10);
+    const offset = (parsedPage - 1) * parsedLimit;
     const conditions = [];
     const values = [];
     if (action && action !== 'all') {
-        if (action === 'PROFILE_UPDATED') {
-            conditions.push(`al.action IN ('PROFILE_UPDATED', 'ADMIN_UPDATED')`);
-        } else if (action === 'PROFILE_DELETED') {
-            conditions.push(`al.action IN ('PROFILE_DELETED', 'ADMIN_DELETED')`);
-        } else if (action === 'STUDENT_UPDATE') {
-            conditions.push(`al.action IN ('STUDENT_UPDATE', 'STUDENT_UPDATED')`);
-        } else if (action === 'STUDENT_DELETE') {
-            conditions.push(`al.action IN ('STUDENT_DELETE', 'STUDENT_DELETED')`);
-        } else {
-            values.push(action);
-            conditions.push(`al.action = $${values.length}`);
-        }
+        const legacyActionMap = {
+            'PROFILE_UPDATED': ['PROFILE_UPDATED', 'ADMIN_UPDATED'],
+            'PROFILE_DELETED': ['PROFILE_DELETED', 'ADMIN_DELETED'],
+            'STUDENT_UPDATE': ['STUDENT_UPDATE', 'STUDENT_UPDATED'],
+            'STUDENT_DELETE': ['STUDENT_DELETE', 'STUDENT_DELETED']
+        };
+        const targetActions = legacyActionMap[action] || [action];
+        values.push(targetActions);
+        conditions.push(`al.action = ANY($${values.length}::text[])`);
     }
     if (userId && userId !== 'all') {
         values.push(Number(userId));
@@ -42,17 +41,25 @@ const getFilteredActivityLogs = async ({ page = 1, limit = 10, action, userId, s
     }
     if (startDate) {
         values.push(startDate);
-        conditions.push(`al.created_at >= $${values.length}::timestamp`);
+        conditions.push(`al.created_at >= $${values.length}::date`);
     }
 
     if (endDate) {
-        values.push(`${endDate} 23:59:59`);
-        conditions.push(`al.created_at <= $${values.length}::timestamp`);
+        values.push(endDate);
+        conditions.push(`al.created_at < ($${values.length}::date + INTERVAL '1 day')`);
     }
 
-    if (search && search.trim() !== '') {
+    const hasSearch = Boolean(search && search.trim() !== '');
+    if (hasSearch) {
         values.push(`%${search.trim()}%`);
-        conditions.push(`(al.description ILIKE $${values.length} OR al.action ILIKE $${values.length} OR al.entity_type ILIKE $${values.length} OR u.name ILIKE $${values.length} OR u.email ILIKE $${values.length})`);
+        const searchIdx = values.length;
+        conditions.push(`(
+            al.description ILIKE $${searchIdx} OR 
+            al.action ILIKE $${searchIdx} OR 
+            al.entity_type ILIKE $${searchIdx} OR 
+            u.name ILIKE $${searchIdx} OR 
+            u.email ILIKE $${searchIdx}
+        )`);
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
@@ -72,12 +79,12 @@ const getFilteredActivityLogs = async ({ page = 1, limit = 10, action, userId, s
     const countQuery = `
         SELECT COUNT(*)::int AS total
         FROM activity_logs al
-        LEFT JOIN users u ON al.user_id = u.id
+        ${hasSearch ? 'LEFT JOIN users u ON al.user_id = u.id' : ''}
         ${whereClause}
     `;
 
     const [dataResult, countResult] = await Promise.all([
-        pool.query(dataQuery, [...values, Number(limit), offset]),
+        pool.query(dataQuery, [...values, parsedLimit, offset]),
         pool.query(countQuery, values)
     ]);
 
@@ -86,9 +93,9 @@ const getFilteredActivityLogs = async ({ page = 1, limit = 10, action, userId, s
     return {
         logs: dataResult.rows,
         total,
-        page: Number(page),
-        limit: Number(limit),
-        totalPages: Math.ceil(total / Number(limit)) || 1
+        page: parsedPage,
+        limit: parsedLimit,
+        totalPages: total === 0 ? 0 : Math.ceil(total / parsedLimit)
     };
 };
 
@@ -105,9 +112,11 @@ const getActivityLogById = async (id) => {
 
 const getFilterOptions = async () => {
     const usersQuery = `
-        SELECT DISTINCT u.id, u.name, u.email, u.role
+        SELECT u.id, u.name, u.email, u.role
         FROM users u
-        INNER JOIN activity_logs al ON u.id = al.user_id
+        WHERE EXISTS (
+            SELECT 1 FROM activity_logs al WHERE al.user_id = u.id
+        )
         ORDER BY u.name ASC
     `;
     const actionsQuery = `SELECT DISTINCT action FROM activity_logs ORDER BY action ASC`;

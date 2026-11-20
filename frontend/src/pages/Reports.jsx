@@ -13,37 +13,55 @@ export default function Reports() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
+
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedCourse, setSelectedCourse] = useState("all");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 8;
 
-    const loadData = async () => {
-        try {
-            setLoading(true);
-            setError("");
-            const [overview, rosterData] = await Promise.all([getReportAnalytics(), getReportRoster(),]);
-            setAnalytics(overview);
-            setRoster(rosterData);
-        } catch (err) {
-            console.error("Failed to load reports", err);
-            setError("Unable to load reports data. Please ensure the backend server is running.");
-        } finally {
-            setLoading(false);
-        }
-    };
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
 
     useEffect(() => {
-        loadData();
+        let isMounted = true;
+        const load = async () => {
+            try {
+                setLoading(true);
+                setError("");
+                const [overview, rosterData] = await Promise.all([getReportAnalytics(), getReportRoster()]);
+                if (isMounted) {
+                    setAnalytics(overview);
+                    setRoster(rosterData);
+                }
+            } catch (err) {
+                if (isMounted) {
+                    console.error("Failed to load reports", err);
+                    setError("Unable to load reports data. Please ensure the backend server is running.");
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            }
+        };
+        load();
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
     // Filtered Roster: combines Search, Course, and Date Range
     const filteredRoster = useMemo(() => {
         return roster.filter((item) => {
-            const q = searchTerm.toLowerCase().trim();
+            const q = debouncedSearchTerm.toLowerCase().trim();
             const matchesSearch =!q ||
                 (item.student_name && item.student_name.toLowerCase().includes(q)) ||
                 (item.student_email && item.student_email.toLowerCase().includes(q)) ||
@@ -64,11 +82,7 @@ export default function Reports() {
 
             return matchesSearch && matchesCourse && matchesStartDate && matchesEndDate;
         });
-    }, [roster, searchTerm, selectedCourse, startDate, endDate]);
-
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchTerm, selectedCourse, startDate, endDate]);
+    }, [roster, debouncedSearchTerm, selectedCourse, startDate, endDate]);
 
     const totalPages = Math.ceil(filteredRoster.length / pageSize) || 1;
     const paginatedRoster = useMemo(() => {
@@ -78,9 +92,11 @@ export default function Reports() {
 
     const handleClearFilters = () => {
         setSearchTerm("");
+        setDebouncedSearchTerm("");
         setSelectedCourse("all");
         setStartDate("");
         setEndDate("");
+        setCurrentPage(1);
     };
 
     const kpis = analytics?.kpis || {};
@@ -129,14 +145,14 @@ export default function Reports() {
                 <div className="my-5 rounded-2xl border border-gray-200 bg-white shadow-xs dark:border-gray-800 dark:bg-gray-900">
                     <ReportFilters
                         searchTerm={searchTerm}
-                        onSearchChange={setSearchTerm}
+                        onSearchChange={(val) => { setSearchTerm(val); setCurrentPage(1); }}
                         selectedCourse={selectedCourse}
-                        onCourseChange={setSelectedCourse}
+                        onCourseChange={(val) => { setSelectedCourse(val); setCurrentPage(1); }}
                         courses={enrollmentByCourse}
                         startDate={startDate}
-                        onStartDateChange={setStartDate}
+                        onStartDateChange={(val) => { setStartDate(val); setCurrentPage(1); }}
                         endDate={endDate}
-                        onEndDateChange={setEndDate}
+                        onEndDateChange={(val) => { setEndDate(val); setCurrentPage(1); }}
                         onClearFilters={handleClearFilters}
                         filteredRoster={filteredRoster}
                         filteredCount={filteredRoster.length}

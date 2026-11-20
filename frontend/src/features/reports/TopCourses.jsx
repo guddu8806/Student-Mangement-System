@@ -40,11 +40,11 @@ export default function TopCourses({ data = [], loading = false, title = "Top Co
 
         <div>
           <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-            Top Courses
+            {title}
           </h2>
 
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Courses categorized by highest enrollments
+            {description}
           </p>
         </div>
 

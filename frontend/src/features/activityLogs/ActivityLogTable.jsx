@@ -1,5 +1,4 @@
-import React from "react";
-import {ChevronLeft,ChevronRight,Activity,} from "lucide-react";
+import { ChevronLeft, ChevronRight, Activity } from "lucide-react";
 
 const ActivityTable = ({ activities = [],totalCount = 0,currentPage = 1,totalPages = 1,pageSize = 10,onPageChange = () => {},}) => {
   const getActionStyle = (action = "") => {
@@ -54,23 +53,20 @@ const ActivityTable = ({ activities = [],totalCount = 0,currentPage = 1,totalPag
   const endItem = Math.min(currentPage * pageSize, totalCount);
 
   const getPageNumbers = () => {
-    if (totalPages <= 5) {
-      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    if(totalPages <= 1) return [];
+    if(totalPages <= 5){
+      return Array.from({length:totalPages} , (_,i) => i+1);
     }
-
     const pages = [];
-    if (currentPage > 2) pages.push(1);
-    if (currentPage > 3) pages.push("...");
+    if(currentPage > 2) pages.push(1);
+    if(currentPage > 3) pages.push("...");
 
-    const start = Math.max(1, currentPage - 1);
-    const end = Math.min(totalPages, currentPage + 1);
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
+    const start = Math.max(1 , currentPage-1);
+    const end = Math.min(totalPages , currentPage+1);
+    for(let i = start; i <= end; i++) pages.push(i);
 
-    if (currentPage < totalPages - 2) pages.push("...");
-    if (currentPage < totalPages - 1) pages.push(totalPages);
-
+    if(currentPage < totalPages - 2) pages.push("...");
+    if(currentPage < totalPages -1) pages.push(totalPages);
     return [...new Set(pages)];
   };
 
@@ -138,7 +134,7 @@ const ActivityTable = ({ activities = [],totalCount = 0,currentPage = 1,totalPag
                     </div>
                   </td>
 
-                  <td className="whitespace-nowrap  py-4">
+                  <td className="whitespace-nowrap px-5 py-4">
                     <span
                       className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold ${getActionStyle(
                         log.action
@@ -188,7 +184,7 @@ const ActivityTable = ({ activities = [],totalCount = 0,currentPage = 1,totalPag
             type="button"
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage <= 1}
-            className="rounded-lg border border-gray-200 p-2 text-gray-500 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800"
+            className="rounded-lg cursor-pointer border border-gray-200 p-2 text-gray-500 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800"
             title="Previous page"
           >
             <ChevronLeft size={16} />
@@ -207,7 +203,7 @@ const ActivityTable = ({ activities = [],totalCount = 0,currentPage = 1,totalPag
                 key={pageItem}
                 type="button"
                 onClick={() => onPageChange(pageItem)}
-                className={`min-w-8 rounded-lg px-2.5 py-1.5 text-xs font-medium transition ${
+                className={`min-w-8 cursor-pointer rounded-lg px-2.5 py-1.5 text-xs font-medium transition ${
                   pageItem === currentPage
                     ? "bg-indigo-600 text-white shadow-sm"
                     : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
@@ -222,7 +218,7 @@ const ActivityTable = ({ activities = [],totalCount = 0,currentPage = 1,totalPag
             type="button"
             onClick={() => onPageChange(currentPage + 1)}
             disabled={currentPage >= totalPages || totalPages === 0}
-            className="rounded-lg border border-gray-200 p-2 text-gray-500 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800"
+            className="rounded-lg border cursor-pointer border-gray-200 p-2 text-gray-500 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-800"
             title="Next page"
           >
             <ChevronRight size={16} />

@@ -1,4 +1,3 @@
-// frontend/src/components/layout/Navbar.jsx
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { GraduationCap, Sun, Moon, Menu, X } from "lucide-react";
