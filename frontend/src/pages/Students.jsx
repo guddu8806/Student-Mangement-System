@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
-import { UserPlus, Search, FileSpreadsheet } from "lucide-react";
+import { UserPlus, Search } from "lucide-react";
 import { createStudent, deleteStudent, getAllStudents, updateStudent, notEnrolledStudents as notEnrollApi } from "../services/api/student.api";
 import StudentForm from "../features/students/StudentForm";
 import StudentTable from "../features/students/StudentTable";
 import { getAllCourses } from "../services/api/course.api";
 import { getAllEnrollments } from "../services/api/enrollment.api";
-import exportToCsv from "../config/exportoCsv";
 
 function Students() {
   const [students, setStudents] = useState([]);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,6 +19,13 @@ function Students() {
   const [enrollmentFilter, setEnrollmentFilter] = useState("all");
   const [courses, setCourses] = useState([]);
   const [enrollments, setEnrollments] = useState([]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   useEffect(() => {
     let active = true;
@@ -104,7 +111,7 @@ function Students() {
   });
 
   const filteredStudents = studentsByStatus.filter((student) => {
-    const query = search.toLowerCase();
+    const query = debouncedSearch.toLowerCase();
     const fullName = `${student.first_name || student.firstName || ""} ${student.last_name || student.lastName || ""}`.toLowerCase();
     const email = (student.email || "").toLowerCase();
     const phone = (student.phone || "").toLowerCase();

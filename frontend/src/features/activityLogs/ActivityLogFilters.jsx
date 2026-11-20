@@ -1,10 +1,4 @@
-import React from "react";
-import {
-  Filter,
-  Search,
-  RotateCcw,
-  X,
-} from "lucide-react";
+import { Filter, Search, RotateCcw, X } from "lucide-react";
 
 const STUDENT_ACTIONS = [
   { value: "ENROLLMENT_CREATE", label: "Enrollment Created" },
@@ -15,6 +9,7 @@ const STUDENT_ACTIONS = [
 
 const ADMIN_ACTIONS = [
   { value: "COURSE_CREATE", label: "Course Created" },
+  { value:"COURSE_DELETE" , label:"Course Deleted"},
   { value: "COURSE_UPDATE", label: "Course Updated" },
   { value: "ENROLLMENT_DROP", label: "Enrollment Dropped" },
   { value: "PROFILE_DELETED", label: "Profile Deleted" },
@@ -26,11 +21,12 @@ const ADMIN_ACTIONS = [
 
 const ActivityLogFilter = ({
   userRole = "student",
+  currentUser,
   search = "",
   onSearchChange = () => {},
   action = "all",
   onActionChange = () => {},
-  userId = "all",
+  userId = "",
   onUserChange = () => {},
   startDate = "",
   onStartDateChange = () => {},
@@ -42,10 +38,11 @@ const ActivityLogFilter = ({
   const isAdmin = userRole === "admin";
   const availableActions = isAdmin ? ADMIN_ACTIONS : STUDENT_ACTIONS;
 
+  const defaultUserId = currentUser?.id ? String(currentUser.id) : "";
   const hasActiveFilters = Boolean(
     (search && search.trim() !== "") ||
     action !== "all" ||
-    (isAdmin && userId !== "all") ||
+    (isAdmin && userId !== defaultUserId && userId !== "") ||
     startDate ||
     endDate
   );
@@ -143,17 +140,24 @@ const ActivityLogFilter = ({
             </label>
 
             <select
-              value={userId}
+              value={userId || defaultUserId}
               onChange={(e) => onUserChange(e.target.value)}
               className="w-full cursor-pointer rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 transition focus:border-indigo-500  focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-indigo-400"
             >
-              <option value="all">All Users</option>
+              {currentUser && (
+                <option value={String(currentUser.id)}>
+                  My Activities 
+                </option>
+              )}
               {filterOptions.users &&
-                filterOptions.users.map((u) => (
-                  <option key={u.id} value={u.id}>
-                    {u.name} ({u.role || "user"})
-                  </option>
-                ))}
+                filterOptions.users
+                .filter((u) => String(u.id) !== String(currentUser?.id))
+                .map((u) => (
+                  <option key={u.id} value={String(u.id)}>
+                      {u.name} 
+                    </option>
+              ))}
+              <option value="all">All Users</option>
             </select>
           </div>
         )}

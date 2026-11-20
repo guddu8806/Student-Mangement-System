@@ -29,7 +29,23 @@ export const NotificationProvider = ({ children }) => {
         if (!token || !user) {
             return;
         }
-        fetchNotifications();
+        let isMounted = true;
+        const load = async () => {
+            setLoading(true);
+            try {
+                const data = await getNotifications();
+                if (isMounted) {
+                    setNotifications(data.notifications || []);
+                    setUnreadCount(data.unreadCount || 0);
+                }
+            } catch (err) {
+                if (isMounted) console.error("Error fetching notifications: ", err);
+            } finally {
+                if (isMounted) setLoading(false);
+            }
+        };
+        load();
+
         socket.connect();
         const handleNewNotification = (newNotif) => {
             console.log("New notification received:", newNotif);
@@ -41,10 +57,11 @@ export const NotificationProvider = ({ children }) => {
         };
         socket.on("notification:new", handleNewNotification);
         return () => {
+            isMounted = false;
             socket.off("notification:new", handleNewNotification);
             socket.disconnect();
         };
-    }, [token, user?.id]);
+    }, [token, user]);
 
     const markAsRead = async (id) => {
         try {

@@ -13,7 +13,7 @@ export default function DashboardLayout() {
 
       <div className="flex pt-16">
         <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-        <main className="flex-1 overflow-x-hidden min-w-0">
+        <main className="flex-1 overflow-x-hidden min-w-0"> 
           <Outlet />
         </main>
       </div>

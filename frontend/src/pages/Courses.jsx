@@ -8,6 +8,7 @@ import {useAuth} from "../context/AuthContext";
 function Courses() {
   const [courses, setCourses] = useState([]);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,6 +18,13 @@ function Courses() {
 
   const isLoggedIn = Boolean(token);
   const isUser = isLoggedIn && user?.role === "admin";
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   useEffect(() => {
     let active = true;
@@ -95,7 +103,7 @@ function Courses() {
     }
   };
 
-  const query = search.trim().toLowerCase();
+  const query = debouncedSearch.trim().toLowerCase();
   const filteredCourses = courses.filter((course) =>
     [course.course_name, course.course_code, course.description]
       .filter(Boolean)

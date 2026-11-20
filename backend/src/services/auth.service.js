@@ -210,8 +210,6 @@ const deleteAccount = async (userId) => {
     if (!user) {
         throw new AppError('User not found', 404);
     }
-
-    await authRepository.deleteUserById(userId);
     await activityLogService.logActivity({
         userId: userId,
         action: "PROFILE_DELETED",
@@ -221,6 +219,7 @@ const deleteAccount = async (userId) => {
             ? `Admin deleted their profile`
             : `Student deleted their profile`
     });
+    await authRepository.deleteUserById(userId);
     return { message: 'User account deleted successfully' };
 };
 

@@ -25,9 +25,7 @@ export default function ReportKPIs({ kpis = {}, loading = false }) {
 
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-      {cards.map((card) => {
-        const Icon = card.icon;
-        return (
+      {cards.map((card) => (
           <div
             key={card.label}
             className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 shadow-xs transition-all hover:shadow-sm dark:border-gray-800 dark:bg-gray-900"
@@ -49,8 +47,7 @@ export default function ReportKPIs({ kpis = {}, loading = false }) {
               className={`absolute inset-x-0 bottom-0 h-1 bg-linear-to-r ${card.borderGradient}`}
             />
           </div>
-        );
-      })}
+      ))}
     </div>
   );
 }

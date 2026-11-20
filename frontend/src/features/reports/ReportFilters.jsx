@@ -1,4 +1,4 @@
-import { Search, Calendar, FileSpreadsheet, X, Filter } from "lucide-react";
+import { Search, Calendar, FileSpreadsheet, X } from "lucide-react";
 import exportToCsv from "../../config/exportoCsv";
 
 export default function ReportFilters({ searchTerm = "", onSearchChange,selectedCourse = "all", onCourseChange, courses = [], startDate = "", onStartDateChange, endDate = "", onEndDateChange, onClearFilters, filteredRoster, filteredCount = 0,}) {

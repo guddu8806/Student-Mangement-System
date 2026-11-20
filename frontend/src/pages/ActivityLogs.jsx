@@ -1,6 +1,5 @@
-// frontend/src/pages/ActivityLogs.jsx
 import { useState, useEffect, useCallback } from "react";
-import { Activity, RefreshCw, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import ActivityLogFilter from "../features/activityLogs/ActivityLogFilters";
 import ActivityTable from "../features/activityLogs/ActivityLogTable";
 import { getActivityLogs, getActivityFilterOptions } from "../services/api/activityLog.api";
@@ -9,6 +8,7 @@ import { useAuth } from "../context/AuthContext";
 const ActivityLogs = () => {
   const { user } = useAuth();
   const userRole = user?.role || "student";
+  const currentUser = user;
 
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,9 +18,12 @@ const ActivityLogs = () => {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [action, setAction] = useState("all");
-  const [userId, setUserId] = useState("all");
+  const [userId, setUserId] = useState(user?.id ? String(user.id) : "");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+  const defaultUserId = currentUser?.id ? String(currentUser.id) : "";
+  const activeUserId = userId || defaultUserId;
 
   const [filterOptions, setFilterOptions] = useState({ users: [], actions: [] });
 
@@ -29,13 +32,18 @@ const ActivityLogs = () => {
   const [totalCount, setTotalCount] = useState(0);
   const pageSize = 10;
 
+  const [apiCount, setApiCount] = useState(0);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
       setCurrentPage(1);
-    }, 300);
+      setApiCount((prev) => prev + 1);
+    }, 700);
     return () => clearTimeout(timer);
   }, [search]);
+
+  
 
   useEffect(() => {
     async function loadOptions() {
@@ -62,7 +70,7 @@ const ActivityLogs = () => {
           limit: pageSize,
           ...(debouncedSearch.trim() && { search: debouncedSearch.trim() }),
           ...(action !== "all" && { action }),
-          ...(userId !== "all" && { userId }),
+          ...(activeUserId && { userId: activeUserId }),
           ...(startDate && { startDate }),
           ...(endDate && { endDate }),
         };
@@ -72,7 +80,7 @@ const ActivityLogs = () => {
           const timestamp = item.created_at ? new Date(item.created_at) : null;
           return {
             id: item.id,
-            user: item.user_name || "System",
+            user: item.user_name || "System / Deleted User",
             email: item.user_email || "N/A",
             action: item.action || "ACTIVITY",
             entity: item.entity_type
@@ -97,7 +105,7 @@ const ActivityLogs = () => {
 
         setLogs(formattedLogs);
         setCurrentPage(response?.page || 1);
-        setTotalPages(response?.totalPages || 1);
+        setTotalPages(response?.totalPages ?? 0);
         setTotalCount(response?.total || 0);
       } catch (err) {
         console.error("Failed to fetch activity logs:", err);
@@ -106,11 +114,20 @@ const ActivityLogs = () => {
         setLoading(false);
       }
     },
-    [debouncedSearch, action, userId, startDate, endDate, pageSize]
+    [debouncedSearch, action, activeUserId, startDate, endDate, pageSize]
   );
 
   useEffect(() => {
-    fetchLogs(currentPage);
+    let isMounted = true;
+    const runFetch = async () => {
+      if (isMounted) {
+        await fetchLogs(currentPage);
+      }
+    };
+    runFetch();
+    return () => {
+      isMounted = false;
+    };
   }, [fetchLogs, currentPage]);
 
   const handleActionChange = (val) => {
@@ -136,15 +153,17 @@ const ActivityLogs = () => {
   const handleResetFilters = () => {
     setSearch("");
     setAction("all");
-    setUserId("all");
+    setUserId("");
     setStartDate("");
     setEndDate("");
     setCurrentPage(1);
   };
+  console.log("Search Iteam: " , debouncedSearch);
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 dark:bg-gray-950 sm:p-6 lg:p-4">
       <div className="mx-auto max-w-7xl space-y-6">
+        {/* <div>API Trigger Count: {apiCount}</div> */}
         {error && (
           <div
             role="alert"
@@ -158,11 +177,12 @@ const ActivityLogs = () => {
 
         <ActivityLogFilter
           userRole={userRole}
+          currentUser={currentUser}
           search={search}
           onSearchChange={setSearch}
           action={action}
           onActionChange={handleActionChange}
-          userId={userId}
+          userId={activeUserId}
           onUserChange={handleUserChange}
           startDate={startDate}
           onStartDateChange={handleStartDateChange}

@@ -15,10 +15,18 @@ function Enrollments() {
   const [students, setStudents] = useState([]);
   const [courses, setCourses] = useState([]);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   useEffect(() => {
     let active = true;
@@ -107,7 +115,7 @@ function Enrollments() {
     }
   };
 
-  const query = search.trim().toLowerCase();
+  const query = debouncedSearch.trim().toLowerCase();
   const filteredEnrollments = enrollments.filter((item) => {
     const studentName = item.student_name || `${item.first_name || ""} ${item.last_name || ""}`;
     const courseName = item.course_name || "";
