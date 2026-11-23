@@ -8,8 +8,6 @@ router.use(verifyToken, requireAdmin);
 
 router.get("/stats", dashboardController.getDashboardStats);
 
-router.get("/students", dashboardController.getStudents);
-
 router.get("/courses", dashboardController.getCourses);
 
 router.get("/enrollments", dashboardController.getEnrollments);

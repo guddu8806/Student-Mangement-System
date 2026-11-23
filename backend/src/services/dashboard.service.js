@@ -4,19 +4,14 @@ const dashboardStats = async() =>{
     return await dashboardRepository.getDashboardStats();
 };
 
-const getAllStudents = async() =>{
-    return await dashboardRepository.getAllStudentsOnDashboard();
-};
-
-const getEnrollments = async() =>{
-    return await dashboardRepository.getAllEnrollments();
+const getEnrollments = async(options = {}) =>{
+    return await dashboardRepository.getAllEnrollments(options);
 };
 
 const getAllCourses = async() =>{
     return await dashboardRepository.getAllCourses();
 };
 
-
 module.exports = {
-    dashboardStats , getAllCourses , getAllStudents , getEnrollments
-}
+    dashboardStats, getAllCourses, getEnrollments
+};

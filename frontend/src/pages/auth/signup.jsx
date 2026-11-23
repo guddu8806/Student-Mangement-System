@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
-import { register as registerApi } from "../../services/api/auth.api";
+import { useRegister } from "../../hooks/queries/useAuth";
 
 function Signup() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const registerMutation = useRegister();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -15,8 +14,9 @@ function Signup() {
     role: "student",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const loading = registerMutation.isPending;
 
   const handleChange = (e) => {
     setFormData({
@@ -33,24 +33,12 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
 
     try {
-      const res = await registerApi(formData);
-      const user = res.user;
-      const token = res.token;
-      if (!user) {
-        throw new Error("Unable to retrieve user details from server.");
-      }
-
-      login(user, token);
+      await registerMutation.mutateAsync(formData);
       navigate("/dashboard");
     } catch (err) {
-      const resMsg = err?.response?.data?.message;
-      console.log(resMsg);
-      setError(resMsg);
-    } finally {
-      setLoading(false);
+      setError(err?.response?.data?.message || err?.message || "Failed to register.");
     }
   };
 

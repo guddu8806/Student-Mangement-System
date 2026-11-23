@@ -1,11 +1,14 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "./AuthContext";
 import { getNotifications, markAllNotificationsAsRead, markNotificationAsRead, deleteNotification } from "../services/api/notification.api";
+import { NOTIFICATION_KEYS } from "../hooks/queries/useNotifications";
 import socket from "../config/socket";
 
 const NotificationContext = createContext(null);
 
 export const NotificationProvider = ({ children }) => {
+    const queryClient = useQueryClient();
     const { token, user } = useAuth();
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
@@ -54,6 +57,7 @@ export const NotificationProvider = ({ children }) => {
                 ...prev.filter((item) => item.id !== newNotif.id)
             ]);
             setUnreadCount((prev) => prev + 1);
+            queryClient.invalidateQueries({ queryKey: NOTIFICATION_KEYS.all });
         };
         socket.on("notification:new", handleNewNotification);
         return () => {
@@ -61,13 +65,14 @@ export const NotificationProvider = ({ children }) => {
             socket.off("notification:new", handleNewNotification);
             socket.disconnect();
         };
-    }, [token, user]);
+    }, [token, user, queryClient]);
 
     const markAsRead = async (id) => {
         try {
             await markNotificationAsRead(id);
             setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)));
             setUnreadCount((prev) => Math.max(0, prev - 1));
+            queryClient.invalidateQueries({ queryKey: NOTIFICATION_KEYS.all });
         } catch (err) {
             console.error("Failed to mark as read: ", err);
         }
@@ -78,6 +83,7 @@ export const NotificationProvider = ({ children }) => {
             await markAllNotificationsAsRead();
             setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
             setUnreadCount(0);
+            queryClient.invalidateQueries({ queryKey: NOTIFICATION_KEYS.all });
         } catch (err) {
             console.error("Failed to mark all as read: ", err);
         }
@@ -91,6 +97,7 @@ export const NotificationProvider = ({ children }) => {
                 setUnreadCount((prev) => Math.max(0, prev - 1));
             }
             setNotifications((prev) => prev.filter((n) => n.id !== id));
+            queryClient.invalidateQueries({ queryKey: NOTIFICATION_KEYS.all });
         } catch (err) {
             console.error("Failed to delete notification: ", err);
         }

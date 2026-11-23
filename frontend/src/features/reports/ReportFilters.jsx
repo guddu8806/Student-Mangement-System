@@ -1,7 +1,21 @@
 import { Search, Calendar, FileSpreadsheet, X } from "lucide-react";
 import exportToCsv from "../../config/exportoCsv";
 
-export default function ReportFilters({ searchTerm = "", onSearchChange,selectedCourse = "all", onCourseChange, courses = [], startDate = "", onStartDateChange, endDate = "", onEndDateChange, onClearFilters, filteredRoster, filteredCount = 0,}) {
+export default function ReportFilters({
+  searchTerm = "",
+  onSearchChange,
+  selectedCourse = "all",
+  onCourseChange,
+  courses = [],
+  startDate = "",
+  onStartDateChange,
+  endDate = "",
+  onEndDateChange,
+  onClearFilters,
+  filteredRoster,
+  filteredCount = 0,
+  onExport,
+}) {
   const isAnyFilterActive = Boolean(searchTerm) || selectedCourse !== "all" || Boolean(startDate) || Boolean(endDate);
   const columns = [
             { key: "enrollment_id", label: "Enrollment ID" },
@@ -15,9 +29,13 @@ export default function ReportFilters({ searchTerm = "", onSearchChange,selected
         ];
   const timestamp = new Date().toISOString().split("T")[0];
 
-  const handleExport =()=>{
-    exportToCsv(filteredRoster, `enrollment_report_${timestamp}.csv`, columns)
-  }
+  const handleExport = () => {
+    if (onExport) {
+      onExport();
+    } else {
+      exportToCsv(filteredRoster, `enrollment_report_${timestamp}.csv`, columns);
+    }
+  };
 
   return (
     <div className="border-b border-gray-200 p-6 dark:border-gray-800">

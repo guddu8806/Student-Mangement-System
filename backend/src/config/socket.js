@@ -34,11 +34,9 @@ const initializeSocket = (server) => {
     io.on("connection", (socket) => {
         const userId = socket.user.id;
         socket.join(`user:${userId}`);
-        socket.join(`user: ${userId}`);
 
         if (socket.user.role === 'admin') {
             socket.join("role:admin");
-            socket.join("role: admin");
         }
 
         console.log(`User ${userId} connected.`);

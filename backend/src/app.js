@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const pool = require('./config/db');
+const compression = require('compression');
 const { notFound, errorHandler } = require('./middleware/error.middleware');
 
 const studentRoutes = require('./routes/student.route');
@@ -14,7 +14,7 @@ const activityLogRoutes = require('./routes/activityLog.route');
 
 
 const app = express();
-
+app.use(compression());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

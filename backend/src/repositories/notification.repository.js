@@ -23,15 +23,49 @@ const createAnnouncement = async(userIds, { title, message, type }) =>{
 
 
 
-const findByUserId = async (userId, { unreadOnly = false } = {}) => {
-    let query = `SELECT * FROM notifications WHERE user_id = $1`;
+const findByUserId = async (userId, { unreadOnly = false, page, limit } = {}) => {
+    let whereClause = `WHERE user_id = $1`;
     const values = [userId];
+
     if (unreadOnly) {
-        query += ` AND is_read = false`;
+        whereClause += ` AND is_read = false`;
     }
-    query += ` ORDER BY created_at DESC`;
-    const result = await pool.query(query, values);
-    return result.rows;
+
+    if (!page && !limit) {
+        const query = `SELECT * FROM notifications ${whereClause} ORDER BY created_at DESC`;
+        const result = await pool.query(query, values);
+        return result.rows;
+    }
+
+    const parsedPage = Math.max(1, Number(page) || 1);
+    const parsedLimit = Math.max(1, Number(limit) || 10);
+    const offset = (parsedPage - 1) * parsedLimit;
+
+    const dataQuery = `
+        SELECT * FROM notifications
+        ${whereClause}
+        ORDER BY created_at DESC
+        LIMIT $2 OFFSET $3
+    `;
+
+    const countQuery = `
+        SELECT COUNT(*)::int AS total FROM notifications ${whereClause}
+    `;
+
+    const [dataResult, countResult] = await Promise.all([
+        pool.query(dataQuery, [userId, parsedLimit, offset]),
+        pool.query(countQuery, values)
+    ]);
+
+    const total = countResult.rows[0]?.total || 0;
+
+    return {
+        notifications: dataResult.rows,
+        total,
+        page: parsedPage,
+        limit: parsedLimit,
+        totalPages: total === 0 ? 0 : Math.ceil(total / parsedLimit)
+    };
 };
 
 
@@ -89,6 +123,32 @@ const findAllStudentUserIds = async () => {
 };
 
 
+const createManyNotifications = async (userIds, { title, message, type }) => {
+    if (!userIds.length) return [];
+    const query = `
+        INSERT INTO notifications (
+            user_id,
+            title,
+            message,
+            type
+        )
+        SELECT
+            user_id,
+            $2,
+            $3,
+            $4
+        FROM UNNEST($1::INTEGER[]) AS user_id
+        RETURNING *
+    `;
+
+    const values = [userIds, title, message, type];
+
+    const result = await pool.query(query, values);
+
+    return result.rows;
+};
+
+
 module.exports = {
     createNotification,
     createAnnouncement,
@@ -100,4 +160,5 @@ module.exports = {
     findAdminUserIds,
     findStudentUserIdsByCourseId,
     findAllStudentUserIds,
+    createManyNotifications
 };

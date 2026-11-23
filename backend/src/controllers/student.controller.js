@@ -22,7 +22,7 @@ const createStudent = async (req, res, next) => {
 
 const getAllStudents = async(req, res, next) =>{
     try{
-        const students = await studentService.getAllStudents();
+        const students = await studentService.getAllStudents(req.query);
         res.status(200).json({
             success: true,
             message:"Students retrieved successfully",
@@ -76,7 +76,8 @@ const deleteStudent = async(req, res, next) =>{
 
 const notEnrolledStudents = async(req, res,next) =>{
     try{
-        const result = await studentService.notEnrolledStudents();
+        const { page, limit, search } = req.query;
+        const result = await studentService.notEnrolledStudents({ page, limit, search });
         res.status(200).json({
             success:true,
             message:"These students are not enrolled in any courses.",

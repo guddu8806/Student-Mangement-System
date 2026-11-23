@@ -1,6 +1,15 @@
 const notificationRepo = require('../repositories/notification.repository');
 const AppError = require('../utils/AppError');
 
+const emitNotifications = (notifications) => {
+    const io = global.io;
+    if (io && Array.isArray(notifications)) {
+        notifications.forEach((notif) => {
+            io.to(`user:${notif.user_id}`).emit('notification:new', notif);
+        });
+    }
+};
+
 const notifyUser = async (userId, { title, message, type }) => {
     const notification = await notificationRepo.createNotification({ user_id: userId, title, message, type });
     const io = global.io;
@@ -13,15 +22,12 @@ const notifyUser = async (userId, { title, message, type }) => {
 
 const notifyAdmins = async ({ title, message, type }) => {
     const adminIds = await notificationRepo.findAdminUserIds();
-    const notifications = [];
-    for (const adminId of adminIds) {
-        const notification = await notifyUser(adminId, {
-            title,
-            message,
-            type
-        });
-        notifications.push(notification);
-    }
+    if(!adminIds.length) return [];
+    const notifications = await notificationRepo.createManyNotifications(
+        adminIds,
+        { title, message, type }
+    );
+    emitNotifications(notifications);
     return notifications;
 };
 
@@ -29,15 +35,12 @@ const notifyAdmins = async ({ title, message, type }) => {
 // Send notification to students enrolled in a course
 const notifyCourseStudents = async (courseId, { title, message, type }) => {
     const studentUserIds = await notificationRepo.findStudentUserIdsByCourseId(courseId);
-    const notifications = [];
-    for (const userId of studentUserIds) {
-        const notification = await notifyUser(userId, {
-            title,
-            message,
-            type
-        });
-        notifications.push(notification);
-    }
+    if(!studentUserIds.length) return [];
+    const notifications = await notificationRepo.createManyNotifications(
+        studentUserIds,
+        { title, message, type }
+    );
+    emitNotifications(notifications);
     return notifications;
 };
 
@@ -45,29 +48,34 @@ const notifyCourseStudents = async (courseId, { title, message, type }) => {
 // Send notification to all students
 const notifyAllStudents = async ({ title, message, type }) => {
     const studentUserIds = await notificationRepo.findAllStudentUserIds();
-    const notifications = [];
-    for (const userId of studentUserIds) {
-        const notification = await notifyUser(userId, {
-            title,
-            message,
-            type
-        });
-
-        notifications.push(notification);
-    }
+    if(!studentUserIds.length) return [];
+    const notifications = await notificationRepo.createManyNotifications(
+        studentUserIds,
+        { title, message, type }
+    );
+    emitNotifications(notifications);
     return notifications;
 };
 
 
 // Get user notifications
-const getUserNotifications = async (userId, { unreadOnly = false } = {}) => {
-    const notifications = await notificationRepo.findByUserId(
+const getUserNotifications = async (userId, { unreadOnly = false, page, limit } = {}) => {
+    const unreadBool = unreadOnly === 'true' || unreadOnly === true;
+    const notificationsResult = await notificationRepo.findByUserId(
         userId,
-        { unreadOnly }
+        { unreadOnly: unreadBool, page, limit }
     );
     const unreadCount = await notificationRepo.getUnreadCount(userId);
+
+    if (notificationsResult && !Array.isArray(notificationsResult)) {
+        return {
+            ...notificationsResult,
+            unreadCount
+        };
+    }
+
     return {
-        notifications,
+        notifications: notificationsResult,
         unreadCount
     };
 };

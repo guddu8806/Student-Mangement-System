@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Trash2, Megaphone } from "lucide-react";
-import { getAllCourses } from "../../services/api/course.api";
-import { getAllEnrollments, deleteEnrollment } from "../../services/api/enrollment.api";
+import { useCourses } from "../../hooks/queries/useCourses";
+import { useEnrollments, useDeleteEnrollment } from "../../hooks/queries/useEnrollments";
 import { useAuth } from "../../context/AuthContext";
 import { useNotifications } from "../../context/NotificationContext";
 import WelcomeSection from "./WelcomeSection";
@@ -30,43 +30,21 @@ function checkDropStatus(dateStr, now) {
 }
 
 const StudentDashboard = () => {
-  const [courses, setCourses] = useState([]);
-  const [enrollments, setEnrollments] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentTime] = useState(() => Date.now());
-  const {user} = useAuth();
+  const { user } = useAuth();
   const { notifications } = useNotifications();
+
+  const { data: courses = [], isLoading: loadingCourses, error: coursesError } = useCourses();
+  const { data: enrollments = [], isLoading: loadingEnrollments, error: enrollmentsError } = useEnrollments();
+  const deleteMutation = useDeleteEnrollment();
+
+  const loading = loadingCourses || loadingEnrollments;
+  const displayError = error || (coursesError || enrollmentsError ? "Failed to load student data." : "");
 
   const announcements = notifications.filter(
     (n) => (n.type || "").toLowerCase().includes("announcement")
   );
-
-  console.log(user);
-  useEffect(() => {
-    let active = true;
-    async function loadStudentData() {
-      try {
-        const [coursesData, enrollmentsData] = await Promise.all([
-          getAllCourses(),
-          getAllEnrollments(),
-        ]);
-        if (!active) return;
-        setCourses(coursesData);
-        setEnrollments(enrollmentsData);
-      } catch {
-        if (active) {
-          setError("Failed to load student data.");
-        }
-      } finally {
-        if (active) setLoading(false);
-      }
-    }
-    loadStudentData();
-    return () => {
-      active = false;
-    };
-  }, []);
 
   const handleDrop = async (enrollmentId) => {
     if (!window.confirm("Are you sure you want to drop this course? Note: Courses can only be dropped within 24 hours of enrollment.")) {
@@ -74,8 +52,7 @@ const StudentDashboard = () => {
     }
     setError("");
     try {
-      await deleteEnrollment(enrollmentId);
-      setEnrollments((prev) => prev.filter((e) => (e.id ?? e.enrollment_id) !== enrollmentId));
+      await deleteMutation.mutateAsync(enrollmentId);
     } catch {
       setError("Failed to drop the course.");
     }
@@ -94,9 +71,9 @@ const StudentDashboard = () => {
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-4 text-slate-900 transition-colors dark:bg-gray-950 dark:text-slate-100 sm:px-6 lg:px-4">
       <div className="mx-auto max-w-7xl space-y-8">
-        {error && (
+        {displayError && (
           <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700 dark:border-rose-900/40 dark:bg-rose-950/40 dark:text-rose-300">
-            {error}
+            {displayError}
           </p>
         )}
 

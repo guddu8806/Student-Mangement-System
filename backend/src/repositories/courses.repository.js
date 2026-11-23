@@ -28,20 +28,72 @@ const findById = async(id) =>{
     return result.rows[0];
 }
 
-const findAll = async () => {
-    const query = `
+const findAll = async ({ page, limit, search } = {}) => {
+    const conditions = [];
+    const values = [];
+
+    if (search && search.trim()) {
+        values.push(`%${search.trim()}%`);
+        const idx = values.length;
+        conditions.push(`(c.course_name ILIKE $${idx} OR c.course_code ILIKE $${idx} OR c.description ILIKE $${idx})`);
+    }
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
+    if (!page && !limit) {
+        const query = `
+            SELECT 
+                c.*,
+                COUNT(e.id)::int AS enrolled_count,
+                GREATEST(0, (COALESCE(c.capacity, 30) - COUNT(e.id)))::int AS available_seats
+            FROM courses c
+            LEFT JOIN enrollments e ON c.id = e.course_id
+            ${whereClause}
+            GROUP BY c.id
+            ORDER BY c.id
+        `;
+        const result = await pool.query(query, values);
+        return result.rows;
+    }
+
+    const parsedPage = Math.max(1, Number(page) || 1);
+    const parsedLimit = Math.max(1, Number(limit) || 10);
+    const offset = (parsedPage - 1) * parsedLimit;
+
+    const dataQuery = `
         SELECT 
             c.*,
             COUNT(e.id)::int AS enrolled_count,
             GREATEST(0, (COALESCE(c.capacity, 30) - COUNT(e.id)))::int AS available_seats
         FROM courses c
         LEFT JOIN enrollments e ON c.id = e.course_id
+        ${whereClause}
         GROUP BY c.id
         ORDER BY c.id
+        LIMIT $${values.length + 1} OFFSET $${values.length + 2}
     `;
-    const result = await pool.query(query);
-    return result.rows;
-}
+
+    const countQuery = `
+        SELECT COUNT(*)::int AS total
+        FROM courses c
+        ${whereClause}
+    `;
+
+    const [dataResult, countResult] = await Promise.all([
+        pool.query(dataQuery, [...values, parsedLimit, offset]),
+        pool.query(countQuery, values)
+    ]);
+
+    const total = countResult.rows[0]?.total || 0;
+
+    return {
+        courses: dataResult.rows,
+        total,
+        page: parsedPage,
+        limit: parsedLimit,
+        totalPages: total === 0 ? 0 : Math.ceil(total / parsedLimit)
+    };
+};
 
 const update = async(id, courseData) =>{
     const allowedFields = ['course_code', 'course_name', 'description', 'credits', 'capacity'];

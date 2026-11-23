@@ -15,8 +15,8 @@ const getAnalytics = async (req, res, next) => {
 
 const getEnrollmentRoster = async (req, res, next) => {
     try {
-        const { courseId, startDate, endDate } = req.query;
-        const roster = await reportService.getDetailedRoster({ courseId, startDate, endDate });
+        const { courseId, startDate, endDate, page, limit, search } = req.query;
+        const roster = await reportService.getDetailedRoster({ courseId, startDate, endDate, page, limit, search });
         res.status(200).json({
             success: true,
             message: "Enrollment roster fetched successfully",
@@ -29,8 +29,8 @@ const getEnrollmentRoster = async (req, res, next) => {
 
 const exportCsv = async (req, res, next) => {
     try {
-        const { courseId, startDate, endDate } = req.query;
-        const csv = await reportService.generateCsvString({ courseId, startDate, endDate });
+        const { courseId, startDate, endDate, search } = req.query;
+        const csv = await reportService.generateCsvString({ courseId, startDate, endDate, search });
         
         const timestamp = new Date().toISOString().split("T")[0];
         const filename = `enrollment_report_${timestamp}.csv`;

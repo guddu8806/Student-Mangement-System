@@ -20,8 +20,8 @@ const createStudent = async(studentData,performedByUserId) => {
 }
 
 
-const getAllStudents = async () => {
-    return await studentRepository.findAll();
+const getAllStudents = async (query = {}) => {
+    return await studentRepository.findAll(query);
 }
 
 
@@ -82,8 +82,8 @@ const deleteStudent = async (id, performedByUserId) => {
     return { message: "Student deleted successfully" };
 };
 
-const notEnrolledStudents = async() =>{
-    return await studentRepository.notEnrolledStudent();
+const notEnrolledStudents = async(options = {}) =>{
+    return await studentRepository.notEnrolledStudent(options);
 };
 
 

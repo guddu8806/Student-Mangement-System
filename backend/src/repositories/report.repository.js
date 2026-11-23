@@ -91,8 +91,70 @@ const getReportKPIs = async () => {
 };
 
 
-const getDetailedEnrollmentRoster = async ({ courseId, startDate, endDate } = {}) => {
-    let query = `
+const getDetailedEnrollmentRoster = async ({ courseId, startDate, endDate, page, limit, search } = {}) => {
+    let whereClause = "WHERE 1=1";
+    const params = [];
+
+    if (courseId && courseId !== "all") {
+        params.push(courseId);
+        whereClause += ` AND c.id = $${params.length}`;
+    }
+    if (startDate) {
+        params.push(startDate);
+        whereClause += ` AND e.enrollment_date >= $${params.length}::date`;
+    }
+    if (endDate) {
+        params.push(endDate);
+        whereClause += ` AND e.enrollment_date < ($${params.length}::date + INTERVAL '1 day')`;
+    }
+    if (search && search.trim()) {
+        params.push(`%${search.trim()}%`);
+        const pIndex = params.length;
+        whereClause += ` AND (
+            CONCAT(s.first_name, ' ', s.last_name) ILIKE $${pIndex} OR
+            s.email ILIKE $${pIndex} OR
+            c.course_code ILIKE $${pIndex} OR
+            c.course_name ILIKE $${pIndex}
+        )`;
+    }
+
+    if (page === undefined && limit === undefined) {
+        const query = `
+            SELECT 
+                e.id AS enrollment_id,
+                e.enrollment_date,
+                s.id AS student_id,
+                CONCAT(s.first_name, ' ', s.last_name) AS student_name,
+                s.email AS student_email,
+                s.phone AS student_phone,
+                c.id AS course_id,
+                c.course_name,
+                c.course_code,
+                c.credits
+            FROM enrollments e
+            INNER JOIN students s ON e.student_id = s.id
+            INNER JOIN courses c ON e.course_id = c.id
+            ${whereClause}
+            ORDER BY e.enrollment_date DESC;
+        `;
+        const result = await pool.query(query, params);
+        return result.rows;
+    }
+
+    const parsedPage = Math.max(1, Number(page) || 1);
+    const parsedLimit = Math.max(1, Number(limit) || 10);
+    const offset = (parsedPage - 1) * parsedLimit;
+
+    const countQuery = `
+        SELECT COUNT(*)::int AS total
+        FROM enrollments e
+        INNER JOIN students s ON e.student_id = s.id
+        INNER JOIN courses c ON e.course_id = c.id
+        ${whereClause}
+    `;
+
+    const dataParams = [...params, parsedLimit, offset];
+    const dataQuery = `
         SELECT 
             e.id AS enrollment_id,
             e.enrollment_date,
@@ -107,27 +169,25 @@ const getDetailedEnrollmentRoster = async ({ courseId, startDate, endDate } = {}
         FROM enrollments e
         INNER JOIN students s ON e.student_id = s.id
         INNER JOIN courses c ON e.course_id = c.id
-        WHERE 1=1
+        ${whereClause}
+        ORDER BY e.enrollment_date DESC
+        LIMIT $${dataParams.length - 1} OFFSET $${dataParams.length};
     `;
-    const params = [];
 
-    if (courseId) {
-        params.push(courseId);
-        query += ` AND c.id = $${params.length}`;
-    }
-    if (startDate) {
-        params.push(startDate);
-        query += ` AND e.enrollment_date >= $${params.length}::date`;
-    }
-    if (endDate) {
-        params.push(endDate);
-        query += ` AND e.enrollment_date < ($${params.length}::date + INTERVAL '1 day')`;
-    }
+    const [countResult, dataResult] = await Promise.all([
+        pool.query(countQuery, params),
+        pool.query(dataQuery, dataParams)
+    ]);
 
-    query += ` ORDER BY e.enrollment_date DESC;`;
+    const total = countResult.rows[0]?.total || 0;
 
-    const result = await pool.query(query, params);
-    return result.rows;
+    return {
+        roster: dataResult.rows,
+        total,
+        page: parsedPage,
+        limit: parsedLimit,
+        totalPages: Math.ceil(total / parsedLimit) || 1
+    };
 };
 
 module.exports = {

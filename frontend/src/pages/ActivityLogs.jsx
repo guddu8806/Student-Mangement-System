@@ -1,18 +1,14 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { AlertCircle } from "lucide-react";
 import ActivityLogFilter from "../features/activityLogs/ActivityLogFilters";
 import ActivityTable from "../features/activityLogs/ActivityLogTable";
-import { getActivityLogs, getActivityFilterOptions } from "../services/api/activityLog.api";
+import { useActivityLogs, useActivityFilterOptions } from "../hooks/queries/useActivityLogs";
 import { useAuth } from "../context/AuthContext";
 
 const ActivityLogs = () => {
   const { user } = useAuth();
   const userRole = user?.role || "student";
   const currentUser = user;
-
-  const [logs, setLogs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   // Filters state
   const [search, setSearch] = useState("");
@@ -25,110 +21,64 @@ const ActivityLogs = () => {
   const defaultUserId = currentUser?.id ? String(currentUser.id) : "";
   const activeUserId = userId || defaultUserId;
 
-  const [filterOptions, setFilterOptions] = useState({ users: [], actions: [] });
-
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
   const pageSize = 10;
-
-  const [apiCount, setApiCount] = useState(0);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
       setCurrentPage(1);
-      setApiCount((prev) => prev + 1);
     }, 700);
     return () => clearTimeout(timer);
   }, [search]);
 
-  
+  // TanStack Query Hooks
+  const { data: filterOptions = { users: [], actions: [] } } = useActivityFilterOptions();
 
-  useEffect(() => {
-    async function loadOptions() {
-      try {
-        const options = await getActivityFilterOptions();
-        if (options) {
-          setFilterOptions(options);
-        }
-      } catch (err) {
-        console.error("Failed to load filter options:", err);
-      }
-    }
-    loadOptions();
-  }, []);
+  const queryParams = useMemo(() => ({
+    page: currentPage,
+    limit: pageSize,
+    ...(debouncedSearch.trim() && { search: debouncedSearch.trim() }),
+    ...(action !== "all" && { action }),
+    ...(activeUserId && { userId: activeUserId }),
+    ...(startDate && { startDate }),
+    ...(endDate && { endDate }),
+  }), [currentPage, pageSize, debouncedSearch, action, activeUserId, startDate, endDate]);
 
-  const fetchLogs = useCallback(
-    async (pageToLoad = 1) => {
-      try {
-        setLoading(true);
-        setError("");
+  const { data: logsResponse, isLoading: loading, error: queryError } = useActivityLogs(queryParams);
 
-        const params = {
-          page: pageToLoad,
-          limit: pageSize,
-          ...(debouncedSearch.trim() && { search: debouncedSearch.trim() }),
-          ...(action !== "all" && { action }),
-          ...(activeUserId && { userId: activeUserId }),
-          ...(startDate && { startDate }),
-          ...(endDate && { endDate }),
-        };
+  const error = queryError ? "Unable to load activity logs from server. Please try again." : "";
+  const totalPages = logsResponse?.totalPages ?? 0;
+  const totalCount = logsResponse?.total || 0;
 
-        const response = await getActivityLogs(params);
-        const formattedLogs = (response?.logs || []).map((item) => {
-          const timestamp = item.created_at ? new Date(item.created_at) : null;
-          return {
-            id: item.id,
-            user: item.user_name || "System / Deleted User",
-            email: item.user_email || "N/A",
-            action: item.action || "ACTIVITY",
-            entity: item.entity_type
-              ? item.entity_type.charAt(0).toUpperCase() + item.entity_type.slice(1)
-              : "General",
-            description: item.description || "—",
-            date: timestamp
-              ? timestamp.toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })
-              : "—",
-            time: timestamp
-              ? timestamp.toLocaleTimeString("en-US", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
-              : "—",
-          };
-        });
-
-        setLogs(formattedLogs);
-        setCurrentPage(response?.page || 1);
-        setTotalPages(response?.totalPages ?? 0);
-        setTotalCount(response?.total || 0);
-      } catch (err) {
-        console.error("Failed to fetch activity logs:", err);
-        setError("Unable to load activity logs from server. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [debouncedSearch, action, activeUserId, startDate, endDate, pageSize]
-  );
-
-  useEffect(() => {
-    let isMounted = true;
-    const runFetch = async () => {
-      if (isMounted) {
-        await fetchLogs(currentPage);
-      }
-    };
-    runFetch();
-    return () => {
-      isMounted = false;
-    };
-  }, [fetchLogs, currentPage]);
+  const logs = useMemo(() => {
+    return (logsResponse?.logs || []).map((item) => {
+      const timestamp = item.created_at ? new Date(item.created_at) : null;
+      return {
+        id: item.id,
+        user: item.user_name || "System / Deleted User",
+        email: item.user_email || "N/A",
+        action: item.action || "ACTIVITY",
+        entity: item.entity_type
+          ? item.entity_type.charAt(0).toUpperCase() + item.entity_type.slice(1)
+          : "General",
+        description: item.description || "—",
+        date: timestamp
+          ? timestamp.toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })
+          : "—",
+        time: timestamp
+          ? timestamp.toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : "—",
+      };
+    });
+  }, [logsResponse?.logs]);
 
   const handleActionChange = (val) => {
     setAction(val);

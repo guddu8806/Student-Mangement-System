@@ -1,19 +1,19 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
-import { login as loginApi } from "../../services/api/auth.api";
+import { useLogin } from "../../hooks/queries/useAuth";
 
 function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const loginMutation = useLogin();
 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const loading = loginMutation.isPending;
 
   const handleChange = (e) => {
     setFormData({
@@ -26,25 +26,12 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
 
     try {
-      const res = await loginApi(formData);
-      console.log(res);
-      const user = res.user;
-      const token = res.token;
-
-      if (!user) {
-        throw new Error("Unable to retrieve user details from server.");
-      }
-
-      login(user, token);
+      await loginMutation.mutateAsync(formData);
       navigate("/dashboard");
     } catch (err) {
-      const resMsg = err.message;
-      setError(resMsg);
-    } finally {
-      setLoading(false);
+      setError(err?.response?.data?.message || err?.message || "Failed to sign in.");
     }
   };
   // useEffect(() => {
