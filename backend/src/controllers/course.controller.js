@@ -21,7 +21,7 @@ const createCourse = async(req , res, next) =>{
 
 const getAllCourses = async(req, res, next) =>{
     try{
-        const courses = await courseService.getAllCourses();
+        const courses = await courseService.getAllCourses(req.query);
         res.status(200).json({
             success:true,
             message: "All courses retreived successfully",

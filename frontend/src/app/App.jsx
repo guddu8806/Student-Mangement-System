@@ -1,25 +1,27 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { AuthProvider } from "../context/AuthContext";
 import { NotificationProvider } from "../context/NotificationContext";
+import PageLoader from "../components/common/Loader";
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 import DashboardLayout from "../components/layout/DashboardLayout";
 
-import Home from "../pages/Home";
-import Dashboard from "../pages/Dashboard";
-import Reports from "../pages/Reports";
-import Students from "../pages/Students";
-import Courses from "../pages/Courses";
-import Enrollments from "../pages/Enrollments";
-import NotFound from "../pages/NotFound";
-import Profile from "../pages/Profile";
-import Login from "../pages/auth/login";
-import Signup from "../pages/auth/signup";
-import ActivityLog from "../pages/ActivityLogs";
+const Home = lazy(() => import("../pages/Home"));
+const Dashboard = lazy(() =>import("../pages/Dashboard"));
+const Reports = lazy(() => import("../pages/Reports"));
+const Students = lazy(() => import("../pages/Students"));
+const Courses = lazy(() => import("../pages/Courses"));
+const Enrollments = lazy(() => import("../pages/Enrollments"));
+const NotFound = lazy(() => import("../pages/NotFound"));
+const Profile = lazy(() => import("../pages/Profile"));
+const Login = lazy(() => import("../pages/auth/login"));
+const Signup = lazy(() => import("../pages/auth/signup"));
+const ActivityLog = lazy(() => import("../pages/ActivityLogs"));
+const Unauthorized = lazy(() => import("../pages/Unauthorized"));
 
 import ProtectedRoute from "../routes/ProtectedRoute";
 import PublicRoute from "../routes/PublicRoute";
-import Unauthorized from "../pages/Unauthorized";
 
 function PublicLayout() {
     return (
@@ -38,34 +40,36 @@ function App() {
         <AuthProvider>
             <NotificationProvider>
                 <BrowserRouter>
-                    <Routes>
-                        <Route element={<PublicLayout />}>
-                            <Route path="/" element={<Home />} />
+                    <Suspense fallback={<PageLoader/>}>
+                        <Routes>
+                            <Route element={<PublicLayout />}>
+                                <Route path="/" element={<Home />} />
 
-                            <Route element={<PublicRoute />}>
-                                <Route path="/login" element={<Login />} />
-                                <Route path="/signup" element={<Signup />} />
+                                <Route element={<PublicRoute />}>
+                                    <Route path="/login" element={<Login />} />
+                                    <Route path="/signup" element={<Signup />} />
+                                </Route>
+
+                                <Route path="/unauthorized" element={<Unauthorized />} />
+                                <Route path="*" element={<NotFound />} />
                             </Route>
 
-                            <Route path="/unauthorized" element={<Unauthorized />} />
-                            <Route path="*" element={<NotFound />} />
-                        </Route>
+                            <Route element={<ProtectedRoute />}>
+                                <Route element={<DashboardLayout />}>
+                                    <Route path="/dashboard" element={<Dashboard />} />
+                                    <Route path="/courses" element={<Courses />} />
+                                    <Route path="/enrollments" element={<Enrollments />} />
+                                    <Route path="/profile" element={<Profile />} />
+                                    <Route path="/activity-logs" element={<ActivityLog />} />
 
-                        <Route element={<ProtectedRoute />}>
-                            <Route element={<DashboardLayout />}>
-                                <Route path="/dashboard" element={<Dashboard />} />
-                                <Route path="/courses" element={<Courses />} />
-                                <Route path="/enrollments" element={<Enrollments />} />
-                                <Route path="/profile" element={<Profile />} />
-                                <Route path="/activity-logs" element={<ActivityLog />} />
-
-                                <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
-                                    <Route path="/students" element={<Students />} />
-                                    <Route path="/reports" element={<Reports />} />
+                                    <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+                                        <Route path="/students" element={<Students />} />
+                                        <Route path="/reports" element={<Reports />} />
+                                    </Route>
                                 </Route>
                             </Route>
-                        </Route>
-                    </Routes>
+                        </Routes>
+                    </Suspense>
                 </BrowserRouter>
             </NotificationProvider>
         </AuthProvider>

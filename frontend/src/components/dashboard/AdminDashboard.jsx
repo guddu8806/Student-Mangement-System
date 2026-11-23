@@ -1,85 +1,28 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import {Area, AreaChart, Bar, BarChart, CartesianGrid, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Megaphone } from "lucide-react";
-import { getDashboardCourses, getDashboardEnrollments, getDashboardStats, getDashboardStudents,} from "../../services/api/dashboard.api";
+import { useDashboardStats } from "../../hooks/queries/useDashboard";
 import { useAuth } from "../../context/AuthContext";
 import WelcomeSection from "./WelcomeSection";
 import AnnouncementModal from "../notifications/AnnouncementModal";
 
 function AdminDashboard() {
-  const [stats, setStats] = useState({ students: 0, courses: 0, enrollments: 0 });
-  const [students, setStudents] = useState([]);
-  const [enrollments, setEnrollments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [isAnnouncementOpen, setIsAnnouncementOpen] = useState(false);
-  const {user} = useAuth();
+  const { user } = useAuth();
 
-  useEffect(() => {
-    let active = true;
+  const { data: statsData, isLoading: loading, error: statsError } = useDashboardStats();
+  const error = statsError ? "Unable to Fetch the data !" : "";
 
-    async function loadDashboard() {
-      try {
-        const [statsData, studentsData, coursesData, enrollmentsData] = await Promise.all([getDashboardStats(),getDashboardStudents(),getDashboardCourses(),getDashboardEnrollments(),]);
-        if (!active) return;
+  const students = statsData?.recentStudents || [];
+  const stats = {
+    students: Number(statsData?.totalStudents || 0),
+    courses: Number(statsData?.totalCourses || 0),
+    enrollments: Number(statsData?.totalEnrollments || 0),
+  };
 
-        setStats({
-          students: Number(studentsData.length),
-          courses: Number(coursesData.length),
-          enrollments: Number(enrollmentsData.length)
-        });
-        setStudents(
-          statsData.recentStudents
-        );
-        setEnrollments(enrollmentsData);
-      } catch {
-        if (active) {
-          setError("Unable to Fetch the data !")
-        }
-      } finally {
-        if (active) setLoading(false);
-      }
-    }
-    loadDashboard();
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  const monthlyEnrollments = Object.values(
-    enrollments.reduce((months, enrollment) => {
-      if (!enrollment.enrollment_date) return months;
-
-      const date = new Date(enrollment.enrollment_date);
-      if (Number.isNaN(date.getTime())) return months;
-
-      const key = `${date.getFullYear()}-${date.getMonth()}`;
-      months[key] ??= {
-        month: date.toLocaleString("en-US", { month: "short", year: "2-digit" }),
-        enrollments: 0,
-        timestamp: date.getFullYear() * 12 + date.getMonth(),
-      };
-      months[key].enrollments += 1;
-      return months;
-    }, {})
-  )
-    .sort((a, b) => a.timestamp - b.timestamp)
-    .map(({ month, enrollments: count }) => ({ month, enrollments: count }));
-
-  const courseEnrollments = Object.values(
-    enrollments.reduce((courses, enrollment) => {
-      const courseId = enrollment.course_id;
-      const name = enrollment.course_name || courses[courseId]?.name || `Course #${courseId}`;
-      courses[courseId] ??= {
-        name,
-        course_code: enrollment.course_code || `C-${courseId}`,
-        enrollments: 0,
-      };
-      courses[courseId].enrollments += 1;
-      return courses;
-    }, {})
-  ).sort((a, b) => b.enrollments - a.enrollments);
+  const monthlyEnrollments = statsData?.monthlyEnrollments || [];
+  const courseEnrollments = statsData?.courseEnrollments || [];
 
   const metricCards = [
     { label: "Total Students", value: stats.students, link: "/students" },

@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Megaphone, X } from "lucide-react";
-import { sendAnnouncement } from "../../services/api/notification.api";
-import { getDashboardCourses } from "../../services/api/dashboard.api";
+import { useSendAnnouncement } from "../../hooks/queries/useNotifications";
+import { useDashboardCourses } from "../../hooks/queries/useDashboard";
 
 const TAGS = [
     { label: "General", prefix: "" },
@@ -14,18 +14,13 @@ const AnnouncementModal = ({ isOpen, onClose }) => {
     const [title, setTitle] = useState("");
     const [message, setMessage] = useState("");
     const [courseId, setCourseId] = useState("");
-    const [courses, setCourses] = useState([]);
     const [selectedTag, setSelectedTag] = useState("General");
-    const [sending, setSending] = useState(false);
     const [statusMsg, setStatusMsg] = useState({ error: "", success: "" });
 
-    useEffect(() => {
-        if (isOpen) {
-            getDashboardCourses()
-                .then((data) => setCourses(data || []))
-                .catch(() => {});
-        }
-    }, [isOpen]);
+    // TanStack Query Hooks
+    const { data: courses = [] } = useDashboardCourses();
+    const sendMutation = useSendAnnouncement();
+    const sending = sendMutation.isPending;
 
     if (!isOpen) return null;
 
@@ -37,16 +32,15 @@ const AnnouncementModal = ({ isOpen, onClose }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setSending(true);
         setStatusMsg({ error: "", success: "" });
 
         try {
-            const res = await sendAnnouncement({
+            const res = await sendMutation.mutateAsync({
                 title: title.trim(),
                 message: message.trim(),
                 courseId: courseId ? Number(courseId) : null,
             });
-            setStatusMsg({ error: "", success: res.message || "Announcement broadcasted successfully!" });
+            setStatusMsg({ error: "", success: res?.message || "Announcement broadcasted successfully!" });
             setTimeout(() => {
                 setTitle("");
                 setMessage("");
@@ -57,8 +51,6 @@ const AnnouncementModal = ({ isOpen, onClose }) => {
             }, 1200);
         } catch (err) {
             setStatusMsg({ error: err.response?.data?.message || "Failed to broadcast announcement", success: "" });
-        } finally {
-            setSending(false);
         }
     };
 

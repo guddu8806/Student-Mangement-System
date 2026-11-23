@@ -27,7 +27,7 @@ export const deleteStudent = async (id) => {
     return unwrap(res);
 };
 
-export const notEnrolledStudents = async() =>{
-    const resp = await apiClient.get(`/students/not_enrolled`);
+export const notEnrolledStudents = async (params = {}) => {
+    const resp = await apiClient.get(`/students/not_enrolled`, { params });
     return unwrap(resp);
-}
+};

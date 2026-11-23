@@ -27,15 +27,15 @@ const getStudentIdForUser = async (user) => {
 };
 
 const findAll = async (params = {}, user) => {
+    let studentId = params.student_id ? Number(params.student_id) : undefined;
     if (user && user.role === 'student') {
-        const studentId = await getStudentIdForUser(user);
-        return await enrollmentRepository.findByStudentId(studentId);
-    }
-    if (params && params.student_id) {
-        return await enrollmentRepository.findByStudentId(Number(params.student_id));
+        studentId = await getStudentIdForUser(user);
     }
 
-    return await enrollmentRepository.findAllEnrollment();
+    return await enrollmentRepository.findAllEnrollment({
+        ...params,
+        studentId
+    });
 };
 
 // Create enrollment: Student enrolls themselves; Admin can enroll any student
@@ -50,26 +50,14 @@ const createEnrollment = async (data, user) => {
         student_id: studentId,
         course_id: data.course_id
     };
-
     const errors = validateEnrollment(payload);
     if (Object.keys(errors).length > 0) {
         throw new AppError(errors, 400);
     }
 
-    // Check course capacity and available seats
-    const courseStatus = await enrollmentRepository.getCourseCapacityStatus(payload.course_id);
-    if (!courseStatus) {
-        throw new AppError("Course not found", 404);
-    }
-
-    if (courseStatus.enrolled_count >= courseStatus.capacity) {
-        throw new AppError(
-            `Course '${courseStatus.course_name}' has reached its maximum enrollment capacity (${courseStatus.capacity}/${courseStatus.capacity} seats filled).`,
-            400
-        );
-    }
-
-    const newEnrollment = await enrollmentRepository.createEnrollment(payload.student_id, payload.course_id);
+    // Atomic transaction: locks course row, checks capacity, checks duplicate, and inserts enrollment
+    const { enrollment: newEnrollment, course: courseStatus } =
+        await enrollmentRepository.createEnrollmentWithCapacityCheck(payload.student_id, payload.course_id);
 
     const student = await studentRepository.findById(payload.student_id);
     const studentName = student ? `${student.first_name} ${student.last_name}`.trim() : 'A student';

@@ -13,18 +13,7 @@ const getDashboardStats = async(req, res, next) =>{
     }
 };
 
-const getStudents = async(req, res, next) =>{
-    try{
-        const result = await dashboardService.getAllStudents();
-        res.status(200).json({
-            success:true,
-            message:"Students rendered successfully",
-            data:result
-        });
-    }catch(error){
-        next(error);
-    }
-};
+
 
 const getCourses = async(req, res, next) =>{
     try{
@@ -41,7 +30,8 @@ const getCourses = async(req, res, next) =>{
 
 const getEnrollments = async(req, res, next) =>{
     try{
-        const result = await dashboardService.getEnrollments();
+        const { page, limit } = req.query;
+        const result = await dashboardService.getEnrollments({ page, limit });
         res.status(200).json({
             success:true,
             message:"All Enrollments rendered successfully",
@@ -54,5 +44,5 @@ const getEnrollments = async(req, res, next) =>{
 
 
 module.exports = {
-    getDashboardStats , getCourses , getStudents ,getEnrollments
+    getDashboardStats , getCourses  ,getEnrollments
 }

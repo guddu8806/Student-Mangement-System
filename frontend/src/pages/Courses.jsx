@@ -1,23 +1,33 @@
-import { useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { Plus, Search } from "lucide-react";
-import { createCourse, deleteCourse, getAllCourses, updateCourse } from "../services/api/course.api";
+import {useCourses, useCreateCourse, useUpdateCourse,useDeleteCourse,} from "../hooks/queries/useCourses";
 import CourseForm from "../features/courses/CourseForm";
 import CourseTable from "../features/courses/CourseTable";
-import {useAuth} from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
+// import { useQueryClient } from "@tanstack/react-query";
 
 function Courses() {
-  const [courses, setCourses] = useState([]);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState(null);
-  const [saving, setSaving] = useState(false);
-  const { user ,token } = useAuth();
+  const { user, token } = useAuth();
 
   const isLoggedIn = Boolean(token);
   const isUser = isLoggedIn && user?.role === "admin";
+  // const queryClient = useQueryClient();
+  // console.log(
+  //   "Courses: ",queryClient.getQueryData(["courses"])
+  // );
+
+  // TanStack Query custom hooks
+  const { data: courses = [], isLoading: loading, error: queryError } = useCourses();
+  const createMutation = useCreateCourse();
+  const updateMutation = useUpdateCourse();
+  const deleteMutation = useDeleteCourse();
+
+  const saving = createMutation.isPending || updateMutation.isPending;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -25,24 +35,6 @@ function Courses() {
     }, 300);
     return () => clearTimeout(timer);
   }, [search]);
-
-  useEffect(() => {
-    let active = true;
-    async function load() {
-      try {
-        const response = await getAllCourses();
-        if (active) setCourses(response);
-      } catch {
-        if (active) setError("Failed to load courses from backend.");
-      } finally {
-        if (active) setLoading(false);
-      }
-    }
-    load();
-    return () => {
-      active = false;
-    };
-  }, []);
 
   const openModal = (course = null) => {
     setEditingCourse(course);
@@ -57,22 +49,13 @@ function Courses() {
   };
 
   const handleSubmit = async (courseData) => {
-    setSaving(true);
     setError("");
-
     try {
       if (editingCourse) {
-        const updated = await updateCourse(editingCourse.id, courseData);
-        setCourses((current) =>
-          current.map((course) =>
-            course.id === editingCourse.id ? { ...course, ...(updated || courseData) } : course
-          )
-        );
+        await updateMutation.mutateAsync({ id: editingCourse.id, courseData });
       } else {
-        const created = await createCourse(courseData);
-        setCourses((current) => [created, ...current]);
+        await createMutation.mutateAsync(courseData);
       }
-
       closeModal();
     } catch (requestError) {
       setError(
@@ -80,8 +63,6 @@ function Courses() {
         requestError?.message ||
         "Failed to save course."
       );
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -89,11 +70,9 @@ function Courses() {
     if (!window.confirm(`Delete "${course.course_name}"? This cannot be undone.`)) {
       return;
     }
-
     setError("");
     try {
-      await deleteCourse(course.id);
-      setCourses((current) => current.filter((item) => item.id !== course.id));
+      await deleteMutation.mutateAsync(course.id);
     } catch (requestError) {
       setError(
         requestError?.response?.data?.message ||
@@ -110,15 +89,17 @@ function Courses() {
       .some((value) => value.toLowerCase().includes(query))
   );
 
+  const displayError = error || (queryError ? "Failed to load courses from backend." : "");
+
   return (
     <main className="min-h-screen flex-1 bg-slate-50 px-8 py-4 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100 sm:px-6 lg:px-4">
       <div className="mx-auto max-w-7xl">
-        {error && !isModalOpen && (
+        {displayError && !isModalOpen && (
           <p
             role="alert"
             className="mb-5 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700 dark:border-rose-900/40 dark:bg-rose-950/30 dark:text-rose-300"
           >
-            {error}
+            {displayError}
           </p>
         )}
 

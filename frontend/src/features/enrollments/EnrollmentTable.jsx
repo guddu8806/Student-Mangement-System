@@ -153,7 +153,7 @@ function EnrollmentTable({
                       <button
                         type="button"
                         onClick={() => onDelete(item.enrollment_id || item.id)}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-100 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300 dark:hover:bg-rose-900/60"
+                        className="cursor-pointer inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-100 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-300 dark:hover:bg-rose-900/60"
                         title="Drop this course within the 24-hour window"
                       >
                         <Trash2 size={13} />

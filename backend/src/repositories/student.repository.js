@@ -25,10 +25,61 @@ const create = async (studentData) => {
     return result.rows[0];
 };
 
-const findAll = async () => {
-    const query = `SELECT * FROM students ORDER BY id`;
-    const result = await pool.query(query);
-    return result.rows;
+const findAll = async ({ page, limit, search } = {}) => {
+    if (!page && !limit) {
+        let query = `SELECT * FROM students`;
+        const values = [];
+        if (search && search.trim()) {
+            values.push(`%${search.trim()}%`);
+            query += ` WHERE (first_name ILIKE $1 OR last_name ILIKE $1 OR email ILIKE $1 OR phone ILIKE $1)`;
+        }
+        query += ` ORDER BY id`;
+        const result = await pool.query(query, values);
+        return result.rows;
+    }
+
+    const parsedPage = Math.max(1, Number(page) || 1);
+    const parsedLimit = Math.max(1, Number(limit) || 10);
+    const offset = (parsedPage - 1) * parsedLimit;
+
+    const conditions = [];
+    const values = [];
+
+    if (search && search.trim()) {
+        values.push(`%${search.trim()}%`);
+        const idx = values.length;
+        conditions.push(`(first_name ILIKE $${idx} OR last_name ILIKE $${idx} OR email ILIKE $${idx} OR phone ILIKE $${idx})`);
+    }
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
+    const dataQuery = `
+        SELECT * FROM students
+        ${whereClause}
+        ORDER BY id
+        LIMIT $${values.length + 1} OFFSET $${values.length + 2}
+    `;
+
+    const countQuery = `
+        SELECT COUNT(*)::int AS total
+        FROM students
+        ${whereClause}
+    `;
+
+    const [dataResult, countResult] = await Promise.all([
+        pool.query(dataQuery, [...values, parsedLimit, offset]),
+        pool.query(countQuery, values)
+    ]);
+
+    const total = countResult.rows[0]?.total || 0;
+
+    return {
+        students: dataResult.rows,
+        total,
+        page: parsedPage,
+        limit: parsedLimit,
+        totalPages: total === 0 ? 0 : Math.ceil(total / parsedLimit)
+    };
 };
 
 const findById = async (id) => {
@@ -104,36 +155,106 @@ const updateByUserId = async (userId, studentData) => {
     return result.rows[0];
 };
 
+
 const deleteById = async (id) => {
-    const checkQuery = `SELECT user_id FROM students WHERE id = $1`;
-    const checkResult = await pool.query(checkQuery, [id]);
-    if (checkResult.rows.length === 0) {
-        return false;
+    const client = await pool.connect();
+    try {
+        await client.query("BEGIN");
+        const checkQuery = `
+            SELECT user_id
+            FROM students
+            WHERE id = $1
+            FOR UPDATE
+        `;
+        const checkResult = await client.query(checkQuery, [id]);
+        if (checkResult.rows.length === 0) {
+            await client.query("ROLLBACK");
+            return false;
+        }
+        const userId = checkResult.rows[0].user_id;
+        const deleteStudentQuery = `
+            DELETE FROM students
+            WHERE id = $1
+            RETURNING *
+        `;
+        const deleteResult = await client.query(
+            deleteStudentQuery,
+            [id]
+        );
+        if (userId) {
+            await client.query(
+                `DELETE FROM users WHERE id = $1`,
+                [userId]
+            );
+        }
+        await client.query("COMMIT");
+        return deleteResult.rowCount > 0;
+    } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+    } finally {
+        client.release();
     }
-
-    const userId = checkResult.rows[0].user_id;
-
-    const query = `DELETE FROM students WHERE id = $1 RETURNING *`;
-    const value = [id];
-    const result = await pool.query(query, value);
-
-    // 3. If there was a linked user login, clean it up as well
-    if (userId) {
-        await pool.query(`DELETE FROM users WHERE id = $1`, [userId]);
-    }
-
-    return result.rowCount > 0;
 };
 
-const notEnrolledStudent = async() =>{
-//  not_enrolled
-    const query = `SELECT s.id , s.first_name , s.last_name, s.email, s.phone, s.created_at FROM students s
-        WHERE NOT EXISTS(
-        SELECT 1 FROM enrollments e WHERE e.student_id = s.id
-    )`;
 
-    const result = await pool.query(query);
-    return result.rows;
+const notEnrolledStudent = async({ page, limit, search } = {}) =>{
+    const conditions = [
+        `NOT EXISTS (SELECT 1 FROM enrollments e WHERE e.student_id = s.id)`
+    ];
+    const values = [];
+
+    if (search && search.trim()) {
+        values.push(`%${search.trim()}%`);
+        const idx = values.length;
+        conditions.push(`(s.first_name ILIKE $${idx} OR s.last_name ILIKE $${idx} OR s.email ILIKE $${idx} OR s.phone ILIKE $${idx})`);
+    }
+
+    const whereClause = `WHERE ${conditions.join(' AND ')}`;
+
+    if (page === undefined && limit === undefined) {
+        const query = `
+            SELECT s.id, s.first_name, s.last_name, s.email, s.phone, s.created_at 
+            FROM students s
+            ${whereClause}
+            ORDER BY s.id
+        `;
+        const result = await pool.query(query, values);
+        return result.rows;
+    }
+
+    const parsedPage = Math.max(1, Number(page) || 1);
+    const parsedLimit = Math.max(1, Number(limit) || 10);
+    const offset = (parsedPage - 1) * parsedLimit;
+
+    const dataQuery = `
+        SELECT s.id, s.first_name, s.last_name, s.email, s.phone, s.created_at 
+        FROM students s
+        ${whereClause}
+        ORDER BY s.id
+        LIMIT $${values.length + 1} OFFSET $${values.length + 2}
+    `;
+
+    const countQuery = `
+        SELECT COUNT(*)::int AS total
+        FROM students s
+        ${whereClause}
+    `;
+
+    const [dataResult, countResult] = await Promise.all([
+        pool.query(dataQuery, [...values, parsedLimit, offset]),
+        pool.query(countQuery, values)
+    ]);
+
+    const total = countResult.rows[0]?.total || 0;
+
+    return {
+        students: dataResult.rows,
+        total,
+        page: parsedPage,
+        limit: parsedLimit,
+        totalPages: Math.ceil(total / parsedLimit) || 1
+    };
 };
 
 module.exports = {

@@ -1,25 +1,31 @@
 import { useEffect, useState } from "react";
 import { Plus, Search } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import { getAllEnrollments, createEnrollment, deleteEnrollment } from "../services/api/enrollment.api";
-import { getAllStudents } from "../services/api/student.api";
-import { getAllCourses } from "../services/api/course.api";
+import { useEnrollments, useCreateEnrollment, useDeleteEnrollment } from "../hooks/queries/useEnrollments";
+import { useStudents } from "../hooks/queries/useStudents";
+import { useCourses } from "../hooks/queries/useCourses";
 import EnrollmentForm from "../features/enrollments/EnrollmentForm";
 import EnrollmentTable from "../features/enrollments/EnrollmentTable";
 
 function Enrollments() {
   const { user } = useAuth();
   const isStudent = user?.role === "student";
+  console.log("isStudent: " , isStudent);
 
-  const [enrollments, setEnrollments] = useState([]);
-  const [students, setStudents] = useState([]);
-  const [courses, setCourses] = useState([]);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [saving, setSaving] = useState(false);
+
+  const { data: enrollments = [], isLoading: loading, error: queryError } = useEnrollments();
+  const { data: courses = [] } = useCourses();
+  const { data: students = [] } = useStudents();
+
+  // Mutations
+  const createMutation = useCreateEnrollment();
+  const deleteMutation = useDeleteEnrollment();
+
+  const saving = createMutation.isPending;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -27,37 +33,6 @@ function Enrollments() {
     }, 300);
     return () => clearTimeout(timer);
   }, [search]);
-
-  useEffect(() => {
-    let active = true;
-    async function loadData() {
-      try {
-        if (isStudent) {
-          const [enrollRes, courseRes] = await Promise.all([ getAllEnrollments(),getAllCourses(),]);
-          setEnrollments(enrollRes);
-          setCourses(courseRes);
-        } else {
-          const [enrollRes, studentRes, courseRes] = await Promise.all([ getAllEnrollments(), getAllStudents(), getAllCourses() ]);
-          if (!active) return;
-          setEnrollments(enrollRes);
-          setStudents(studentRes);
-          setCourses(courseRes);
-          // console.log("enrollment: " , courseRes);
-        }
-      } catch {
-        setError("Failed to load enrollment records.");
-      } finally {
-        if (active) setLoading(false);
-      }
-    }
-
-    loadData();
-
-    return () => {
-      active = false;
-    };
-  }, [isStudent]);
-
 
   const openModal = () => {
     setError("");
@@ -70,23 +45,17 @@ function Enrollments() {
   };
 
   const handleSubmit = async (formData) => {
-    setSaving(true);
     setError("");
-
     try {
-      await createEnrollment(formData);
-      const [updatedEnroll, updatedCourses] = await Promise.all([
-        getAllEnrollments(),
-        getAllCourses(),
-      ]);
-      setEnrollments(updatedEnroll);
-      setCourses(updatedCourses);
+      await createMutation.mutateAsync(formData);
       closeModal();
     } catch (err) {
       const resMsg = err?.response?.data?.message;
-      setError(resMsg);
-    } finally {
-      setSaving(false);
+      const message =
+        typeof resMsg === "object" && resMsg !== null
+          ? Object.values(resMsg).join(", ")
+          : resMsg || err?.message || "Failed to enroll.";
+      setError(message);
     }
   };
 
@@ -101,10 +70,7 @@ function Enrollments() {
 
     setError("");
     try {
-      await deleteEnrollment(id);
-      setEnrollments((current) =>
-        current.filter((item) => (item.enrollment_id || item.id) !== id)
-      );
+      await deleteMutation.mutateAsync(id);
     } catch (err) {
       const resMsg = err?.response?.data?.message;
       const message =
@@ -130,15 +96,17 @@ function Enrollments() {
     );
   });
 
+  const displayError = error || (queryError ? "Failed to load enrollment records." : "");
+
   return (
     <main className="min-h-screen flex-1 bg-slate-50 px-4 py-4 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100 sm:px-6 lg:px-4">
       <div className="mx-auto max-w-7xl">
-        {error && !isModalOpen && (
+        {displayError && !isModalOpen && (
           <p
             role="alert"
             className="mb-5 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700 dark:border-rose-900/40 dark:bg-rose-950/30 dark:text-rose-300"
           >
-            {error}
+            {displayError}
           </p>
         )}
 
@@ -162,28 +130,24 @@ function Enrollments() {
                   type="search"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder={isStudent ? "Search my courses..." : "Search enrollments..."}
-                  aria-label="Search enrollments"
+                  placeholder={isStudent ? "Search my courses..." : "Search by student, course, email..."}
                   className="w-full rounded-lg border border-slate-200 bg-transparent py-2 pl-9 pr-3 text-sm outline-none transition focus:border-violet-500 dark:border-slate-700"
                 />
               </div>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={openModal}
-                  className=" cursor-pointer flex flex-1 items-center justify-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-xs transition hover:bg-violet-700 sm:flex-none"
-                >
-                  <Plus size={16} />
-                  <span>{isStudent ? "Enroll in Course" : "Enroll Student"}</span>
-                </button>
-              </div>
+              <button
+                onClick={openModal}
+                className="cursor-pointer flex items-center justify-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-violet-700"
+              >
+                <Plus size={16} />
+                <span>{isStudent ? "Enroll in Course" : "Enroll Student"}</span>
+              </button>
             </div>
           </div>
 
           <EnrollmentTable
             enrollments={filteredEnrollments}
             loading={loading}
-            search={search}
             onDelete={handleDelete}
             isStudent={isStudent}
           />
@@ -192,7 +156,6 @@ function Enrollments() {
 
       {isModalOpen && (
         <EnrollmentForm
-          key="enroll-modal"
           isOpen={isModalOpen}
           onClose={closeModal}
           onSubmit={handleSubmit}
@@ -200,7 +163,7 @@ function Enrollments() {
           courses={courses}
           saving={saving}
           error={isModalOpen ? error : ""}
-          isStudent={isStudent}
+          isStudent = {isStudent}
           currentUser={user}
         />
       )}

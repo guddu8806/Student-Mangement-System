@@ -34,8 +34,8 @@ const createCourse = async (courseData ,performedByUserId) => {
     return newCourse;
 };
 
-const getAllCourses = async () => {
-    return await courseRepository.findAll();
+const getAllCourses = async (query = {}) => {
+    return await courseRepository.findAll(query);
 };
 
 const getCourseById = async (id) => {
