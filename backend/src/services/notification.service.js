@@ -1,5 +1,6 @@
 const notificationRepo = require('../repositories/notification.repository');
 const AppError = require('../utils/AppError');
+const activityLogService = require('./activityLog.service');
 
 const emitNotifications = (notifications) => {
     const io = global.io;
@@ -147,6 +148,19 @@ const broadcastAnnouncement = async (adminUserId, { title, message, courseId }) 
         saved.forEach((notif) => {
             io.to(`user:${notif.user_id}`).emit("notification:new", notif);
         });
+    }
+    try {
+        await activityLogService.logActivity({
+            userId: adminUserId,
+            action: "ANNOUNCEMENT_BROADCAST",
+            entityType: "Notification",
+            entityId: courseId ? Number(courseId) : null,
+            description: courseId
+                ? `Broadcasted announcement '${title}' to course #${courseId}`
+                : `Broadcasted announcement '${title}' to all students`
+        });
+    } catch (err) {
+        console.error("Activity log error:", err.message);
     }
 
     return { count: saved.length };

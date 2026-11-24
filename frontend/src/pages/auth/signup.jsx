@@ -71,7 +71,7 @@ function Signup() {
               <button
                 type="button"
                 onClick={() => handleRoleSelect("student")}
-                className={`rounded-lg border py-2 px-3 text-xs font-semibold transition ${
+                className={`cursor-pointer rounded-lg border py-2 px-3 text-xs font-semibold transition ${
                   formData.role === "student"
                     ? "border-violet-600 bg-violet-50 text-violet-700 shadow-xs dark:border-violet-500 dark:bg-violet-950/40 dark:text-violet-300"
                     : "border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
@@ -82,7 +82,7 @@ function Signup() {
               <button
                 type="button"
                 onClick={() => handleRoleSelect("admin")}
-                className={`rounded-lg border py-2 px-3 text-xs font-semibold transition ${
+                className={`cursor-pointer rounded-lg border py-2 px-3 text-xs font-semibold transition ${
                   formData.role === "admin"
                     ? "border-violet-600 bg-violet-50 text-violet-700 shadow-xs dark:border-violet-500 dark:bg-violet-950/40 dark:text-violet-300"
                     : "border-slate-200 text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
@@ -129,7 +129,7 @@ function Signup() {
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              placeholder="+1 555-0199"
+              placeholder="+91 12345 45678"
               className="w-full rounded-lg border border-slate-200 bg-transparent px-3 py-2.5 text-sm outline-none transition focus:border-violet-500 focus:ring-1 focus:ring-violet-500 dark:border-slate-700 dark:text-white"
             />
           </div>
@@ -141,7 +141,7 @@ function Signup() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="text-xs font-medium text-violet-600 hover:text-violet-500 dark:text-violet-400"
+                className="cursor-pointer text-xs font-medium text-violet-600 hover:text-violet-500 dark:text-violet-400"
               >
                 {showPassword ? "Hide" : "Show"}
               </button>
@@ -160,7 +160,7 @@ function Signup() {
           <button
             type="submit"
             disabled={loading}
-            className="flex w-full items-center justify-center rounded-lg bg-violet-600 py-2.5 text-sm font-semibold text-white shadow-md shadow-violet-600/20 transition hover:bg-violet-700 disabled:opacity-50"
+            className="cursor-pointer flex w-full items-center justify-center rounded-lg bg-violet-600 py-2.5 text-sm font-semibold text-white shadow-md shadow-violet-600/20 transition hover:bg-violet-700 disabled:opacity-50"
           >
             {loading ? "Creating account..." : "Create Account"}
           </button>
@@ -169,7 +169,7 @@ function Signup() {
           Already have an account?{" "}
           <Link
             to="/login"
-            className="font-semibold text-violet-600 hover:text-violet-500 dark:text-violet-400"
+            className="cursor-pointer font-semibold text-violet-600 hover:text-violet-500 dark:text-violet-400"
           >
             Sign in
           </Link>

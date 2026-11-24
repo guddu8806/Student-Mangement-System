@@ -1,4 +1,3 @@
-
 import { Loader2 } from "lucide-react";
 
 const SIZES = {
@@ -27,7 +26,7 @@ const SIZES = {
 export default function Loader({
   variant = "page",
   size = "md",
-  text = "Loading, please wait...",
+  text = "Loading...",
   minHeight = "min-h-[50vh]",
   className = "",
 }) {
@@ -42,21 +41,15 @@ export default function Loader({
     >
       <div className={`relative flex items-center justify-center ${config.ring}`}>
         <div className="absolute inset-0 rounded-full bg-violet-500/15 blur-xl animate-pulse" />
-
         <div className="absolute inset-0 rounded-full border border-violet-300/30 dark:border-violet-400/20" />
-
-        <div className="absolute inset-[-5px] rounded-full border border-dashed border-violet-400/50 animate-[spin_8s_linear_infinite]" />
-
+        <div className="absolute -inset-1.25 rounded-full border border-dashed border-violet-400/50 animate-[spin_8s_linear_infinite]" />
         <div className="absolute inset-1 rounded-full border-[3px] border-violet-100 dark:border-violet-950" />
-
         <div className="absolute inset-1 rounded-full border-[3px] border-transparent border-t-violet-600 border-r-fuchsia-500 animate-spin" />
-
         <Loader2
           className={`relative text-violet-600 dark:text-violet-400 ${config.spinner}`}
           strokeWidth={2.2}
         />
       </div>
-
       {text && (
         <div className="flex flex-col items-center gap-2">
           <p
@@ -64,7 +57,6 @@ export default function Loader({
           >
             {text}
           </p>
-
           <div className="flex items-center gap-1.5">
             {[0, 1, 2].map((dot) => (
               <span
@@ -81,7 +73,7 @@ export default function Loader({
 
   if (variant === "fullscreen") {
     return (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/80 backdrop-blur-md dark:bg-slate-950/80">
+      <div className="fixed inset-0 z-100 flex items-center justify-center bg-white/80 backdrop-blur-md dark:bg-slate-950/80">
         {content}
       </div>
     );

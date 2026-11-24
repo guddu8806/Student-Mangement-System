@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AlertCircle, CheckCircle2, X } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useLogout } from "../hooks/queries/useAuth";
 import { useProfile, useUpdateProfile } from "../hooks/queries/useProfile";
 import { useEnrollments } from "../hooks/queries/useEnrollments";
 import ProfileHeader from "../features/profile/ProfileHeader";
@@ -11,7 +12,8 @@ import ProfileAcademicInfo from "../features/profile/ProfileAcademicInfo";
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { token, login, logout } = useAuth();
+  const { token, login } = useAuth();
+  const logout = useLogout();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({ name: "", phone: "" });
   const [message, setMessage] = useState({ type: "", text: "" });

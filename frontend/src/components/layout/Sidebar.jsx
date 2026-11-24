@@ -1,9 +1,11 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { GraduationCap, X } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useLogout } from "../../hooks/queries/useAuth";
 
 export default function Sidebar({ isOpen, onClose }) {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
+  const logout = useLogout();
   const navigate = useNavigate();
   const isAdmin = user?.role === "admin";
 

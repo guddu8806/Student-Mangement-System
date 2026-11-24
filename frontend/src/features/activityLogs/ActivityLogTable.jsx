@@ -3,6 +3,9 @@ import { ChevronLeft, ChevronRight, Activity } from "lucide-react";
 const ActivityTable = ({ activities = [],totalCount = 0,currentPage = 1,totalPages = 1,pageSize = 10,onPageChange = () => {},}) => {
   const getActionStyle = (action = "") => {
     const act = action.toUpperCase();
+    if (act.includes("BROADCAST") || act.includes("ANNOUNCEMENT")) {
+      return "bg-violet-50 text-violet-700 dark:bg-violet-500/10 dark:text-violet-400"; 
+    }
     if (act.includes("CREATE")) {
       return "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400";
     }
@@ -16,6 +19,9 @@ const ActivityTable = ({ activities = [],totalCount = 0,currentPage = 1,totalPag
   };
   const formatActionName = (action = "") => {
     const act = (action || "").toUpperCase();
+    if (act === "ANNOUNCEMENT_BROADCAST") {
+      return "Announcement Broadcast"; 
+    }
     if (act === "PROFILE_UPDATED" || act === "ADMIN_UPDATED") {
       return "Profile Updated";
     }

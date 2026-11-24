@@ -21,10 +21,10 @@ const getDetailedRoster = async (filters) => {
 // Generates RFC-compliant CSV with UTF-8 BOM for Excel
 const generateCsvString = async (filters) => {
     const data = await reportRepository.getDetailedEnrollmentRoster(filters);
-    
+    const list = Array.isArray(data) ? data : (data?.roster || []);
     const headers = ["Enrollment ID","Enrollment Date","Student ID", "Student Name", "Email", "Phone", "Course Code", "Course Name", "Credits"];
 
-    if (!data || data.length === 0) {
+    if (!list || list.length === 0) {
         return headers.join(",") + "\n";
     }
     const escapeCsv = (str) => {
@@ -32,7 +32,7 @@ const generateCsvString = async (filters) => {
         return `"${String(str).replace(/"/g, '""')}"`;
     };
 
-    const rows = data.map(item => [
+    const rows = list.map(item => [
         escapeCsv(item.enrollment_id),
         escapeCsv(item.enrollment_date ? new Date(item.enrollment_date).toISOString().split('T')[0] : ""),
         escapeCsv(item.student_id),

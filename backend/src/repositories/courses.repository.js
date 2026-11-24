@@ -109,12 +109,33 @@ const update = async(id, courseData) =>{
     return result.rows[0];
 }
 
-const deleteById = async(id) =>{
-    const query = `DELETE FROM courses WHERE id = $1 RETURNING *`;
-    const value = [id];
-    const result = await pool.query(query,value);
-    return result.rowCount > 0;
-}
+const deleteById = async (id) => {
+    const client = await pool.connect();
+    try {
+        await client.query("BEGIN");
+
+        // Lock course row for update and check existence
+        const checkCourse = await client.query("SELECT id FROM courses WHERE id = $1 FOR UPDATE", [id]);
+        if (checkCourse.rows.length === 0) {
+            await client.query("ROLLBACK");
+            return false;
+        }
+
+        // Clean up linked enrollments first to satisfy foreign key constraints
+        await client.query("DELETE FROM enrollments WHERE course_id = $1", [id]);
+
+        // Delete the course record
+        const deleteResult = await client.query("DELETE FROM courses WHERE id = $1 RETURNING *", [id]);
+
+        await client.query("COMMIT");
+        return deleteResult.rowCount > 0;
+    } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+    } finally {
+        client.release();
+    }
+};
 
 module.exports = {
     create,

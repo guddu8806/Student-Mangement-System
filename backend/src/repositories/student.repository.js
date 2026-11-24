@@ -172,6 +172,10 @@ const deleteById = async (id) => {
             return false;
         }
         const userId = checkResult.rows[0].user_id;
+
+        // Clean up linked enrollments first to satisfy foreign key constraints
+        await client.query(`DELETE FROM enrollments WHERE student_id = $1`, [id]);
+
         const deleteStudentQuery = `
             DELETE FROM students
             WHERE id = $1
@@ -182,6 +186,10 @@ const deleteById = async (id) => {
             [id]
         );
         if (userId) {
+            // Clean up user notifications
+            await client.query(`DELETE FROM notifications WHERE user_id = $1`, [userId]);
+            // Preserve historical audit trail by nullifying user_id in activity logs
+            await client.query(`UPDATE activity_logs SET user_id = NULL WHERE user_id = $1`, [userId]);
             await client.query(
                 `DELETE FROM users WHERE id = $1`,
                 [userId]

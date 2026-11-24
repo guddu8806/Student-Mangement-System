@@ -28,6 +28,6 @@ export const deleteAccount = async () => {
 };
 
 export const deleteByUserId = async (userId) => {
-    const res = await apiClient.delete(`/auth/${userId}`);
+    const res = await apiClient.delete(`/auth/users/${userId}`);
     return unwrap(res);
 };

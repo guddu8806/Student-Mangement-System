@@ -17,6 +17,7 @@ const ADMIN_ACTIONS = [
   { value: "STUDENT_CREATE", label: "Student Created" },
   { value: "STUDENT_UPDATE", label: "Student Updated" },
   { value: "STUDENT_DELETE", label: "Student Deleted" },
+  { value: "ANNOUNCEMENT_BROADCAST", label: "Announcement Broadcast" },
 ];
 
 const ActivityLogFilter = ({

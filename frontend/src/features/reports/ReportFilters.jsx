@@ -1,39 +1,10 @@
 import { Search, Calendar, FileSpreadsheet, X } from "lucide-react";
-import exportToCsv from "../../config/exportoCsv";
 
-export default function ReportFilters({
-  searchTerm = "",
-  onSearchChange,
-  selectedCourse = "all",
-  onCourseChange,
-  courses = [],
-  startDate = "",
-  onStartDateChange,
-  endDate = "",
-  onEndDateChange,
-  onClearFilters,
-  filteredRoster,
-  filteredCount = 0,
-  onExport,
-}) {
+export default function ReportFilters({searchTerm = "",onSearchChange,selectedCourse = "all",onCourseChange,courses = [],startDate = "",onStartDateChange,endDate = "",onEndDateChange,onClearFilters,filteredCount = 0,onExport,}) {
   const isAnyFilterActive = Boolean(searchTerm) || selectedCourse !== "all" || Boolean(startDate) || Boolean(endDate);
-  const columns = [
-            { key: "enrollment_id", label: "Enrollment ID" },
-            { key: "student_name", label: "Student Name" },
-            { key: "student_email", label: "Email" },
-            { key: "student_phone", label: "Phone" },
-            { key: "course_code", label: "Course Code" },
-            { key: "course_name", label: "Course Name" },
-            { key: "credits", label: "Credits" },
-            { key: "enrollment_date", label: "Enrollment Date" },
-        ];
-  const timestamp = new Date().toISOString().split("T")[0];
-
   const handleExport = () => {
     if (onExport) {
       onExport();
-    } else {
-      exportToCsv(filteredRoster, `enrollment_report_${timestamp}.csv`, columns);
     }
   };
 
@@ -46,7 +17,6 @@ export default function ReportFilters({
           </h2>
         </div>
 
-        {/* Filter Controls Bar */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative min-w-50 flex-1 sm:flex-initial">
             <Search
