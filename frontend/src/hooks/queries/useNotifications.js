@@ -73,6 +73,7 @@ export const useSendAnnouncement = () => {
     mutationFn: (data) => sendAnnouncement(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: NOTIFICATION_KEYS.all });
+      queryClient.invalidateQueries({ queryKey: ["activityLogs"] });
     },
   });
 };

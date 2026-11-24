@@ -9,15 +9,12 @@ const createNotification  = async({user_id , title , message , type}) =>{
 
 const createAnnouncement = async(userIds, { title, message, type }) =>{
     if(!userIds || userIds.length === 0) return [];
-    const values = [];
-    const placeholders =  userIds.map((userId, index) => {
-        const startIndex = index * 4;
-        values.push(userId, title, message, type);
-        return `($${startIndex + 1}, $${startIndex + 2}, $${startIndex + 3}, $${startIndex + 4})`;
-    }).join(', ');
-
-    const query = `INSERT INTO notifications (user_id, title, message, type) VALUES ${placeholders} RETURNING *`;
-    const result = await pool.query(query, values);
+    const query = `INSERT INTO notifications (user_id, title, message, type)
+        SELECT user_id, $2, $3, $4
+        FROM UNNEST($1::int[]) AS user_id
+        RETURNING *`;
+    const values = [userIds, title, message, type];
+    const result = await pool.query(query , values);
     return result.rows;
 };
 

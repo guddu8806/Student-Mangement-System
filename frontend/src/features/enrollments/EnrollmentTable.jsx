@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ClipboardList, Trash2, Clock, AlertCircle } from "lucide-react";
 
 function checkDropStatus(dateStr, now) {
@@ -23,14 +23,12 @@ function checkDropStatus(dateStr, now) {
   };
 }
 
-function EnrollmentTable({
-  enrollments = [],
-  loading = false,
-  search = "",
-  onDelete,
-  isStudent = false,
-}) {
-  const [currentTime] = useState(() => Date.now());
+function EnrollmentTable({enrollments = [],loading = false,search = "",onDelete,isStudent = false,}) {
+  const [currentTime , setCurrentTime] = useState(() => Date.now());
+  useEffect(() =>{
+    const timer = setInterval(() => setCurrentTime(Date.now()) , 60000);
+    return () => clearInterval(timer);
+  },[]);
 
   if (loading) {
     return (

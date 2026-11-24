@@ -9,17 +9,17 @@ const ActivityLogs = () => {
   const { user } = useAuth();
   const userRole = user?.role || "student";
   const currentUser = user;
+  const isAdmin = userRole === "admin";
 
   // Filters state
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [action, setAction] = useState("all");
-  const [userId, setUserId] = useState(user?.id ? String(user.id) : "");
+  const [userId, setUserId] = useState(isAdmin ? "all" : (user?.id ? String(user.id) : ""));
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  const defaultUserId = currentUser?.id ? String(currentUser.id) : "";
-  const activeUserId = userId || defaultUserId;
+  const activeUserId = userId;
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
@@ -103,17 +103,15 @@ const ActivityLogs = () => {
   const handleResetFilters = () => {
     setSearch("");
     setAction("all");
-    setUserId("");
+    setUserId(isAdmin ? "all" : (currentUser?.id ? String(currentUser.id) : ""));
     setStartDate("");
     setEndDate("");
     setCurrentPage(1);
   };
-  console.log("Search Iteam: " , debouncedSearch);
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 dark:bg-gray-950 sm:p-6 lg:p-4">
       <div className="mx-auto max-w-7xl space-y-6">
-        {/* <div>API Trigger Count: {apiCount}</div> */}
         {error && (
           <div
             role="alert"

@@ -34,9 +34,8 @@ function Login() {
       setError(err?.response?.data?.message || err?.message || "Failed to sign in.");
     }
   };
-  // useEffect(() => {
-  //   handleSubmit();
-  // }, [])
+
+  console.log("Error: " , error);
   
 
   return (
@@ -82,7 +81,7 @@ function Login() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="text-xs font-medium text-violet-600 hover:text-violet-500 dark:text-violet-400"
+                className="cursor-pointer text-xs font-medium text-violet-600 hover:text-violet-500 dark:text-violet-400"
               >
                 {showPassword ? "Hide" : "Show"}
               </button>
@@ -101,7 +100,7 @@ function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="flex w-full items-center justify-center rounded-lg bg-violet-600 py-2.5 text-sm font-semibold text-white shadow-md shadow-violet-600/20 transition hover:bg-violet-700 disabled:opacity-50"
+            className="cursor-pointer flex w-full items-center justify-center rounded-lg bg-violet-600 py-2.5 text-sm font-semibold text-white shadow-md shadow-violet-600/20 transition hover:bg-violet-700 disabled:opacity-50"
           >
             {loading ? "Signing in..." : "Sign In"}
           </button>
@@ -111,7 +110,7 @@ function Login() {
           Don&apos;t have an account?{" "}
           <Link
             to="/signup"
-            className="font-semibold text-violet-600 hover:text-violet-500 dark:text-violet-400"
+            className="cursor-pointer font-semibold text-violet-600 hover:text-violet-500 dark:text-violet-400"
           >
             Sign up now
           </Link>

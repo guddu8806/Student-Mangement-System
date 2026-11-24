@@ -106,7 +106,6 @@ const NotificationDropdown = ({ onClose }) => {
                 )}
             </div>
 
-            {/* Filter Tabs */}
             <div className="flex border-b border-gray-100 bg-gray-50/50 px-4 pt-2 dark:border-gray-700 dark:bg-gray-800/50">
                 <button
                     onClick={() => setFilter("all")}
@@ -142,7 +141,6 @@ const NotificationDropdown = ({ onClose }) => {
                 )}
             </div>
 
-            {/* Items List */}
             <div className="max-h-96 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-700/60">
                 {loading ? (
                     <div className="p-8 text-center text-xs text-gray-400">Loading notifications...</div>
@@ -201,7 +199,7 @@ const NotificationDropdown = ({ onClose }) => {
                                         e.stopPropagation();
                                         removeNotification(notif.id);
                                     }}
-                                    className="opacity-0 group-hover:opacity-100 absolute right-3 top-3 text-gray-400 hover:text-red-500 transition-opacity"
+                                    className="cursor-pointer opacity-0 group-hover:opacity-100 absolute right-3 top-3 text-gray-400 hover:text-red-500 transition-opacity"
                                     title="Delete"
                                 >
                                     <Trash2 size={13} />

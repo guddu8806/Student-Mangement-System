@@ -6,9 +6,12 @@ const getAllLogs = async (req, res, next) => {
         if (req.user && req.user.role === 'student') {
             queryParams.userId = req.user.id;
         } else if (req.user && req.user.role === 'admin') {
-            if (!queryParams.userId) {
-                queryParams.userId = req.user.id;
-            } else if (queryParams.userId === 'all') {
+            // if (!queryParams.userId) {
+            //     queryParams.userId = req.user.id;
+            // } else if (queryParams.userId === 'all') {
+            //     delete queryParams.userId;
+            // }
+            if(queryParams.userId === 'all' || !queryParams.userId){
                 delete queryParams.userId;
             }
         }

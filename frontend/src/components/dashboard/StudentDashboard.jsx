@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState , useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Trash2, Megaphone } from "lucide-react";
 import { useCourses } from "../../hooks/queries/useCourses";
@@ -31,7 +31,11 @@ function checkDropStatus(dateStr, now) {
 
 const StudentDashboard = () => {
   const [error, setError] = useState("");
-  const [currentTime] = useState(() => Date.now());
+  const [currentTime , setCurrentTime] = useState(() => Date.now());
+  useEffect(() =>{
+    const timer = setInterval(()=> setCurrentTime(Date.now()) , 60000);
+    return () => clearInterval(timer);
+  },[]);
   const { user } = useAuth();
   const { notifications } = useNotifications();
 

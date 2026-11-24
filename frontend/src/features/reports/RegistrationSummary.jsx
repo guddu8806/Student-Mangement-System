@@ -1,12 +1,17 @@
-import exportToCsv from "../../config/exportoCsv";
+import exportToCsv from "../../config/exporToCsv";
 import {FileSpreadsheet} from "lucide-react"
 
 export default function RegistrationSummary({data = [], loading = false, title = "Registration & Enrollment History", description = "Student registrations vs course enrollments"}) {
 
-  console.log("Data on Registration Summary: " ,data);
-  const handleExport = () =>{
-    exportToCsv(data , "monthly-report.csv");
-  }
+  const summaryColumns = [
+    { key: "label", label: "Month / Period" },
+    { key: "registrations", label: "Student Registrations" },
+    { key: "enrollments", label: "Course Enrollments" }
+  ];
+  const handleExport = () => {
+    const timestamp = new Date().toISOString().split("T")[0];
+    exportToCsv(data, `monthly_summary_${timestamp}.csv`, summaryColumns);
+  };
   if (loading) {
     return (
       <div className="rounded-xl border border-gray-200 dark:border-gray-800 p-6">

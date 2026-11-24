@@ -119,7 +119,6 @@ export default function Reports() {
                         endDate={endDate}
                         onEndDateChange={(val) => { setEndDate(val); setCurrentPage(1); }}
                         onClearFilters={handleClearFilters}
-                        filteredRoster={roster}
                         filteredCount={totalCount}
                         onExport={handleExportCsv}
                     />

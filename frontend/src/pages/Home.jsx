@@ -142,7 +142,7 @@ function Home() {
                 Get Started
               </Link>
               <Link
-                to="/Courses"
+                to="/courses"
                 className="inline-flex items-center rounded-xl border border-slate-300 bg-white/90 px-6 py-3.5 text-sm font-semibold text-slate-700 shadow-xs backdrop-blur-sm transition hover:bg-slate-100 hover:text-violet-700 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-violet-400"
               >
                 View Courses

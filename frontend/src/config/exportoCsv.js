@@ -1,6 +1,5 @@
 const exportToCsv = (data, filename = "report.csv", columns = null) => {
   if (!data || data.length === 0) {
-    alert("No data available to export.");
     return;
   }
   const cols = Array.isArray(columns) && columns.length > 0  ? columns : Object.keys(data[0]).map((key) => ({ key, label: key }));
