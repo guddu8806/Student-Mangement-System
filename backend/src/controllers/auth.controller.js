@@ -1,4 +1,5 @@
 const authService = require('../services/auth.service');
+const AppError = require("../utils/AppError");
 
 // Register controller
 const registerUser = async (req, res, next) => {
@@ -32,6 +33,9 @@ const loginUser = async (req, res, next) => {
 const getProfile = async (req, res, next) => {
     try {
         const result = await authService.getProfile(req.user.id);
+        if(!result){
+            throw new AppError("User not found" ,404);
+        }
         res.status(200).json({
             success: true,
             message: 'Profile retrieved successfully',

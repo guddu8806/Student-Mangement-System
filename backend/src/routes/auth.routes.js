@@ -2,10 +2,11 @@ const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/auth.controller');
 const { verifyToken, requireAdmin } = require('../middleware/auth.middleware');
+const { loginLimiter } = require("../middleware/rateLimit.middleware");
 
 // Public routes
 router.post('/register', authController.registerUser);
-router.post('/login', authController.loginUser);
+router.post('/login',loginLimiter, authController.loginUser);
 
 // Protected routes (Admin or Student)
 router.get('/profile', verifyToken, authController.getProfile);
