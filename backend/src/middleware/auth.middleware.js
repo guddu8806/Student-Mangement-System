@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
+const pool = require("../config/db");
 
 // Middleware to verify if request has a valid JWT token
-const verifyToken = (req, res, next) => {
+const verifyToken = async(req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -12,7 +13,21 @@ const verifyToken = (req, res, next) => {
         }
         const token = authHeader.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded; // { id, role, student_id }
+        const result = await pool.query(`SELECT u.id,u.role,s.id AS student_id FROM users u LEFT JOIN students s ON s.user_id = u.id WHERE u.id = $1`,[decoded.id]);
+        const user = result.rows[0];
+        if(!user){
+            return res.status(401).json({
+                success:false,
+                message:"User account no longer exists."
+            });
+        }
+        if (user.role === "student" && !user.student_id) {
+            return res.status(401).json({
+                success: false,
+                message: "Student account no longer exists"
+            });
+        }
+        req.user = user;
         next();
     } catch (error) {
         return res.status(401).json({

@@ -37,6 +37,9 @@ const getStudentById = async (req, res, next) => {
     try{
         const {id} = req.params;
         const student = await studentService.getStudentById(id);
+        if(!student){
+            throw new AppError("Student not found." ,404);
+        }
         res.status(200).json({
             success: true,
             message:"Student retrieved successfully",

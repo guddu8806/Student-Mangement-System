@@ -31,3 +31,8 @@ export const deleteByUserId = async (userId) => {
     const res = await apiClient.delete(`/auth/users/${userId}`);
     return unwrap(res);
 };
+
+export const getMe = async() =>{
+    const res = await apiClient.get("/auth/me");
+    return unwrap(res);
+}

@@ -16,10 +16,6 @@ function Courses() {
 
   const isLoggedIn = Boolean(token);
   const isUser = isLoggedIn && user?.role === "admin";
-  // const queryClient = useQueryClient();
-  // console.log(
-  //   "Courses: ",queryClient.getQueryData(["courses"])
-  // );
 
   // TanStack Query custom hooks
   const { data: courses = [], isLoading: loading, error: queryError } = useCourses();

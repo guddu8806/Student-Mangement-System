@@ -1,4 +1,5 @@
 const activityLogService = require('../services/activityLog.service');
+const AppError = require("../utils/AppError")
 
 const getAllLogs = async (req, res, next) => {
     try {
@@ -6,11 +7,6 @@ const getAllLogs = async (req, res, next) => {
         if (req.user && req.user.role === 'student') {
             queryParams.userId = req.user.id;
         } else if (req.user && req.user.role === 'admin') {
-            // if (!queryParams.userId) {
-            //     queryParams.userId = req.user.id;
-            // } else if (queryParams.userId === 'all') {
-            //     delete queryParams.userId;
-            // }
             if(queryParams.userId === 'all' || !queryParams.userId){
                 delete queryParams.userId;
             }
@@ -31,7 +27,19 @@ const getFilterOptions = async (req, res, next) => {
     try {
         const filters = await activityLogService.fetchFilterOptions();
         if (req.user && req.user.role === 'student') {
-            filters.users = filters.users.filter(u => u.id === req.user.id);
+            filters.users = filters.users.filter(
+                u => u.id === req.user.id
+            );
+            const allowedActions = [
+                'LOGIN',
+                'LOGOUT',
+                'ENROLLMENT_CREATE',
+                'ENROLLMENT_DROP',
+                'PROFILE_UPDATE'
+            ];
+            filters.actions = filters.actions.filter(
+                action => allowedActions.includes(action)
+            );
         }
 
         res.status(200).json({
@@ -53,6 +61,9 @@ const getLogById = async (req, res, next) => {
                 success: false,
                 message: "Forbidden: You cannot view another user's activity log"
             });
+        }
+        if(!log){
+            throw new AppError("Activity log not found", 404);
         }
 
         res.status(200).json({
