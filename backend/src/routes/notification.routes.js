@@ -11,7 +11,6 @@ router.patch('/read-all', notificationController.markAllAsRead);
 router.patch('/:id/read', notificationController.markAsRead);
 router.delete('/:id', notificationController.deleteNotification);
 
-// Admin-only announcement broadcast
 router.post('/announcement', requireAdmin, notificationController.createAnnouncement);
 
 module.exports = router;

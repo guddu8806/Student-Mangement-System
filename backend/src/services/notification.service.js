@@ -20,7 +20,6 @@ const notifyUser = async (userId, { title, message, type }) => {
     return notification;
 };
 
-
 const notifyAdmins = async ({ title, message, type }) => {
     const adminIds = await notificationRepo.findAdminUserIds();
     if(!adminIds.length) return [];
@@ -32,8 +31,6 @@ const notifyAdmins = async ({ title, message, type }) => {
     return notifications;
 };
 
-
-// Send notification to students enrolled in a course
 const notifyCourseStudents = async (courseId, { title, message, type }) => {
     const studentUserIds = await notificationRepo.findStudentUserIdsByCourseId(courseId);
     if(!studentUserIds.length) return [];
@@ -45,8 +42,6 @@ const notifyCourseStudents = async (courseId, { title, message, type }) => {
     return notifications;
 };
 
-
-// Send notification to all students
 const notifyAllStudents = async ({ title, message, type }) => {
     const studentUserIds = await notificationRepo.findAllStudentUserIds();
     if(!studentUserIds.length) return [];
@@ -58,8 +53,6 @@ const notifyAllStudents = async ({ title, message, type }) => {
     return notifications;
 };
 
-
-// Get user notifications
 const getUserNotifications = async (userId, { unreadOnly = false, page, limit } = {}) => {
     const unreadBool = unreadOnly === 'true' || unreadOnly === true;
     const notificationsResult = await notificationRepo.findByUserId(
@@ -81,14 +74,10 @@ const getUserNotifications = async (userId, { unreadOnly = false, page, limit } 
     };
 };
 
-
-// Get unread notification count
 const getUnreadCount = async (userId) => {
     return await notificationRepo.getUnreadCount(userId);
 };
 
-
-// Mark notification as read
 const markAsRead = async (id, userId) => {
     const notifId = Number(id);
     if (!Number.isInteger(notifId) || notifId <= 0) {
@@ -101,14 +90,10 @@ const markAsRead = async (id, userId) => {
     return notification;
 };
 
-
-// Mark all notifications as read
 const markAllAsRead = async (userId) => {
     return await notificationRepo.markAllAsRead(userId);
 };
 
-
-// Delete notification
 const deleteNotification = async (id, userId) => {
     const notifId = Number(id);
     if (!Number.isInteger(notifId) || notifId <= 0) {
@@ -122,8 +107,6 @@ const deleteNotification = async (id, userId) => {
     return notification;
 };
 
-
-// Broadcast announcement to all students or specific course
 const broadcastAnnouncement = async (adminUserId, { title, message, courseId }) => {
     if (!title || !message) {
         throw new AppError("Title and message are required for announcements", 400);
@@ -165,7 +148,6 @@ const broadcastAnnouncement = async (adminUserId, { title, message, courseId }) 
 
     return { count: saved.length };
 };
-
 
 module.exports = {
     notifyUser,

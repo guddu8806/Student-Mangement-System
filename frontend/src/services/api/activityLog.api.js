@@ -11,8 +11,3 @@ export const getActivityFilterOptions = async () => {
     const res = await apiClient.get("/activity-logs/filters");
     return unwrap(res);
 };
-
-// export const getActivityLogById = async (id) => {
-//     const res = await apiClient.get(`/activity-logs/${id}`);
-//     return unwrap(res);
-// };

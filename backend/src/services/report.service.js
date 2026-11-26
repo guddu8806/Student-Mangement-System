@@ -18,7 +18,6 @@ const getDetailedRoster = async (filters) => {
     return await reportRepository.getDetailedEnrollmentRoster(filters);
 };
 
-// Generates RFC-compliant CSV with UTF-8 BOM for Excel
 const generateCsvString = async (filters) => {
     const data = await reportRepository.getDetailedEnrollmentRoster(filters);
     const list = Array.isArray(data) ? data : (data?.roster || []);

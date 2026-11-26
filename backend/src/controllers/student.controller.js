@@ -1,8 +1,6 @@
 const studentService = require('../services/student.service');
 const AppError = require('../utils/AppError');
 
-
-// create , view, update, delete student
 const createStudent = async (req, res, next) => {
     try{
         const studentData = req.body;
@@ -90,7 +88,6 @@ const notEnrolledStudents = async(req, res,next) =>{
         next(error);
     }
 };
-
 
 module.exports = {
     createStudent,

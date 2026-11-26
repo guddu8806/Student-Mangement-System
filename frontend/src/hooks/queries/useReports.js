@@ -11,7 +11,6 @@ export const REPORT_KEYS = {
   roster: (params) => ["reports", "roster", params],
 };
 
-// Hook to fetch report analytics (KPIs, charts)
 export const useReportAnalytics = () => {
   return useQuery({
     queryKey: REPORT_KEYS.analytics,
@@ -19,7 +18,6 @@ export const useReportAnalytics = () => {
   });
 };
 
-// Hook to fetch detailed roster data
 export const useReportRoster = (params = {}) => {
   return useQuery({
     queryKey: REPORT_KEYS.roster(params),
@@ -27,5 +25,4 @@ export const useReportRoster = (params = {}) => {
   });
 };
 
-// Export helper for downloading CSV
 export { downloadReportCsvDirect };

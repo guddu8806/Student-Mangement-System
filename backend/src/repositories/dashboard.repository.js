@@ -5,13 +5,13 @@ const getDashboardStats = async() =>{
     const coursesCountQuery = `SELECT COUNT(*)::int AS total FROM courses`;
     const enrollmentsCountQuery = `SELECT COUNT(*)::int AS total FROM enrollments`;
     const recentStudentsQuery = `
-        SELECT id, first_name, last_name, email, phone, created_at 
-        FROM students 
-        ORDER BY created_at DESC 
+        SELECT id, first_name, last_name, email, phone, created_at
+        FROM students
+        ORDER BY created_at DESC
         LIMIT 5
     `;
     const monthlyEnrollmentsQuery = `
-        SELECT 
+        SELECT
             TO_CHAR(DATE_TRUNC('month', enrollment_date), 'Mon YY') AS month,
             COUNT(*)::int AS enrollments
         FROM enrollments
@@ -20,7 +20,7 @@ const getDashboardStats = async() =>{
         ORDER BY DATE_TRUNC('month', enrollment_date) ASC
     `;
     const courseEnrollmentsQuery = `
-        SELECT 
+        SELECT
             c.id AS course_id,
             c.course_name AS name,
             c.course_code,
@@ -59,7 +59,7 @@ const getAllCourses = async() =>{
 
 const getAllEnrollments = async({ page, limit } = {}) =>{
     if (page === undefined && limit === undefined) {
-        // Safe default limit of 100 to prevent unbounded full table scan
+
         const enrollment_table = `
             SELECT
                 e.id AS enrollment_id,

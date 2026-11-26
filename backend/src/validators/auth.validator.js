@@ -1,6 +1,5 @@
 const AppError = require('../utils/AppError');
 
-// Validate registration data
 const validateUser = (user) => {
     if (!user || typeof user !== 'object' || Array.isArray(user)) {
         throw new AppError('Invalid request body', 400);
@@ -41,7 +40,6 @@ const validateUser = (user) => {
     }
 };
 
-// Validate login data
 const validateLogin = (data) => {
     if (!data || typeof data !== 'object' || Array.isArray(data)) {
         throw new AppError('Invalid request body', 400);

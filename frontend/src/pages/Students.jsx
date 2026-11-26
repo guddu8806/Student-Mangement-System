@@ -20,13 +20,11 @@ function Students() {
   const [editingStudent, setEditingStudent] = useState(null);
   const [enrollmentFilter, setEnrollmentFilter] = useState("all");
 
-  // TanStack Query Hooks
   const { data: students = [], isLoading: loading, error: queryError } = useStudents();
   const { data: notEnrolledStudents = [] } = useNotEnrolledStudents();
   const { data: courses = [] } = useCourses();
   const { data: enrollments = [] } = useEnrollments();
 
-  // Mutation Hooks
   const createMutation = useCreateStudent();
   const updateMutation = useUpdateStudent();
   const deleteMutation = useDeleteStudent();
@@ -110,8 +108,8 @@ function Students() {
       )}
 
       <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs dark:border-slate-800 dark:bg-slate-900">
-        <div className="flex flex-col gap-4 border-b border-slate-200 p-4 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between ">
-          <div className="w-1/2">
+        <div className="flex flex-col gap-4 border-b border-slate-200 p-4 dark:border-slate-800 lg:flex-row lg:items-center lg:justify-between">
+          <div>
             <h2 className="font-semibold text-gray-900 dark:text-white">
               {enrollmentFilter === "all"
                 ? "All Students"
@@ -124,7 +122,7 @@ function Students() {
             </p>
           </div>
 
-          <div className="flex w-full flex-col gap-3  sm:flex-row sm:items-center ml-12">
+          <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:w-auto">
             <select
               value={enrollmentFilter}
               onChange={(e) => setEnrollmentFilter(e.target.value)}
@@ -140,7 +138,7 @@ function Students() {
               ))}
             </select>
 
-            <div className="relative w-full sm:w-50">
+            <div className="relative w-full sm:w-56">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="search"
@@ -153,7 +151,7 @@ function Students() {
 
             <button
               onClick={() => openModal()}
-              className="cursor-pointer flex items-center justify-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-violet-700"
+              className="cursor-pointer flex shrink-0 items-center justify-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-violet-700"
             >
               <UserPlus size={17} />
               <span>Add Student</span>

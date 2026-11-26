@@ -204,7 +204,6 @@ const updateProfile = async (userId, updateData) => {
     };
 };
 
-// 5. Delete Account (Admin deletes self or another user by ID)
 const deleteAccount = async (userId) => {
     const user = await authRepository.findUserById(userId);
     if (!user) {

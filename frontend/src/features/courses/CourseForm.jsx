@@ -30,7 +30,7 @@ function CourseForm({ isOpen, onClose, onSubmit, initialData = null, saving = fa
         role="dialog"
         aria-modal="true"
         aria-labelledby="course-modal-title"
-        className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900"
+        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900"
       >
         <div className="mb-5 flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
           <h2 id="course-modal-title" className="text-lg font-bold text-gray-900 dark:text-white">

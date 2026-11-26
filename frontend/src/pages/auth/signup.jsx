@@ -45,7 +45,7 @@ function Signup() {
   return (
     <div className="flex flex-1 items-center justify-center px-4 py-10 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 dark:border-slate-800 dark:bg-slate-900">
-        
+
         <div className="text-center">
           <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
             Create an account
@@ -61,7 +61,6 @@ function Signup() {
           </div>
         )}
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-300">

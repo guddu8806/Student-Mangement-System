@@ -1,7 +1,5 @@
 const pool = require('../config/db');
 
-//  create, view, update, and delete courses. 
-
 const create = async(courseData) =>{
     const {course_code , course_name, description , credits, capacity} = courseData;
     const query = `INSERT INTO courses (course_code , course_name , description , credits, capacity ) VALUES ($1, $2, $3, $4, $5) RETURNING *`;
@@ -13,7 +11,7 @@ const create = async(courseData) =>{
 
 const findById = async(id) =>{
     const query = `
-        SELECT 
+        SELECT
             c.*,
             COUNT(e.id)::int AS enrolled_count,
             GREATEST(0, (COALESCE(c.capacity, 30) - COUNT(e.id)))::int AS available_seats
@@ -42,7 +40,7 @@ const findAll = async ({ page, limit, search } = {}) => {
 
     if (!page && !limit) {
         const query = `
-            SELECT 
+            SELECT
                 c.*,
                 COUNT(e.id)::int AS enrolled_count,
                 GREATEST(0, (COALESCE(c.capacity, 30) - COUNT(e.id)))::int AS available_seats
@@ -61,7 +59,7 @@ const findAll = async ({ page, limit, search } = {}) => {
     const offset = (parsedPage - 1) * parsedLimit;
 
     const dataQuery = `
-        SELECT 
+        SELECT
             c.*,
             COUNT(e.id)::int AS enrolled_count,
             GREATEST(0, (COALESCE(c.capacity, 30) - COUNT(e.id)))::int AS available_seats
@@ -114,17 +112,14 @@ const deleteById = async (id) => {
     try {
         await client.query("BEGIN");
 
-        // Lock course row for update and check existence
         const checkCourse = await client.query("SELECT id FROM courses WHERE id = $1 FOR UPDATE", [id]);
         if (checkCourse.rows.length === 0) {
             await client.query("ROLLBACK");
             return false;
         }
 
-        // Clean up linked enrollments first to satisfy foreign key constraints
         await client.query("DELETE FROM enrollments WHERE course_id = $1", [id]);
 
-        // Delete the course record
         const deleteResult = await client.query("DELETE FROM courses WHERE id = $1 RETURNING *", [id]);
 
         await client.query("COMMIT");

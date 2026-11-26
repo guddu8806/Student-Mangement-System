@@ -14,18 +14,17 @@ export const STUDENT_KEYS = {
   detail: (id) => ["students", id],
 };
 
-// Hook to fetch all students
-export const useStudents = (params) => {
+export const useStudents = (params ,options={}) => {
   return useQuery({
     queryKey: params ? [...STUDENT_KEYS.all, params] : STUDENT_KEYS.all,
     queryFn: async () => {
       const response = await getAllStudents(params);
       return Array.isArray(response) ? response : (response?.students || []);
     },
+    ...options
   });
 };
 
-// Hook to fetch students not enrolled in any course
 export const useNotEnrolledStudents = (params) => {
   return useQuery({
     queryKey: params ? [...STUDENT_KEYS.notEnrolled, params] : STUDENT_KEYS.notEnrolled,
@@ -36,7 +35,6 @@ export const useNotEnrolledStudents = (params) => {
   });
 };
 
-// Hook to fetch single student by ID
 export const useStudent = (id) => {
   return useQuery({
     queryKey: STUDENT_KEYS.detail(id),
@@ -45,7 +43,6 @@ export const useStudent = (id) => {
   });
 };
 
-// Hook to create a student
 export const useCreateStudent = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -57,7 +54,6 @@ export const useCreateStudent = () => {
   });
 };
 
-// Hook to update a student
 export const useUpdateStudent = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -69,7 +65,6 @@ export const useUpdateStudent = () => {
   });
 };
 
-// Hook to delete a student
 export const useDeleteStudent = () => {
   const queryClient = useQueryClient();
   return useMutation({

@@ -85,8 +85,8 @@ const NotificationDropdown = ({ onClose }) => {
     };
 
     return (
-        <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800 z-50 overflow-hidden">
-            {/* Header */}
+        <div className="fixed inset-x-3 top-18 sm:absolute sm:inset-x-auto sm:top-auto sm:right-0 sm:mt-2 sm:w-96 rounded-2xl border border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-800 z-50 overflow-hidden">
+
             <div className="flex items-center justify-between border-b border-gray-100 p-4 dark:border-gray-700">
                 <div className="flex items-center gap-2">
                     <h3 className="font-semibold text-gray-900 dark:text-white">Notifications</h3>
@@ -178,7 +178,7 @@ const NotificationDropdown = ({ onClose }) => {
                                             {notif.title}
                                         </h4>
                                         {isAnnouncement && (
-                                            <span className="rounded bg-violet-100 px-1.5 py-0.2 text-[9px] font-bold uppercase tracking-wider text-violet-700 dark:bg-violet-900/60 dark:text-violet-300">
+                                            <span className="rounded bg-violet-100 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-violet-700 dark:bg-violet-900/60 dark:text-violet-300">
                                                 Broadcast
                                             </span>
                                         )}
@@ -195,11 +195,13 @@ const NotificationDropdown = ({ onClose }) => {
                                 </div>
 
                                 <button
+                                    type="button"
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         removeNotification(notif.id);
                                     }}
-                                    className="cursor-pointer opacity-0 group-hover:opacity-100 absolute right-3 top-3 text-gray-400 hover:text-red-500 transition-opacity"
+                                    aria-label="Delete notification"
+                                    className="cursor-pointer opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100 focus:opacity-100 absolute right-3 top-3 text-gray-400 hover:text-red-500 transition-opacity"
                                     title="Delete"
                                 >
                                     <Trash2 size={13} />

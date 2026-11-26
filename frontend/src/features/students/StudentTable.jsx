@@ -1,12 +1,9 @@
 import { Pencil, Trash2 } from "lucide-react";
+import Loader from "../../components/common/Loader";
 
 function StudentTable({ students = [], loading = false, onEdit, onDelete }) {
   if (loading) {
-    return (
-      <div className="flex items-center justify-center py-16">
-        <div className="h-7 w-7 animate-spin rounded-full border-3 border-violet-600 border-t-transparent"></div>
-      </div>
-    );
+    return <Loader size="sm" minHeight="min-h-[200px]" text="Loading students..." />;
   }
 
   if (students.length === 0) {
@@ -20,8 +17,8 @@ function StudentTable({ students = [], loading = false, onEdit, onDelete }) {
   }
 
   return (
-    <div className="overflow-hidden  border border-slate-200  shadow-xs dark:border-slate-800 dark:bg-slate-900">
-      <table className="w-full text-left text-sm">
+    <div className="overflow-x-auto border border-slate-200 shadow-xs dark:border-slate-800 dark:bg-slate-900">
+      <table className="w-full min-w-150 text-left text-sm">
         <thead className="border-b border-slate-200 bg-slate-50/75 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400">
           <tr>
             <th scope="col" className="px-5 py-3.5">

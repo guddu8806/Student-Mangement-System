@@ -4,12 +4,23 @@ import { Area, AreaChart, Bar, BarChart, CartesianGrid, LabelList, ResponsiveCon
 import { Megaphone } from "lucide-react";
 import { useDashboardStats } from "../../hooks/queries/useDashboard";
 import { useAuth } from "../../context/AuthContext";
+import { useTheme } from "../../context/ThemeContext";
 import WelcomeSection from "./WelcomeSection";
 import AnnouncementModal from "../notifications/AnnouncementModal";
 
 function AdminDashboard() {
   const [isAnnouncementOpen, setIsAnnouncementOpen] = useState(false);
   const { user } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const tooltipStyle = {
+    backgroundColor: isDark ? "#0f172a" : "#ffffff",
+    borderColor: isDark ? "#1e293b" : "#e2e8f0",
+    borderRadius: "0.75rem",
+    color: isDark ? "#f8fafc" : "#0f172a",
+    fontSize: "12px",
+  };
+  const tooltipItemStyle = { color: isDark ? "#e2e8f0" : "#1e293b" };
 
   const { data: statsData, isLoading: loading, error: statsError } = useDashboardStats();
   const error = statsError ? "Unable to Fetch the data !" : "";
@@ -31,7 +42,7 @@ function AdminDashboard() {
   ];
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-4 text-slate-900 transition-colors dark:bg-gray-950 dark:text-slate-100 sm:px-6 lg:px-4">
+    <div className="px-4 py-4 text-slate-900 transition-colors dark:text-slate-100 sm:px-6 lg:px-4">
       <div className="mx-auto max-w-7xl">
         {error && (
           <p role="alert" className="mb-6 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700 dark:border-rose-900/40 dark:bg-rose-950/40 dark:text-rose-300">
@@ -73,7 +84,6 @@ function AdminDashboard() {
           ))}
         </section>
 
-        {/* Analytics Charts */}
         <section className="mt-6 grid gap-6 lg:grid-cols-2">
           <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900">
             <h2 className="text-base font-semibold text-gray-900 dark:text-white">
@@ -95,7 +105,7 @@ function AdminDashboard() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#94a3b8" opacity={0.2} />
                     <XAxis dataKey="month" stroke="#64748b" fontSize={12} />
                     <YAxis allowDecimals={false} stroke="#64748b" fontSize={12} />
-                    <Tooltip />
+                    <Tooltip contentStyle={tooltipStyle} itemStyle={tooltipItemStyle} />
                     <Area
                       type="monotone"
                       dataKey="enrollments"
@@ -126,20 +136,22 @@ function AdminDashboard() {
                   <BarChart
                     data={courseEnrollments}
                     layout="vertical"
-                    margin={{ top: 8, right: 32, bottom: 8, left: 8 }}
+                    margin={{ top: 8, right: 24, bottom: 8, left: 0 }}
                   >
                     <CartesianGrid horizontal={false} stroke="#94a3b8" opacity={0.2} />
                     <XAxis type="number" allowDecimals={false} stroke="#64748b" fontSize={12} />
                     <YAxis
                       type="category"
                       dataKey="course_code"
-                      width={100}
+                      width={72}
                       tickLine={false}
                       axisLine={false}
                       stroke="#64748b"
                       fontSize={12}
                     />
                     <Tooltip
+                      contentStyle={tooltipStyle}
+                      itemStyle={tooltipItemStyle}
                       formatter={(value) => [value, "Students enrolled"]}
                       cursor={{ fill: "#8b5cf6", fillOpacity: 0.08 }}
                     />
@@ -164,7 +176,7 @@ function AdminDashboard() {
         </section>
 
         <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900">
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-base font-semibold text-gray-900 dark:text-white">
                 Recent Students
@@ -184,18 +196,18 @@ function AdminDashboard() {
                 {students.map((student) => {
                   const name = [student.first_name, student.last_name].filter(Boolean).join(" ")
                   return (
-                    <li key={student.id ?? student.email} className="flex items-center justify-between px-4 py-3 transition hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
-                      <div className="flex items-center gap-3">
-                        <div>
-                          <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                    <li key={student.id ?? student.email} className="flex flex-col gap-1 px-4 py-3 transition hover:bg-slate-50/60 dark:hover:bg-slate-800/40 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold text-gray-900 dark:text-white">
                             {name}
                           </p>
-                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                          <p className="truncate text-xs text-slate-500 dark:text-slate-400">
                             {student.email || "No email"}
                           </p>
                         </div>
                       </div>
-                      <span className="text-xs text-slate-400">
+                      <span className="shrink-0 text-xs text-slate-400">
                         {student.phone || "No phone"}
                       </span>
                     </li>
@@ -215,7 +227,7 @@ function AdminDashboard() {
           onClose={() => setIsAnnouncementOpen(false)}
         />
       </div>
-    </main>
+    </div>
   );
 }
 

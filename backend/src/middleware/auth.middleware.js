@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const pool = require("../config/db");
 
-// Middleware to verify if request has a valid JWT token
 const verifyToken = async(req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
@@ -37,7 +36,6 @@ const verifyToken = async(req, res, next) => {
     }
 };
 
-// Middleware to check if logged-in user is an Admin
 const requireAdmin = (req, res, next) => {
     if (!req.user || req.user.role !== 'admin') {
         return res.status(403).json({
@@ -47,8 +45,6 @@ const requireAdmin = (req, res, next) => {
     }
     next();
 };
-
-
 
 module.exports = {
     verifyToken,

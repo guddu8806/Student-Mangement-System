@@ -1,13 +1,12 @@
 const pool = require('../config/db');
 
-// Create student record (Used by Admin or auto-created during Student registration)
 const create = async (studentData) => {
     const { first_name, last_name, email, phone, user_id = null } = studentData;
-    
+
     if (user_id) {
         const query = `
-            INSERT INTO students (first_name, last_name, email, phone, user_id) 
-            VALUES ($1, $2, $3, $4, $5) 
+            INSERT INTO students (first_name, last_name, email, phone, user_id)
+            VALUES ($1, $2, $3, $4, $5)
             RETURNING *
         `;
         const values = [first_name, last_name, email, phone, user_id];
@@ -16,8 +15,8 @@ const create = async (studentData) => {
     }
 
     const query = `
-        INSERT INTO students (first_name, last_name, email, phone) 
-        VALUES ($1, $2, $3, $4) 
+        INSERT INTO students (first_name, last_name, email, phone)
+        VALUES ($1, $2, $3, $4)
         RETURNING *
     `;
     const values = [first_name, last_name, email, phone];
@@ -89,7 +88,6 @@ const findById = async (id) => {
     return result.rows[0];
 };
 
-// Find student profile by linked user_id
 const findByUserId = async (userId) => {
     const query = `SELECT * FROM students WHERE user_id = $1`;
     const values = [userId];
@@ -97,7 +95,6 @@ const findByUserId = async (userId) => {
     return result.rows[0];
 };
 
-// Update student record by Student ID (For Admin)
 const update = async (id, studentData) => {
     const allowedFields = ['first_name', 'last_name', 'email', 'phone'];
 
@@ -112,7 +109,6 @@ const update = async (id, studentData) => {
     const result = await pool.query(query, values);
     const updatedStudent = result.rows[0];
 
-    // If the student has a linked user account, keep the user account in sync
     if (updatedStudent && updatedStudent.user_id) {
         const userUpdates = [];
         const userValues = [];
@@ -139,7 +135,6 @@ const update = async (id, studentData) => {
     return updatedStudent;
 };
 
-// Update student record by User ID (For Student Profile update - Email is protected)
 const updateByUserId = async (userId, studentData) => {
     const allowedFields = ['first_name', 'last_name', 'phone'];
 
@@ -154,7 +149,6 @@ const updateByUserId = async (userId, studentData) => {
     const result = await pool.query(query, values);
     return result.rows[0];
 };
-
 
 const deleteById = async (id) => {
     const client = await pool.connect();
@@ -173,7 +167,6 @@ const deleteById = async (id) => {
         }
         const userId = checkResult.rows[0].user_id;
 
-        // Clean up linked enrollments first to satisfy foreign key constraints
         await client.query(`DELETE FROM enrollments WHERE student_id = $1`, [id]);
 
         const deleteStudentQuery = `
@@ -186,9 +179,9 @@ const deleteById = async (id) => {
             [id]
         );
         if (userId) {
-            // Clean up user notifications
+
             await client.query(`DELETE FROM notifications WHERE user_id = $1`, [userId]);
-            // Preserve historical audit trail by nullifying user_id in activity logs
+
             await client.query(`UPDATE activity_logs SET user_id = NULL WHERE user_id = $1`, [userId]);
             await client.query(
                 `DELETE FROM users WHERE id = $1`,
@@ -204,7 +197,6 @@ const deleteById = async (id) => {
         client.release();
     }
 };
-
 
 const notEnrolledStudent = async({ page, limit, search } = {}) =>{
     const conditions = [
@@ -222,7 +214,7 @@ const notEnrolledStudent = async({ page, limit, search } = {}) =>{
 
     if (page === undefined && limit === undefined) {
         const query = `
-            SELECT s.id, s.first_name, s.last_name, s.email, s.phone, s.created_at 
+            SELECT s.id, s.first_name, s.last_name, s.email, s.phone, s.created_at
             FROM students s
             ${whereClause}
             ORDER BY s.id
@@ -236,7 +228,7 @@ const notEnrolledStudent = async({ page, limit, search } = {}) =>{
     const offset = (parsedPage - 1) * parsedLimit;
 
     const dataQuery = `
-        SELECT s.id, s.first_name, s.last_name, s.email, s.phone, s.created_at 
+        SELECT s.id, s.first_name, s.last_name, s.email, s.phone, s.created_at
         FROM students s
         ${whereClause}
         ORDER BY s.id

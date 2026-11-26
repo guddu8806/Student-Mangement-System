@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ClipboardList, Trash2, Clock, AlertCircle } from "lucide-react";
+import Loader from "../../components/common/Loader";
 
 function checkDropStatus(dateStr, now) {
   if (!dateStr) return { eligible: true, text: "Eligible to drop" };
@@ -31,11 +32,7 @@ function EnrollmentTable({enrollments = [],loading = false,search = "",onDelete,
   },[]);
 
   if (loading) {
-    return (
-      <div className="p-12 text-center text-sm text-slate-500 dark:text-slate-400">
-        Loading enrollments...
-      </div>
-    );
+    return <Loader size="sm" minHeight="min-h-[200px]" text="Loading enrollments..." />;
   }
 
   if (enrollments.length === 0) {
@@ -71,13 +68,10 @@ function EnrollmentTable({enrollments = [],loading = false,search = "",onDelete,
         </thead>
         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
           {enrollments.map((item) => {
-            const studentName =
-              item.student_name ||
-              `${item.first_name || ""} ${item.last_name || ""}`.trim() ||
-              `Student #${item.student_id}`;
+            const studentName = item.student_name ;
             const courseName = item.course_name || `Course #${item.course_id}`;
             const dropStatus = checkDropStatus(item.enrollment_date, currentTime);
-
+            console.log("Item: ", item);
             return (
               <tr
                 key={item.enrollment_id || item.id}

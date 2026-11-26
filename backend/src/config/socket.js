@@ -14,7 +14,6 @@ const initializeSocket = (server) => {
 
     global.io = io;
 
-    // JWT Authentication
     io.use((socket, next) => {
         try {
             const token = socket.handshake.auth?.token;
@@ -30,7 +29,6 @@ const initializeSocket = (server) => {
         }
     });
 
-    // Handling the connection
     io.on("connection", (socket) => {
         const userId = socket.user.id;
         socket.join(`user:${userId}`);

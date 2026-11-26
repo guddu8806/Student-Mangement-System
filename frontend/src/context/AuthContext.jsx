@@ -1,5 +1,6 @@
 import { createContext, useState, useContext, useEffect } from 'react';
 import { getMe } from '../services/api/auth.api';
+import { FullScreenLoader } from '../components/common/Loader';
 
 const AuthContext = createContext();
 
@@ -34,7 +35,6 @@ export const AuthProvider = ({ children }) => {
                 setIsInitializing(false);
                 return;
             }
-
             try {
                 const resp = await getMe();
                 if (cancelled) return;
@@ -42,7 +42,6 @@ export const AuthProvider = ({ children }) => {
                 if (!verifiedUser) {
                     throw new Error('Invalid user payload');
                 }
-
                 setUser(verifiedUser);
                 localStorage.setItem('user', JSON.stringify(verifiedUser));
             } catch {
@@ -57,9 +56,7 @@ export const AuthProvider = ({ children }) => {
                 }
             }
         };
-
         fetchCurrentUser();
-
         return () => {
             cancelled = true;
         };
@@ -95,7 +92,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     if (isInitializing) {
-        return null;
+        return <FullScreenLoader text="Checking session..." />;
     }
 
     return (
@@ -105,5 +102,4 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);

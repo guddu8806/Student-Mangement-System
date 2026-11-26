@@ -1,7 +1,7 @@
 import { Search, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function ReportTable({data = [],currentPage = 1,totalPages = 1, onPageChange, pageSize = 8,totalFilteredCount = 0,}) {
-  
+
   return (
     <>
       <div className="overflow-x-auto">
@@ -28,13 +28,11 @@ export default function ReportTable({data = [],currentPage = 1,totalPages = 1, o
                 </td>
                 <td className="px-6 py-4 text-xs text-gray-500 dark:text-gray-400">
                   <div>{row.student_email}</div>
-                  {/* <div className="text-[11px] text-gray-400">{row.student_phone || ""}</div> */}
+
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-2">
-                    {/* <span className="inline-block rounded-md bg-violet-100 px-2 py-0.5 text-xs font-bold text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
-                      {row.course_code}
-                    </span> */}
+
                     <span className="text-xs font-medium text-gray-900 dark:text-gray-200">
                       {row.course_name}
                     </span>
@@ -81,9 +79,8 @@ export default function ReportTable({data = [],currentPage = 1,totalPages = 1, o
         </table>
       </div>
 
-      {/* Pagination Footer */}
       {totalFilteredCount > pageSize && (
-        <div className="flex items-center justify-between border-t border-gray-200 px-6 py-3.5 dark:border-gray-800">
+        <div className="flex flex-col gap-3 border-t border-gray-200 px-6 py-3.5 dark:border-gray-800 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-xs text-gray-500 dark:text-gray-400">
             Page <span className="font-semibold text-gray-900 dark:text-white">{currentPage}</span> of{" "}
             <span className="font-semibold text-gray-900 dark:text-white">{totalPages}</span>

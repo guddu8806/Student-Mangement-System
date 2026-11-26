@@ -1,7 +1,6 @@
 const authService = require('../services/auth.service');
 const AppError = require("../utils/AppError");
 
-// Register controller
 const registerUser = async (req, res, next) => {
     try {
         const result = await authService.registerUser(req.body);
@@ -15,7 +14,6 @@ const registerUser = async (req, res, next) => {
     }
 };
 
-// Login controller
 const loginUser = async (req, res, next) => {
     try {
         const result = await authService.loginUser(req.body);
@@ -29,7 +27,6 @@ const loginUser = async (req, res, next) => {
     }
 };
 
-// Get profile controller
 const getProfile = async (req, res, next) => {
     try {
         const result = await authService.getProfile(req.user.id);
@@ -46,7 +43,6 @@ const getProfile = async (req, res, next) => {
     }
 };
 
-// Update profile controller (Name/Phone only, email locked)
 const updateProfile = async (req, res, next) => {
     try {
         const result = await authService.updateProfile(req.user.id, req.body);
@@ -60,7 +56,6 @@ const updateProfile = async (req, res, next) => {
     }
 };
 
-// Delete own profile (Admin self-delete)
 const deleteProfile = async (req, res, next) => {
     try {
         const result = await authService.deleteAccount(req.user.id);
@@ -74,7 +69,6 @@ const deleteProfile = async (req, res, next) => {
     }
 };
 
-// Delete user by ID (Admin deletes another user/admin)
 const deleteUserById = async (req, res, next) => {
     try {
         const { id } = req.params;

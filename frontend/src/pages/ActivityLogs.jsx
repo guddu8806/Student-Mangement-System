@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { AlertCircle } from "lucide-react";
 import ActivityLogFilter from "../features/activityLogs/ActivityLogFilters";
 import ActivityTable from "../features/activityLogs/ActivityLogTable";
+import Loader from "../components/common/Loader";
 import { useActivityLogs, useActivityFilterOptions } from "../hooks/queries/useActivityLogs";
 import { useAuth } from "../context/AuthContext";
 
@@ -11,7 +12,6 @@ const ActivityLogs = () => {
   const currentUser = user;
   const isAdmin = userRole === "admin";
 
-  // Filters state
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [action, setAction] = useState("all");
@@ -32,7 +32,6 @@ const ActivityLogs = () => {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // TanStack Query Hooks
   const { data: filterOptions = { users: [], actions: [] } } = useActivityFilterOptions();
 
   const queryParams = useMemo(() => ({
@@ -110,7 +109,7 @@ const ActivityLogs = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 dark:bg-gray-950 sm:p-6 lg:p-4">
+    <div className="bg-slate-50 p-4 dark:bg-slate-950 sm:p-6 lg:p-4">
       <div className="mx-auto max-w-7xl space-y-6">
         {error && (
           <div
@@ -121,7 +120,6 @@ const ActivityLogs = () => {
             <span>{error}</span>
           </div>
         )}
-
 
         <ActivityLogFilter
           userRole={userRole}
@@ -141,8 +139,8 @@ const ActivityLogs = () => {
         />
 
         {loading ? (
-          <div className="flex items-center justify-center rounded-2xl border border-gray-200 bg-white py-16 dark:border-gray-800 dark:bg-gray-900">
-            <div className="h-7 w-7 animate-spin rounded-full border-3 border-indigo-600 border-t-transparent" />
+          <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+            <Loader size="sm" minHeight="min-h-[260px]" text="Loading activity logs..." />
           </div>
         ) : (
           <ActivityTable
