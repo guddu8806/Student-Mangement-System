@@ -1,12 +1,9 @@
 import { BookOpen, Pencil, Trash2 } from "lucide-react";
+import Loader from "../../components/common/Loader";
 
 const CourseTable = ({ courses = [], loading = false, search = "", onEdit, onDelete, isUser }) => {
   if (loading) {
-    return (
-      <div className="p-12 text-center text-sm text-slate-500 dark:text-slate-400">
-        Loading courses...
-      </div>
-    );
+    return <Loader size="sm" minHeight="min-h-[200px]" text="Loading courses..." />;
   }
 
   if (courses.length === 0) {
@@ -44,12 +41,10 @@ const CourseTable = ({ courses = [], loading = false, search = "", onEdit, onDel
             >
               <td className="whitespace-nowrap px-5 py-4">
                 <div className="flex items-center gap-3">
-                  {/* <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-600 text-xs font-bold text-white shadow-xs">
-                    {(course.course_code || "CR").slice(0, 2).toUpperCase()}
-                  </div> */}
+
                   <div>
                     <p className="font-semibold text-gray-900 dark:text-white">{course.course_name}</p>
-                    {/* <p className="text-xs text-slate-400">ID #{course.id}</p> */}
+
                   </div>
                 </div>
               </td>

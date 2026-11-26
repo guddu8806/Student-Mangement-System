@@ -10,7 +10,6 @@ const apiClient = axios.create({
     timeout: 10000,
 });
 
-
 apiClient.interceptors.request.use((config) =>{
     const token = localStorage.getItem("token");
     if(token){
@@ -19,23 +18,22 @@ apiClient.interceptors.request.use((config) =>{
     return config;
 });
 
-// handling expired token and invalid token 
 apiClient.interceptors.response.use(
     (response) => response,
     (error) => {
         const status = error.response?.status;
-        const isAuthPage = ["/login", "/signup"].includes(
-            window.location.pathname
-        );
-        if(status === 401 && !isAuthPage){
-            localStorage.removeItem("user")
+        const publicRoutes = ["/", "/login", "/signup"];
+        const currentPath = window.location.pathname;
+        if (status === 401) {
+            localStorage.removeItem("user");
             localStorage.removeItem("token");
-            window.location.href = "/login";
+
+            if (!publicRoutes.includes(currentPath)) {
+                window.location.href = "/login";
+            }
         }
         return Promise.reject(error);
     }
 );
-
-
 
 export default apiClient;

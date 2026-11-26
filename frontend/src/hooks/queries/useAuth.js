@@ -7,7 +7,6 @@ export const AUTH_KEYS = {
   session: ["auth", "session"],
 };
 
-// Hook to log in
 export const useLogin = (options = {}) => {
   const queryClient = useQueryClient();
   const { login } = useAuthContext();
@@ -27,7 +26,6 @@ export const useLogin = (options = {}) => {
   });
 };
 
-// Hook to register / sign up
 export const useRegister = (options = {}) => {
   const queryClient = useQueryClient();
   const { login } = useAuthContext();
@@ -47,7 +45,6 @@ export const useRegister = (options = {}) => {
   });
 };
 
-// Hook to handle logout with cache clearing
 export const useLogout = () => {
   const queryClient = useQueryClient();
   const { logout } = useAuthContext();

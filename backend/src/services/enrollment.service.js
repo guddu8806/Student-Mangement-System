@@ -38,7 +38,6 @@ const findAll = async (params = {}, user) => {
     });
 };
 
-// Create enrollment: Student enrolls themselves; Admin can enroll any student
 const createEnrollment = async (data, user) => {
     let studentId = data.student_id;
 
@@ -55,7 +54,6 @@ const createEnrollment = async (data, user) => {
         throw new AppError(errors, 400);
     }
 
-    // Atomic transaction: locks course row, checks capacity, checks duplicate, and inserts enrollment
     const { enrollment: newEnrollment, course: courseStatus } =
         await enrollmentRepository.createEnrollmentWithCapacityCheck(payload.student_id, payload.course_id);
 
@@ -105,7 +103,6 @@ const dropEnrollment = async (id, user) => {
         throw new AppError("Enrollment not found", 404);
     }
 
-    // Role-based authorization & 24-hour limit
     if (user && user.role === 'student') {
         const studentId = await getStudentIdForUser(user);
 

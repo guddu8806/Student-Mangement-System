@@ -11,7 +11,6 @@ export const ENROLLMENT_KEYS = {
   detail: (id) => ["enrollments", id],
 };
 
-// Hook to fetch enrollments
 export const useEnrollments = (params) => {
   return useQuery({
     queryKey: params ? [...ENROLLMENT_KEYS.all, params] : ENROLLMENT_KEYS.all,
@@ -22,7 +21,6 @@ export const useEnrollments = (params) => {
   });
 };
 
-// Hook to fetch single enrollment by ID
 export const useEnrollment = (id) => {
   return useQuery({
     queryKey: ENROLLMENT_KEYS.detail(id),
@@ -31,7 +29,6 @@ export const useEnrollment = (id) => {
   });
 };
 
-// Hook to create enrollment
 export const useCreateEnrollment = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -44,7 +41,6 @@ export const useCreateEnrollment = () => {
   });
 };
 
-// Hook to delete enrollment
 export const useDeleteEnrollment = () => {
   const queryClient = useQueryClient();
   return useMutation({

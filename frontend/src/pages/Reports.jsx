@@ -33,7 +33,6 @@ export default function Reports() {
         endDate: endDate || undefined,
     }), [currentPage, pageSize, debouncedSearchTerm, selectedCourse, startDate, endDate]);
 
-    // TanStack Query Hooks
     const { data: analytics = null, isLoading: loadingAnalytics, error: analyticsError } = useReportAnalytics();
     const { data: rosterData, isLoading: loadingRoster, error: rosterError } = useReportRoster(rosterParams);
 
@@ -69,9 +68,9 @@ export default function Reports() {
     const registrationHistory = analytics?.registrationHistory || [];
 
     return (
-        <main className="min-h-screen bg-slate-50 mt-4  text-slate-900 transition-colors dark:bg-gray-950 dark:text-slate-100 sm:px-6 lg:px-4">
+        <div className="px-4 py-4 text-slate-900 transition-colors dark:text-slate-100 sm:px-6 lg:px-4">
             <div className="mx-auto max-w-7xl">
-                <div className="flex flex-col  sm:flex-row sm:items-center sm:justify-between border border-gray-200 dark:border-gray-800 bg-background dark:bg-gray-900 dark:text-slate-100  p-4 rounded-2xl">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 dark:text-slate-100 p-4 rounded-2xl">
                     <div>
                         <h1 className="mt-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-3xl">
                             Reports & Analytics
@@ -107,7 +106,7 @@ export default function Reports() {
                     />
                 </div>
 
-                <div className="my-5 rounded-2xl border border-gray-200 bg-white shadow-xs dark:border-gray-800 dark:bg-gray-900">
+                <div className="my-5 rounded-2xl border border-slate-200 bg-white shadow-xs dark:border-slate-800 dark:bg-slate-900">
                     <ReportFilters
                         searchTerm={searchTerm}
                         onSearchChange={(val) => { setSearchTerm(val); setCurrentPage(1); }}
@@ -133,6 +132,6 @@ export default function Reports() {
                     />
                 </div>
             </div>
-        </main>
+        </div>
     );
 }

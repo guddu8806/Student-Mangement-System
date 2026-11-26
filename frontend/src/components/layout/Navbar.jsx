@@ -64,21 +64,15 @@ const Navbar = ({ onToggleSidebar }) => {
                             </NavLink>
                             <NavLink
                                 to="/login"
-                                className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-violet-600 dark:text-gray-200 dark:hover:text-violet-300 transition"
+                                className={({ isActive }) =>
+                                    `px-3 py-2 text-sm font-medium transition-colors ${
+                                        isActive
+                                            ? "text-violet-600 dark:text-violet-400 font-semibold"
+                                            : "text-gray-700 hover:text-violet-600 dark:text-gray-200 dark:hover:text-violet-300"
+                                    }`
+                                }
                             >
-                                Reports
-                            </NavLink>
-                            <NavLink
-                                to="/login"
-                                className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-violet-600 dark:text-gray-200 dark:hover:text-violet-300 transition"
-                            >
-                                Courses
-                            </NavLink>
-                            <NavLink
-                                to="/login"
-                                className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-violet-600 dark:text-gray-200 dark:hover:text-violet-300 transition"
-                            >
-                                Students
+                                Login
                             </NavLink>
                             <NavLink
                                 to="/signup"
@@ -104,7 +98,9 @@ const Navbar = ({ onToggleSidebar }) => {
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
                             type="button"
-                            className="rounded-lg p-2 text-gray-700 hover:bg-violet-50 dark:text-gray-300 sm:hidden"
+                            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+                            aria-expanded={isMenuOpen}
+                            className="cursor-pointer rounded-lg p-2 text-gray-700 hover:bg-violet-50 dark:text-gray-300 sm:hidden"
                         >
                             {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
                         </button>

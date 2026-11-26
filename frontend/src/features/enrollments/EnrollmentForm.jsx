@@ -34,7 +34,7 @@ function EnrollmentForm({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900">
+      <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900">
         <div className="mb-5 flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white">
             {isStudent ? "Enroll in a Course" : "Enroll Student in Course"}

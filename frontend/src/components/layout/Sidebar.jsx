@@ -62,7 +62,7 @@ export default function Sidebar({ isOpen, onClose }) {
               <NavLink to="/enrollments" onClick={onClose} className={navItemClass}>
                 <span>Enrollments</span>
               </NavLink>
-              {/* Accessible to both student and admin */}
+
               <NavLink to="/activity-logs" onClick={onClose} className={navItemClass}>
                 <span>Activity Logs</span>
               </NavLink>
@@ -129,7 +129,9 @@ export default function Sidebar({ isOpen, onClose }) {
         />
       )}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 transform bg-white transition-transform duration-200 ease-in-out dark:bg-slate-900 lg:hidden ${
+        aria-hidden={!isOpen}
+        inert={!isOpen}
+        className={`fixed inset-y-0 left-0 z-50 w-64 transform overflow-y-auto bg-white transition-transform duration-200 ease-in-out dark:bg-slate-900 lg:hidden ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >

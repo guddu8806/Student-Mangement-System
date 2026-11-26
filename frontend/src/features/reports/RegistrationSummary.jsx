@@ -1,5 +1,6 @@
 import exportToCsv from "../../config/exporToCsv";
 import {FileSpreadsheet} from "lucide-react"
+import Loader from "../../components/common/Loader";
 
 export default function RegistrationSummary({data = [], loading = false, title = "Registration & Enrollment History", description = "Student registrations vs course enrollments"}) {
 
@@ -14,15 +15,12 @@ export default function RegistrationSummary({data = [], loading = false, title =
   };
   if (loading) {
     return (
-      <div className="rounded-xl border border-gray-200 dark:border-gray-800 p-6">
-        <p className="text-sm text-gray-500">
-          Loading report...
-        </p>
+      <div className="rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+        <Loader size="sm" minHeight="min-h-[200px]" text="Loading report..." />
       </div>
     );
   }
 
-  // Empty data state
   if (!data || data.length === 0) {
     return (
       <div className="rounded-xl border border-gray-200 dark:border-gray-800 p-6">
@@ -37,7 +35,6 @@ export default function RegistrationSummary({data = [], loading = false, title =
     );
   }
 
-  // Calculate totals
   const totalRegistrations = data.reduce(
     (total, item) => total + (item.registrations || 0),
     0
@@ -51,7 +48,6 @@ export default function RegistrationSummary({data = [], loading = false, title =
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
 
-      {/* Header */}
       <div className="mb-6">
         <h2 className="text-lg font-bold text-gray-900 dark:text-white">
           {title}
@@ -62,8 +58,7 @@ export default function RegistrationSummary({data = [], loading = false, title =
         </p>
       </div>
 
-      {/* Summary */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 gap-4 mb-6 sm:grid-cols-2">
 
         <div className="rounded-xl bg-sky-50 dark:bg-sky-950/30 p-4">
           <p className="text-sm text-sky-600 dark:text-sky-400">
@@ -150,8 +145,8 @@ export default function RegistrationSummary({data = [], loading = false, title =
 
       </div>
 
-      <div className="mt-2 text-xs text-gray-400 flex justify-between">
-        <p className="text-lg text-gray-400 ">For Monthly Report</p>
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
+        <p className="text-xs font-medium">Monthly registration vs. enrollment summary</p>
         <button
             onClick={handleExport}
             className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-violet-600 px-3.5 py-2 text-xs font-semibold text-white shadow-xs shadow-violet-600/25 transition-all hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-50"

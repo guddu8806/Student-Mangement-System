@@ -62,18 +62,17 @@ const StudentDashboard = () => {
     }
   };
 
-  const enrolledCourseIds = new Set(enrollments.map((e) => e.course_id || e.id)); 
+  const enrolledCourseIds = new Set(enrollments.map((e) => e.course_id));
   const enrolledCoursesCount = enrollments.length;
   const availableCourses = courses.filter((c) => !enrolledCourseIds.has(c.id));
 
-  // Compute total enrolled credits
   const totalCredits = enrollments.reduce((acc, curr) => {
     const cred = Number(curr.credits || curr.course_credits || 0);
     return acc + cred;
   }, 0);
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-4 text-slate-900 transition-colors dark:bg-gray-950 dark:text-slate-100 sm:px-6 lg:px-4">
+    <div className="px-4 py-4 text-slate-900 transition-colors dark:text-slate-100 sm:px-6 lg:px-4">
       <div className="mx-auto max-w-7xl space-y-8">
         {displayError && (
           <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700 dark:border-rose-900/40 dark:bg-rose-950/40 dark:text-rose-300">
@@ -120,8 +119,8 @@ const StudentDashboard = () => {
           </section>
         )}
 
-        <section className="flex flex-row my-4 ">
-          <div className="w-1/2 mr-2 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs transition hover:border-violet-300 dark:border-slate-800 dark:bg-slate-900">
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs transition hover:border-violet-300 dark:border-slate-800 dark:bg-slate-900">
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Enrolled Courses
@@ -131,7 +130,7 @@ const StudentDashboard = () => {
               {loading ? "…" : enrolledCoursesCount}
             </p>
           </div>
-          <div className=" w-1/2 ml-2 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs transition hover:border-violet-300 dark:border-slate-800 dark:bg-slate-900">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs transition hover:border-violet-300 dark:border-slate-800 dark:bg-slate-900">
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Total Credits
@@ -144,7 +143,7 @@ const StudentDashboard = () => {
         </section>
 
         <section className="rounded-2xl mb-4 border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900">
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
             <div>
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">
                 My Active Courses
@@ -227,7 +226,7 @@ const StudentDashboard = () => {
                           <button
                             type="button"
                             onClick={() => handleDrop(enrollmentId)}
-                            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-rose-600 transition hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/50"
+                            className="cursor-pointer inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-rose-600 transition hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/50"
                           >
                             <Trash2 size={12} />
                             Drop
@@ -244,7 +243,7 @@ const StudentDashboard = () => {
 
         {availableCourses.length > 0 && (
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900">
-            <div className="mb-4 flex items-center justify-between">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
               <div>
                 <h2 className="text-lg font-bold text-gray-900 dark:text-white">
                   Available Courses to Explore
@@ -308,7 +307,7 @@ const StudentDashboard = () => {
         )}
 
       </div>
-    </main>
+    </div>
   );
 }
 

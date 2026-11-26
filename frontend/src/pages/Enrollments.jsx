@@ -10,7 +10,6 @@ import EnrollmentTable from "../features/enrollments/EnrollmentTable";
 function Enrollments() {
   const { user } = useAuth();
   const isStudent = user?.role === "student";
-  console.log("isStudent: " , isStudent);
 
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -19,9 +18,8 @@ function Enrollments() {
 
   const { data: enrollments = [], isLoading: loading, error: queryError } = useEnrollments();
   const { data: courses = [] } = useCourses();
-  const { data: students = [] } = useStudents();
+  const { data: students = [] } = useStudents(undefined, { enabled: !isStudent });
 
-  // Mutations
   const createMutation = useCreateEnrollment();
   const deleteMutation = useDeleteEnrollment();
 
@@ -99,7 +97,7 @@ function Enrollments() {
   const displayError = error || (queryError ? "Failed to load enrollment records." : "");
 
   return (
-    <main className="min-h-screen flex-1 bg-slate-50 px-4 py-4 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100 sm:px-6 lg:px-4">
+    <div className="flex-1 bg-slate-50 px-4 py-4 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100 sm:px-6 lg:px-4">
       <div className="mx-auto max-w-7xl">
         {displayError && !isModalOpen && (
           <p
@@ -167,7 +165,7 @@ function Enrollments() {
           currentUser={user}
         />
       )}
-    </main>
+    </div>
   );
 }
 

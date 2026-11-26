@@ -11,7 +11,6 @@ export const PROFILE_KEYS = {
   current: ["profile", "current"],
 };
 
-// Hook to fetch the current user's profile
 export const useProfile = (options = {}) => {
   return useQuery({
     queryKey: PROFILE_KEYS.current,
@@ -20,7 +19,6 @@ export const useProfile = (options = {}) => {
   });
 };
 
-// Hook to update profile
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -33,7 +31,6 @@ export const useUpdateProfile = () => {
   });
 };
 
-// Hook to delete the current user's own account
 export const useDeleteAccount = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -44,7 +41,6 @@ export const useDeleteAccount = () => {
   });
 };
 
-// Hook to delete user by ID (admin operation)
 export const useDeleteUser = () => {
   const queryClient = useQueryClient();
   return useMutation({

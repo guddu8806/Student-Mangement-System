@@ -1,33 +1,34 @@
-import { BookOpen, GraduationCap, Users } from "lucide-react";
+import { BookOpen, GraduationCap, ShieldCheck, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import educoreHero from "../assets/educore-hero.png";
+import { useAuth } from "../context/AuthContext";
 
 const stats = [
   {
-    label: "Students",
-    value: "2,500+",
-    icon: Users,
+    label: "Access Control",
+    value: "Role-Based",
+    icon: ShieldCheck,
     color: "text-violet-600 dark:text-violet-400",
     bg: "bg-violet-100 dark:bg-violet-500/20",
   },
   {
-    label: "Courses",
-    value: "120+",
+    label: "Catalog & Seats",
+    value: "Live Tracking",
     icon: BookOpen,
     color: "text-emerald-600 dark:text-emerald-400",
     bg: "bg-emerald-100 dark:bg-emerald-500/20",
   },
   {
-    label: "Enrollments",
-    value: "98%",
+    label: "Drop Policy",
+    value: "24h Window",
     icon: GraduationCap,
     color: "text-amber-600 dark:text-amber-400",
     bg: "bg-amber-100 dark:bg-amber-500/20",
   },
   {
-    label: "Pass Rate",
-    value: "95%",
-    icon: GraduationCap,
+    label: "Notifications",
+    value: "Real-Time",
+    icon: Users,
     color: "text-fuchsia-600 dark:text-fuchsia-400",
     bg: "bg-fuchsia-100 dark:bg-fuchsia-500/20",
   },
@@ -109,17 +110,18 @@ const highlights = [
 ];
 
 function Home() {
+  const { token, user } = useAuth();
+  const isLoggedIn = Boolean(token && user);
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100">
       <section
         className="relative isolate flex items-center overflow-hidden bg-cover bg-center bg-no-repeat px-4 py-16 sm:py-24"
         style={{
           backgroundImage: `url(${educoreHero})`,
-          backgroundPosition: "center",
-          backgroundSize: "100% 100%",
         }}
       >
-        <div className="absolute inset-0 -z-10 bg-white/20  dark:bg-slate-950/75" />
+        <div className="absolute inset-0 -z-10 bg-white/75 backdrop-blur-[2px] dark:bg-slate-950/80" />
 
         <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-12 text-center md:flex-row md:text-left">
           <div className="md:w-1/2">
@@ -136,16 +138,16 @@ function Home() {
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4 md:justify-start">
               <Link
-                to="/signup"
+                to={isLoggedIn ? "/dashboard" : "/signup"}
                 className="inline-flex items-center rounded-xl bg-violet-600 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-violet-600/25 transition hover:bg-violet-700 dark:bg-violet-600 dark:hover:bg-violet-500"
               >
-                Get Started
+                {isLoggedIn ? "Go to Dashboard" : "Get Started"}
               </Link>
               <Link
-                to="/courses"
+                to={isLoggedIn ? "/courses" : "/login"}
                 className="inline-flex items-center rounded-xl border border-slate-300 bg-white/90 px-6 py-3.5 text-sm font-semibold text-slate-700 shadow-xs backdrop-blur-sm transition hover:bg-slate-100 hover:text-violet-700 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-violet-400"
               >
-                View Courses
+                {isLoggedIn ? "View Courses" : "Login"}
               </Link>
             </div>
           </div>
@@ -322,10 +324,10 @@ function Home() {
 
               <div className="mt-6 border-t border-slate-100 pt-4 dark:border-slate-800">
                 <Link
-                  to="/enrollments"
+                  to={isLoggedIn ? "/enrollments" : "/login"}
                   className="flex w-full items-center justify-center rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-violet-700"
                 >
-                  Manage Current Enrollments
+                  {isLoggedIn ? "Manage Current Enrollments" : "Sign In to Manage Enrollments"}
                 </Link>
               </div>
             </div>
@@ -382,16 +384,16 @@ function Home() {
 
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link
-              to="/login"
+              to={isLoggedIn ? "/dashboard" : "/login"}
               className="rounded-xl bg-white px-6 py-3 text-sm font-semibold text-violet-700 shadow-md transition hover:bg-violet-50"
             >
-              Get Started
+              {isLoggedIn ? "Open Dashboard" : "Get Started"}
             </Link>
             <Link
-              to="/courses"
+              to={isLoggedIn ? "/courses" : "/signup"}
               className="rounded-xl border border-white/40 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
             >
-              Explore Courses
+              {isLoggedIn ? "Explore Courses" : "Create Account"}
             </Link>
           </div>
         </div>

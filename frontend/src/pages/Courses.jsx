@@ -4,7 +4,6 @@ import {useCourses, useCreateCourse, useUpdateCourse,useDeleteCourse,} from "../
 import CourseForm from "../features/courses/CourseForm";
 import CourseTable from "../features/courses/CourseTable";
 import { useAuth } from "../context/AuthContext";
-// import { useQueryClient } from "@tanstack/react-query";
 
 function Courses() {
   const [search, setSearch] = useState("");
@@ -17,7 +16,6 @@ function Courses() {
   const isLoggedIn = Boolean(token);
   const isUser = isLoggedIn && user?.role === "admin";
 
-  // TanStack Query custom hooks
   const { data: courses = [], isLoading: loading, error: queryError } = useCourses();
   const createMutation = useCreateCourse();
   const updateMutation = useUpdateCourse();
@@ -88,7 +86,7 @@ function Courses() {
   const displayError = error || (queryError ? "Failed to load courses from backend." : "");
 
   return (
-    <main className="min-h-screen flex-1 bg-slate-50 px-8 py-4 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100 sm:px-6 lg:px-4">
+    <div className="flex-1 bg-slate-50 px-4 py-4 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100 sm:px-6 lg:px-4">
       <div className="mx-auto max-w-7xl">
         {displayError && !isModalOpen && (
           <p
@@ -157,7 +155,7 @@ function Courses() {
           error={isModalOpen ? error : ""}
         />
       )}
-    </main>
+    </div>
   );
 }
 

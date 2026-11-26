@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
-import { AuthProvider } from "../context/AuthContext";
+
 import { NotificationProvider } from "../context/NotificationContext";
 import PageLoader from "../components/common/Loader";
 import Navbar from "../components/layout/Navbar";
@@ -25,11 +25,11 @@ import PublicRoute from "../routes/PublicRoute";
 
 function PublicLayout() {
     return (
-        <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 transition-colors dark:bg-gray-950 dark:text-slate-100">
+        <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100">
             <Navbar />
-            <div className="flex-1 pt-16">
+            <main className="flex flex-1 flex-col pt-16">
                 <Outlet />
-            </div>
+            </main>
             <Footer />
         </div>
     );
@@ -37,7 +37,7 @@ function PublicLayout() {
 
 function App() {
     return (
-        <AuthProvider>
+
             <NotificationProvider>
                 <BrowserRouter>
                     <Suspense fallback={<PageLoader/>}>
@@ -72,7 +72,7 @@ function App() {
                     </Suspense>
                 </BrowserRouter>
             </NotificationProvider>
-        </AuthProvider>
+
     );
 }
 

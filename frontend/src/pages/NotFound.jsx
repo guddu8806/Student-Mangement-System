@@ -5,14 +5,11 @@ function NotFound() {
   return (
     <div className="relative flex min-h-[80vh] flex-1 items-center justify-center overflow-hidden bg-slate-50 px-4 py-12 dark:bg-slate-950">
 
-      {/* Background Decoration */}
       <div className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-violet-200/40 blur-3xl dark:bg-violet-900/20" />
       <div className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-purple-200/40 blur-3xl dark:bg-purple-900/20" />
 
-      {/* Main Content */}
       <div className="relative z-10 w-full max-w-lg text-center">
 
-        {/* Icon */}
         <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl border border-violet-200/60 bg-white shadow-xl shadow-violet-500/10 dark:border-violet-500/20 dark:bg-slate-900">
           <AlertCircle
             size={38}
@@ -21,12 +18,10 @@ function NotFound() {
           />
         </div>
 
-        {/* Error Code */}
-        <h1 className="mt-7 bg-linear-to-r from-violet-600 to-purple-500 bg-clip-text text-2xl font-black tracking-tight text-transparent sm:text-6xl">
+        <h1 className="mt-7 bg-linear-to-r from-violet-600 to-purple-500 bg-clip-text text-5xl font-black tracking-tight text-transparent sm:text-6xl">
           404
         </h1>
 
-        {/* Text */}
         <h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
           Oops! Page not found
         </h2>
@@ -36,7 +31,6 @@ function NotFound() {
           or the page might have been moved.
         </p>
 
-        {/* Buttons */}
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Link
             to="/"
@@ -55,7 +49,6 @@ function NotFound() {
           </button>
         </div>
 
-        {/* Footer Label */}
         <p className="mt-12 text-xs font-medium tracking-widest text-slate-400 dark:text-slate-600">
           EDUCORE <span className="mx-1">·</span> STUDENT MANAGEMENT SYSTEM
         </p>

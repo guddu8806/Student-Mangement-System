@@ -8,12 +8,15 @@ export default function ProfileHeader({
 }) {
   return (
     <section className="overflow-hidden mt-2 rounded-2xl border border-slate-200 bg-white shadow-xs dark:border-slate-800 dark:bg-slate-900">
-      <div className="px-6 py-16 pb-6">
-        <div className="-mt-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div className="flex items-end gap-4">
-            <div className="pb-1">
+      <div className="p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-violet-600 text-lg font-bold text-white shadow-md shadow-violet-600/20">
+              {(profile?.name ).charAt(0).toUpperCase()}
+            </div>
+            <div>
               <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-                {profile?.name || "User"}
+                {profile?.name }
               </h1>
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 {profile?.email}

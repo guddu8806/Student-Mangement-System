@@ -15,7 +15,6 @@ const errorHandler = (err, req, res, next) => {
     message = "Invalid JSON request body";
   }
 
-  // PostgreSQL errors
   if (err.code === "23505") {
     statusCode = 409;
     message = "This record already exists. Please check your details.";
@@ -25,7 +24,6 @@ const errorHandler = (err, req, res, next) => {
     statusCode = 400;
     message = "Related record does not exist or is currently in use.";
   }
-
 
   const response = {
     success: false,

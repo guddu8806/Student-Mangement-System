@@ -1,7 +1,12 @@
 import { NavLink } from "react-router-dom";
 import { GraduationCap } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 function Footer() {
+    const { token, user } = useAuth();
+    const isLoggedIn = Boolean(token && user);
+    const isAdmin = user?.role === "admin";
+
     return (
         <footer className="mt-auto border-t border-gray-200 bg-white py-6 text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200">
             <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 md:flex-row">
@@ -25,18 +30,33 @@ function Footer() {
                         <NavLink to="/" className="transition hover:text-violet-600 dark:hover:text-violet-400">
                             Home
                         </NavLink>
-                        <NavLink to="/dashboard" className="transition hover:text-violet-600 dark:hover:text-violet-400">
-                            Dashboard
-                        </NavLink>
-                        <NavLink to="/students" className="transition hover:text-violet-600 dark:hover:text-violet-400">
-                            Students
-                        </NavLink>
-                        <NavLink to="/courses" className="transition hover:text-violet-600 dark:hover:text-violet-400">
-                            Courses
-                        </NavLink>
-                        <NavLink to="/enrollments" className="transition hover:text-violet-600 dark:hover:text-violet-400">
-                            Enrollments
-                        </NavLink>
+                        {isLoggedIn ? (
+                            <>
+                                <NavLink to="/dashboard" className="transition hover:text-violet-600 dark:hover:text-violet-400">
+                                    Dashboard
+                                </NavLink>
+                                {isAdmin && (
+                                    <NavLink to="/students" className="transition hover:text-violet-600 dark:hover:text-violet-400">
+                                        Students
+                                    </NavLink>
+                                )}
+                                <NavLink to="/courses" className="transition hover:text-violet-600 dark:hover:text-violet-400">
+                                    Courses
+                                </NavLink>
+                                <NavLink to="/enrollments" className="transition hover:text-violet-600 dark:hover:text-violet-400">
+                                    Enrollments
+                                </NavLink>
+                            </>
+                        ) : (
+                            <>
+                                <NavLink to="/login" className="transition hover:text-violet-600 dark:hover:text-violet-400">
+                                    Sign In
+                                </NavLink>
+                                <NavLink to="/signup" className="transition hover:text-violet-600 dark:hover:text-violet-400">
+                                    Get Started
+                                </NavLink>
+                            </>
+                        )}
                     </nav>
                 </div>
             </div>

@@ -1,10 +1,9 @@
 const pool = require("../config/db");
 
-// 1. Insert activity log
 const createActivityLog = async (data) => {
     const query = `
-        INSERT INTO activity_logs (user_id, action, entity_type, entity_id, description) 
-        VALUES ($1, $2, $3, $4, $5) 
+        INSERT INTO activity_logs (user_id, action, entity_type, entity_id, description)
+        VALUES ($1, $2, $3, $4, $5)
         RETURNING *
     `;
     const values = [
@@ -54,20 +53,20 @@ const getFilteredActivityLogs = async ({ page = 1, limit = 10, action, userId, s
         values.push(`%${search.trim()}%`);
         const searchIdx = values.length;
         conditions.push(`(
-            al.description ILIKE $${searchIdx} OR 
-            al.action ILIKE $${searchIdx} OR 
-            al.entity_type ILIKE $${searchIdx} OR 
-            u.name ILIKE $${searchIdx} OR 
+            al.description ILIKE $${searchIdx} OR
+            al.action ILIKE $${searchIdx} OR
+            al.entity_type ILIKE $${searchIdx} OR
+            u.name ILIKE $${searchIdx} OR
             u.email ILIKE $${searchIdx}
         )`);
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
     const dataQuery = `
-        SELECT 
-            al.*, 
-            u.name AS user_name, 
-            u.email AS user_email, 
+        SELECT
+            al.*,
+            u.name AS user_name,
+            u.email AS user_email,
             u.role AS user_role
         FROM activity_logs al
         LEFT JOIN users u ON al.user_id = u.id

@@ -9,6 +9,7 @@ import ProfileHeader from "../features/profile/ProfileHeader";
 import ProfileInfo from "../features/profile/ProfileInfo";
 import ProfileEditForm from "../features/profile/ProfileEditForm";
 import ProfileAcademicInfo from "../features/profile/ProfileAcademicInfo";
+import Loader from "../components/common/Loader";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -18,7 +19,6 @@ const Profile = () => {
   const [formData, setFormData] = useState({ name: "", phone: "" });
   const [message, setMessage] = useState({ type: "", text: "" });
 
-  // TanStack Query Hooks
   const { data: profileData, isLoading: loading, error: profileError } = useProfile();
   const { data: enrollments = [] } = useEnrollments();
   const updateMutation = useUpdateProfile();
@@ -79,11 +79,7 @@ const Profile = () => {
   ];
 
   if (loading) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center text-sm text-slate-500">
-        Loading profile...
-      </div>
-    );
+    return <Loader size="md" minHeight="min-h-[50vh]" text="Loading profile..." />;
   }
 
   if (profileError) {
@@ -95,7 +91,7 @@ const Profile = () => {
   }
 
   return (
-    <main className="mx-auto space-y-6 py-2 text-slate-900 transition-colors dark:text-slate-100 sm:px-4">
+    <div className="mx-auto space-y-6 px-4 py-4 text-slate-900 transition-colors dark:text-slate-100 sm:px-6 lg:px-4">
       {message.text && (
         <div
           role="alert"
@@ -159,11 +155,10 @@ const Profile = () => {
         )}
       </section>
 
-      {/* Academic Information Section (Student Only) */}
       {!isAdmin && (
         <ProfileAcademicInfo enrollments={enrollments} />
       )}
-    </main>
+    </div>
   );
 };
 

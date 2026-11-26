@@ -10,26 +10,32 @@ const NotificationContext = createContext(null);
 export const NotificationProvider = ({ children }) => {
     const queryClient = useQueryClient();
     const { token, user } = useAuth();
+    const currentOwner = token && user ? `${user.id}:${token}` : null;
+    const [ownerKey, setOwnerKey] = useState(null);
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [loading, setLoading] = useState(false);
 
+    const activeNotifications = currentOwner && ownerKey === currentOwner ? notifications : [];
+    const activeUnreadCount = currentOwner && ownerKey === currentOwner ? unreadCount : 0;
+
     const fetchNotifications = useCallback(async () => {
-        if (!token) return;
+        if (!currentOwner) return;
         setLoading(true);
         try {
             const data = await getNotifications();
             setNotifications(data.notifications || []);
             setUnreadCount(data.unreadCount || 0);
+            setOwnerKey(currentOwner);
         } catch (err) {
             console.error("Error fetching notifications: ", err);
         } finally {
             setLoading(false);
         }
-    }, [token]);
+    }, [currentOwner]);
 
     useEffect(() => {
-        if (!token || !user) {
+        if (!currentOwner) {
             return;
         }
         let isMounted = true;
@@ -40,6 +46,7 @@ export const NotificationProvider = ({ children }) => {
                 if (isMounted) {
                     setNotifications(data.notifications || []);
                     setUnreadCount(data.unreadCount || 0);
+                    setOwnerKey(currentOwner);
                 }
             } catch (err) {
                 if (isMounted) console.error("Error fetching notifications: ", err);
@@ -51,12 +58,12 @@ export const NotificationProvider = ({ children }) => {
 
         socket.connect();
         const handleNewNotification = (newNotif) => {
-            console.log("New notification received:", newNotif);
             setNotifications((prev) => [
                 newNotif,
                 ...prev.filter((item) => item.id !== newNotif.id)
             ]);
             setUnreadCount((prev) => prev + 1);
+            setOwnerKey(currentOwner);
             queryClient.invalidateQueries({ queryKey: NOTIFICATION_KEYS.all });
         };
         socket.on("notification:new", handleNewNotification);
@@ -65,7 +72,7 @@ export const NotificationProvider = ({ children }) => {
             socket.off("notification:new", handleNewNotification);
             socket.disconnect();
         };
-    }, [token, user, queryClient]);
+    }, [currentOwner, queryClient]);
 
     const markAsRead = async (id) => {
         try {
@@ -106,8 +113,8 @@ export const NotificationProvider = ({ children }) => {
     return (
         <NotificationContext.Provider
             value={{
-                notifications,
-                unreadCount,
+                notifications: activeNotifications,
+                unreadCount: activeUnreadCount,
                 loading,
                 markAsRead,
                 markAllAsRead,
@@ -120,8 +127,6 @@ export const NotificationProvider = ({ children }) => {
     );
 };
 
-
-// eslint-disable-next-line react-refresh/only-export-components
 export const useNotifications = () => {
     const context = useContext(NotificationContext);
     if (!context) {

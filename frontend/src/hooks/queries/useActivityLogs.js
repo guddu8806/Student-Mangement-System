@@ -10,7 +10,6 @@ export const ACTIVITY_LOG_KEYS = {
   filters: ["activityLogs", "filters"],
 };
 
-// Hook to fetch paginated & filtered activity logs
 export const useActivityLogs = (params = {}) => {
   return useQuery({
     queryKey: ACTIVITY_LOG_KEYS.list(params),
@@ -21,7 +20,6 @@ export const useActivityLogs = (params = {}) => {
   });
 };
 
-// Hook to fetch activity log filter options (users, actions)
 export const useActivityFilterOptions = () => {
   return useQuery({
     queryKey: ACTIVITY_LOG_KEYS.filters,

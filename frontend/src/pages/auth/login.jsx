@@ -35,9 +35,6 @@ function Login() {
     }
   };
 
-  console.log("Error: " , error);
-  
-
   return (
     <div className="flex flex-1 items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900">

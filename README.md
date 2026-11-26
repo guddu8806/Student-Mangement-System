@@ -1,5 +1,23 @@
 # Student Management System
+
+![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Relational%20DB-4169E1?logo=postgresql&logoColor=white)
+![License](https://img.shields.io/badge/License-ISC-blue)
+
 This is a full stack student management system designed to organize and manage student information through a simple and user-friendly interface.
+
+## Table of Contents
+- [Overview](#overview)
+- [Tech Stack](#tech-stack)
+- [Features](#features)
+- [Project Structure](#project-structure)
+- [Environment Variables](#environment-variables)
+- [Database Design](#database-design)
+- [API Testing](#api-testing)
+- [Installation](#installation)
+- [Scripts & Verification](#scripts--verification)
+- [License](#license)
 
 # Overview
 This project is being developed using React for the frontend, Node.js and Express.js for the backend, and PostgreSQL for the database management.
@@ -7,8 +25,9 @@ This project is being developed using React for the frontend, Node.js and Expres
 ## Tech Stack
 
 ### Frontend
-- React (Vite)
-- Tailwind CSS
+- React 19 (Vite 8)
+- Tailwind CSS v4
+- TanStack Query (`@tanstack/react-query`)
 - Axios
 - React Router
 - Lucide React
@@ -23,18 +42,23 @@ This project is being developed using React for the frontend, Node.js and Expres
 - Socket.IO
 - JSON Web Token (`jsonwebtoken`)
 - bcryptjs
+- Helmet & CORS
+- Compression
+- Express Rate Limit (`express-rate-limit`)
+- dotenv
 
 ## Features
 - Role-Based Authentication & Authorization (JWT authentication for Admin & Student roles, profile management)
-- Student Information Management (CRUD - Create, Read, Update, Delete, enrollment status & course filtering, unenrolled student lookup)
-- Course Management (CRUD - Course codes, credit limits, seat capacities, live seat availability, descriptions)
-- Enrollment System (Assign students to courses with duplicate prevention and course capacity enforcement)
+- Student Information Management (CRUD - Create, Read, Update, Delete, enrollment status & course filtering, unenrolled student lookup, search & pagination)
+- Course Management (CRUD - Course codes, credit limits, seat capacities, live seat availability, descriptions, search & pagination)
+- Enrollment System (Assign students to courses with duplicate prevention, atomic row-locked capacity enforcement, search & pagination)
 - Enrollment Drop Policy (Enforces 24-hour drop window from enrollment time for students; Admins can drop anytime)
 - Real-Time Notifications & Announcements (Socket.IO push notifications, unread tracking, mark as read/delete, Admin broadcasts to all students or course enrollees)
 - Reports & Analytics (KPIs, top courses, monthly registration vs enrollment history, filterable detailed roster, CSV export)
-- Student & Course Activity Logs (Audit logging for admin actions on students, courses, and student enrollments/course withdrawals with date, user, activity-type filtering and pagination)
+- Student & Course Activity Logs (Audit logging for admin and student actions with date, user, search, activity-type filtering and pagination)
 - Dashboard Metrics & Analytics (Admin dashboard with Recharts visualizations; Student dashboard with enrolled courses, credits & campus announcements)
 - Light & Dark Mode Support (Persistent theme switcher across the application)
+- Security & Performance Middleware (`helmet` headers, `compression`, and login rate limiting of 5 attempts per 15 minutes)
 - Centralized Error Handling & PostgreSQL validation (Duplicate record `23505`, Foreign key `23503`)
 - Layered 3-Tier Architecture (Controller -> Service -> Repository)
 - REST API for frontend-backend communication
@@ -50,47 +74,176 @@ This project is being developed using React for the frontend, Node.js and Expres
 - Activity Logs
 
 ## Project Structure
-student-management-system/
+```text
+Student-Mangement-System/
 ├── frontend/
 │   ├── public/
+│   │   └── logo.png
 │   ├── src/
 │   │   ├── app/
+│   │   │   └── App.jsx
 │   │   ├── assets/
+│   │   │   ├── educore-hero.png
+│   │   │   ├── hero.png
+│   │   │   ├── react.svg
+│   │   │   └── vite.svg
 │   │   ├── components/
+│   │   │   ├── common/
+│   │   │   │   └── Loader.jsx
 │   │   │   ├── dashboard/
+│   │   │   │   ├── AdminDashboard.jsx
+│   │   │   │   ├── StudentDashboard.jsx
+│   │   │   │   └── WelcomeSection.jsx
 │   │   │   ├── layout/
+│   │   │   │   ├── DashboardLayout.jsx
+│   │   │   │   ├── Footer.jsx
+│   │   │   │   ├── Navbar.jsx
+│   │   │   │   └── Sidebar.jsx
 │   │   │   └── notifications/
+│   │   │       ├── AnnouncementModal.jsx
+│   │   │       ├── NotificationBell.jsx
+│   │   │       └── NotificationDropdown.jsx
 │   │   ├── config/
-│   │   ├── features/
-│   │   │   ├── courses/
-│   │   │   ├── enrollments/
-│   │   │   ├── reports/
-│   │   │   └── students/
-│   │   ├── pages/
-│   │   │   └── auth/
+│   │   │   ├── exportoCsv.js
+│   │   │   └── socket.js
 │   │   ├── context/
+│   │   │   ├── AuthContext.jsx
+│   │   │   ├── NotificationContext.jsx
+│   │   │   └── ThemeContext.jsx
+│   │   ├── features/
+│   │   │   ├── activityLogs/
+│   │   │   │   ├── ActivityLogFilters.jsx
+│   │   │   │   └── ActivityLogTable.jsx
+│   │   │   ├── courses/
+│   │   │   │   ├── CourseForm.jsx
+│   │   │   │   └── CourseTable.jsx
+│   │   │   ├── enrollments/
+│   │   │   │   ├── EnrollmentForm.jsx
+│   │   │   │   └── EnrollmentTable.jsx
+│   │   │   ├── profile/
+│   │   │   │   ├── ProfileAcademicInfo.jsx
+│   │   │   │   ├── ProfileEditForm.jsx
+│   │   │   │   ├── ProfileHeader.jsx
+│   │   │   │   └── ProfileInfo.jsx
+│   │   │   ├── reports/
+│   │   │   │   ├── RegistrationSummary.jsx
+│   │   │   │   ├── ReportFilters.jsx
+│   │   │   │   ├── ReportKPIs.jsx
+│   │   │   │   ├── ReportTable.jsx
+│   │   │   │   └── TopCourses.jsx
+│   │   │   └── students/
+│   │   │       ├── StudentForm.jsx
+│   │   │       └── StudentTable.jsx
+│   │   ├── hooks/
+│   │   │   └── queries/
+│   │   │       ├── useActivityLogs.js
+│   │   │       ├── useAuth.js
+│   │   │       ├── useCourses.js
+│   │   │       ├── useDashboard.js
+│   │   │       ├── useEnrollments.js
+│   │   │       ├── useNotifications.js
+│   │   │       ├── useProfile.js
+│   │   │       ├── useReports.js
+│   │   │       └── useStudents.js
+│   │   ├── lib/
+│   │   │   └── queryClient.js
+│   │   ├── pages/
+│   │   │   ├── auth/
+│   │   │   │   ├── login.jsx
+│   │   │   │   └── signup.jsx
+│   │   │   ├── ActivityLogs.jsx
+│   │   │   ├── Courses.jsx
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── Enrollments.jsx
+│   │   │   ├── Home.jsx
+│   │   │   ├── NotFound.jsx
+│   │   │   ├── Profile.jsx
+│   │   │   ├── Reports.jsx
+│   │   │   ├── Students.jsx
+│   │   │   └── Unauthorized.jsx
 │   │   ├── routes/
+│   │   │   ├── ProtectedRoute.jsx
+│   │   │   └── PublicRoute.jsx
 │   │   ├── services/
+│   │   │   └── api/
+│   │   │       ├── activityLog.api.js
+│   │   │       ├── apiClient.js
+│   │   │       ├── auth.api.js
+│   │   │       ├── course.api.js
+│   │   │       ├── dashboard.api.js
+│   │   │       ├── enrollment.api.js
+│   │   │       ├── notification.api.js
+│   │   │       ├── report.api.js
+│   │   │       └── student.api.js
 │   │   ├── styles/
+│   │   │   └── index.css
 │   │   └── main.jsx
+│   ├── eslint.config.js
+│   ├── index.html
 │   ├── package.json
+│   ├── package-lock.json
+│   ├── README.md
 │   └── vite.config.js
 ├── backend/
 │   ├── src/
 │   │   ├── config/
+│   │   │   ├── db.js
+│   │   │   └── socket.js
 │   │   ├── controllers/
+│   │   │   ├── activityLog.controller.js
+│   │   │   ├── auth.controller.js
+│   │   │   ├── course.controller.js
+│   │   │   ├── dashboard.controller.js
+│   │   │   ├── enrollment.controller.js
+│   │   │   ├── notification.controller.js
+│   │   │   ├── report.controller.js
+│   │   │   └── student.controller.js
 │   │   ├── middleware/
+│   │   │   ├── auth.middleware.js
+│   │   │   ├── error.middleware.js
+│   │   │   └── rateLimit.middleware.js
 │   │   ├── repositories/
+│   │   │   ├── activityLog.repository.js
+│   │   │   ├── auth.repository.js
+│   │   │   ├── courses.repository.js
+│   │   │   ├── dashboard.repository.js
+│   │   │   ├── enrollment.repository.js
+│   │   │   ├── notification.repository.js
+│   │   │   ├── report.repository.js
+│   │   │   └── student.repository.js
 │   │   ├── routes/
+│   │   │   ├── activityLog.route.js
+│   │   │   ├── auth.routes.js
+│   │   │   ├── course.route.js
+│   │   │   ├── dashboard.routes.js
+│   │   │   ├── enrollment.routes.js
+│   │   │   ├── notification.routes.js
+│   │   │   ├── report.routes.js
+│   │   │   └── student.route.js
 │   │   ├── services/
+│   │   │   ├── activityLog.service.js
+│   │   │   ├── auth.service.js
+│   │   │   ├── courses.service.js
+│   │   │   ├── dashboard.service.js
+│   │   │   ├── enrollment.service.js
+│   │   │   ├── notification.service.js
+│   │   │   ├── report.service.js
+│   │   │   └── student.service.js
 │   │   ├── utils/
+│   │   │   ├── AppError.js
+│   │   │   └── generateToken.js
 │   │   ├── validators/
+│   │   │   ├── auth.validator.js
+│   │   │   ├── course.validator.js
+│   │   │   ├── enrollment.validator.js
+│   │   │   └── student.validator.js
 │   │   ├── app.js
 │   │   └── server.js
 │   ├── package.json
 │   └── package-lock.json
 ├── .gitignore
 └── README.md
+```
 
 
 ## Prerequisites
@@ -105,22 +258,23 @@ student-management-system/
 
 | Variable | Description |
 | --- | --- |
-| DB_HOST | PostgreSQL host |
-| DB_PORT | PostgreSQL port |
-| DB_NAME | Database name |
+| DB_HOST | PostgreSQL host (e.g., `localhost`) |
+| DB_PORT | PostgreSQL port (default PostgreSQL port: `5432`) |
+| DB_NAME | Database name (`educore`) |
 | DB_USER | Database username |
 | DB_PASSWORD | Database password |
-| PORT | Backend server port |
-| CLIENT_URL | Frontend origin URL for Socket.IO CORS (e.g., http://localhost:5173) |
+| DB_POOL_MAX | Maximum PostgreSQL pool connections (default: `20`) |
+| PORT | Backend server port (default: `5000`) |
+| CLIENT_URL | Frontend origin URL for Socket.IO CORS (e.g., `http://localhost:5173`) |
 | JWT_SECRET | Secret key for JWT signing |
-| JWT_EXPIRES_IN | JWT token expiration duration (e.g., 5d) |
-| VITE_API_BASE_URL | Frontend API base URL (e.g., http://localhost:5000/api) |
-| VITE_SOCKET_URL | Frontend Socket.IO server URL (e.g., http://localhost:5000) |
+| JWT_EXPIRES_IN | JWT token expiration duration (default: `5d`) |
+| VITE_API_BASE_URL | Frontend API base URL (e.g., `http://localhost:5000/api`) |
+| VITE_SOCKET_URL | Frontend Socket.IO server URL (e.g., `http://localhost:5000`) |
 
 
 
 ## Database Design
-- The application uses a relational database with five main tables
+- The application uses a relational database with six main tables
 
 ### Users
 - Stores user credentials and authentication roles
@@ -139,7 +293,7 @@ student-management-system/
     - last_name
     - email (Unique)
     - phone
-    - user_id - Foreign key referencing users(id) ON DELETE SET NULL
+    - user_id - Foreign key referencing users(id) ON DELETE SET NULL (Unique)
     - created_at
     - updated_at
 
@@ -196,7 +350,16 @@ student-management-system/
 
 
 # API Testing
-- Base URL: http://localhost:5000
+- Base URL: `http://localhost:5000`
+- Standard Success Response Format:
+  ```json
+  { "success": true, "message": "...", "data": {} }
+  ```
+- Standard Error Response Format (`400`, `401`, `403`, `404`, `409`, `429`, `500`):
+  ```json
+  { "success": false, "message": "...", "errors": {} }
+  ```
+- Rate Limiting: `POST /api/auth/login` allows up to **5 attempts per 15 minutes** per IP (`429 Too Many Requests`).
 
 ## Health 
     - Method: GET
@@ -286,13 +449,13 @@ student-management-system/
     - Headers: Authorization: Bearer <ADMIN_TOKEN>
     - Body (raw JSON): None
 
-### GET All Students
+### GET All Students (Optional ?page=&limit=&search=)
     - Method: GET
     - URL: http://localhost:5000/api/students
     - Headers: Authorization: Bearer <ADMIN_TOKEN>
     - Body (raw JSON): None
 
-### GET Not Enrolled Students
+### GET Not Enrolled Students (Optional ?page=&limit=&search=)
     - Method: GET
     - URL: http://localhost:5000/api/students/not_enrolled
     - Headers: Authorization: Bearer <ADMIN_TOKEN>
@@ -335,7 +498,7 @@ student-management-system/
     - Headers: Authorization: Bearer <TOKEN>
     - Body (raw JSON): None
 
-### Get All Courses (Admin & Student)
+### Get All Courses (Admin & Student - Optional ?page=&limit=&search=)
     - Method: GET
     - URL: http://localhost:5000/api/courses
     - Headers: Authorization: Bearer <TOKEN>
@@ -377,7 +540,7 @@ student-management-system/
             "course_id": 1
         }
 
-### Get All Enrollments (Student views own; Admin views all or filters by ?student_id=:id)
+### Get All Enrollments (Student views own; Admin views all - Optional ?page=&limit=&search=&student_id=:id)
     - Method: GET
     - URL: http://localhost:5000/api/enrollment
     - Headers: Authorization: Bearer <TOKEN>
@@ -398,15 +561,9 @@ student-management-system/
     - Headers: Authorization: Bearer <ADMIN_TOKEN>
     - Body (raw JSON): None
 
-### Dashboard Enrollments
+### Dashboard Enrollments (Optional ?page=&limit=)
     - Method: GET
     - URL: http://localhost:5000/api/dashboard/enrollments
-    - Headers: Authorization: Bearer <ADMIN_TOKEN>
-    - Body (raw JSON): None
-
-### Dashboard Students
-    - Method: GET
-    - URL: http://localhost:5000/api/dashboard/students
     - Headers: Authorization: Bearer <ADMIN_TOKEN>
     - Body (raw JSON): None
 
@@ -419,7 +576,7 @@ student-management-system/
 
 
 ## NOTIFICATIONS API
-### Get User Notifications (Optional ?unreadOnly=true)
+### Get User Notifications (Optional ?unreadOnly=true&page=&limit=)
     - Method: GET
     - URL: http://localhost:5000/api/notifications
     - Headers: Authorization: Bearer <TOKEN>
@@ -468,50 +625,58 @@ student-management-system/
     - Headers: Authorization: Bearer <ADMIN_TOKEN>
     - Body (raw JSON): None
 
-### Get Detailed Enrollment Roster (Optional ?courseId=&startDate=&endDate=)
+### Get Detailed Enrollment Roster (Optional ?courseId=&startDate=&endDate=&search=&page=&limit=)
     - Method: GET
     - URL: http://localhost:5000/api/reports/roster
     - Headers: Authorization: Bearer <ADMIN_TOKEN>
     - Body (raw JSON): None
 
-### Export Enrollment Roster as CSV (Optional ?courseId=&startDate=&endDate=)
+### Export Enrollment Roster as CSV (Optional ?courseId=&startDate=&endDate=&search=)
     - Method: GET
     - URL: http://localhost:5000/api/reports/export/csv
     - Headers: Authorization: Bearer <ADMIN_TOKEN>
     - Body (raw JSON): None
 
 
-## Activity Logs API (Admin Only)
-### Get Activity Logs (With Pagination & Filters)
+## Activity Logs API (Admin & Student — Students view own logs; Admins view all)
+### Get Activity Logs (With Pagination, Search & Filters)
     - Method: GET
-    - URL: http://localhost:5000/api/activity-logs?page=1&limit=10&action=&userId=&startDate=&endDate=
-    - Headers: Authorization: Bearer <ADMIN_TOKEN>
+    - URL: http://localhost:5000/api/activity-logs?page=1&limit=10&action=&userId=&startDate=&endDate=&search=
+    - Headers: Authorization: Bearer <TOKEN>
     - Body (raw JSON): None
 
 ### Get Activity Log Filter Options (Distinct Users & Actions)
     - Method: GET
     - URL: http://localhost:5000/api/activity-logs/filters
-    - Headers: Authorization: Bearer <ADMIN_TOKEN>
+    - Headers: Authorization: Bearer <TOKEN>
     - Body (raw JSON): None
 
 ### Get Activity Log By ID
     - Method: GET
     - URL: http://localhost:5000/api/activity-logs/:id
-    - Headers: Authorization: Bearer <ADMIN_TOKEN>
+    - Headers: Authorization: Bearer <TOKEN>
     - Body (raw JSON): None
+
+
+## Socket.IO Events (Real-Time Notifications)
+- **Server URL:** `http://localhost:5000` (`VITE_SOCKET_URL`)
+- **Authentication:** Pass JWT via handshake auth: `io(SOCKET_URL, { auth: { token: "<TOKEN>" } })`
+- **Rooms:** Authenticated sockets join `user:<userId>` (and `role:admin` for admins)
+- **Server -> Client Event:**
+    - `notification:new` - Pushed when a new notification or admin broadcast announcement is created for the user
 
 
 
 
 # Installation
 1. Clone the repository
-    - git clone https://github.com/guddu8806/Student-Mangement-System.git
-    - cd student-management-system
+    - `git clone https://github.com/guddu8806/Student-Mangement-System.git`
+    - `cd Student-Mangement-System`
 
 2. Configure the database
     - Create a PostgreSQL database for the application:
-        CREATE DATABASE educore;
-    - Run the database schema or SQL queries to create the required tables:
+        `CREATE DATABASE educore;`
+    - Run the database schema and recommended indexes:
         ```sql
         CREATE TABLE users (
             id SERIAL PRIMARY KEY,
@@ -572,34 +737,61 @@ student-management-system/
             description TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
+
+        -- Recommended indexes
+        CREATE INDEX idx_enrollments_student_id ON enrollments(student_id);
+        CREATE INDEX idx_enrollments_course_id ON enrollments(course_id);
+        CREATE INDEX idx_notifications_user_unread ON notifications(user_id, is_read, created_at DESC);
+        CREATE INDEX idx_activity_logs_user_created ON activity_logs(user_id, created_at DESC);
+        CREATE INDEX idx_activity_logs_action ON activity_logs(action);
         ```
 
 3. Configure the backend
-    - cd backend
-    - npm install
-    - Create a .env file and add all the environment variables:
+    - `cd backend`
+    - `npm install`
+    - Create a `.env` file and add all the environment variables:
+        ```env
         PORT=5000
         CLIENT_URL=http://localhost:5173
         DB_HOST=localhost
-        DB_PORT=5433
+        DB_PORT=5432
         DB_NAME=educore
         DB_USER=postgres
-        DB_PASSWORD=********** (YOUR DB PASSWORD)
+        DB_PASSWORD=YOUR_DB_PASSWORD
+        DB_POOL_MAX=20
         JWT_SECRET=your_jwt_secret_key_here
         JWT_EXPIRES_IN=5d
+        ```
     - Start the backend server:
-        npm run dev
+        - Development: `npm run dev`
+        - Production: `npm start`
 
 4. Configure the frontend
-    - cd ../frontend
-    - npm install
-    - Create a .env file:
+    - `cd ../frontend`
+    - `npm install`
+    - Create a `.env` file:
+        ```env
         VITE_API_BASE_URL=http://localhost:5000/api
         VITE_SOCKET_URL=http://localhost:5000
+        ```
     - Start the frontend development server:
-        npm run dev
+        - Local: `npm run dev`
+        - LAN / Mobile testing: `npm run dev -- --host` (update `.env` URLs and backend `CLIENT_URL` to use your PC's LAN IP)
 
 5. Access the application
-    - Backend API: http://localhost:5000
-    - Frontend App: http://localhost:5173
+    - Backend API: `http://localhost:5000`
+    - Frontend App: `http://localhost:5173`
+
+
+# Scripts & Verification
+| Workspace | Command | Description |
+| --- | --- | --- |
+| `backend` | `npm run dev` | Start backend with `nodemon` |
+| `backend` | `npm start` | Start backend in production mode |
+| `frontend` | `npm run dev` | Start Vite dev server |
+| `frontend` | `npm run build` | Build production bundle (`frontend/dist`) |
+| `frontend` | `npm run lint` | Run ESLint checks |
+| `frontend` | `npm run preview` | Preview production build locally |
+
+
 

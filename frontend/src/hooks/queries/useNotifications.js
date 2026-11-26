@@ -14,7 +14,6 @@ export const NOTIFICATION_KEYS = {
   unreadCount: ["notifications", "unreadCount"],
 };
 
-// Hook to fetch user notifications
 export const useNotificationsQuery = (params = {}) => {
   return useQuery({
     queryKey: NOTIFICATION_KEYS.list(params),
@@ -25,7 +24,6 @@ export const useNotificationsQuery = (params = {}) => {
   });
 };
 
-// Hook to fetch unread notification count
 export const useUnreadCountQuery = () => {
   return useQuery({
     queryKey: NOTIFICATION_KEYS.unreadCount,
@@ -33,7 +31,6 @@ export const useUnreadCountQuery = () => {
   });
 };
 
-// Hook to mark a single notification as read
 export const useMarkNotificationAsRead = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -44,7 +41,6 @@ export const useMarkNotificationAsRead = () => {
   });
 };
 
-// Hook to mark all notifications as read
 export const useMarkAllNotificationsAsRead = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -55,7 +51,6 @@ export const useMarkAllNotificationsAsRead = () => {
   });
 };
 
-// Hook to delete a notification
 export const useDeleteNotification = () => {
   const queryClient = useQueryClient();
   return useMutation({
@@ -66,7 +61,6 @@ export const useDeleteNotification = () => {
   });
 };
 
-// Hook to broadcast an announcement
 export const useSendAnnouncement = () => {
   const queryClient = useQueryClient();
   return useMutation({

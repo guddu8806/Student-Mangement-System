@@ -1,7 +1,6 @@
 const enrollmentService = require("../services/enrollment.service");
 const AppError = require("../utils/AppError");
 
-// find all enrollments
 const findAllEnrollment = async (req, res, next) => {
     try {
         const all_enrollment = await enrollmentService.findAll(req.query, req.user);
@@ -15,7 +14,6 @@ const findAllEnrollment = async (req, res, next) => {
     }
 };
 
-// create enrollment
 const createEnroll = async (req, res, next) => {
     try {
         const enroll = await enrollmentService.createEnrollment(req.body, req.user);
@@ -32,7 +30,6 @@ const createEnroll = async (req, res, next) => {
     }
 };
 
-// drop enrollment
 const dropEnrollment = async (req, res, next) => {
     try {
         const { id } = req.params;

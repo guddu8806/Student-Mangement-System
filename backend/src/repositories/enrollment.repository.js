@@ -1,7 +1,6 @@
 const pool = require("../config/db");
 const AppError = require("../utils/AppError");
 
-// find existing enrollment by student_id and course_id
 const findEnrollment = async (studentId, courseId) => {
     const query = `SELECT * FROM enrollments WHERE student_id = $1 AND course_id = $2`;
     const values = [studentId, courseId];
@@ -9,7 +8,6 @@ const findEnrollment = async (studentId, courseId) => {
     return result.rows[0] || null;
 };
 
-// find enrollment by its primary key ID
 const findById = async (id) => {
     const query = `SELECT * FROM enrollments WHERE id = $1`;
     const values = [id];
@@ -17,7 +15,6 @@ const findById = async (id) => {
     return result.rows[0] || null;
 };
 
-// find all enrollments (with student and course details)
 const findAllEnrollment = async ({ page, limit, studentId, search } = {}) => {
     const conditions = [];
     const values = [];
@@ -92,12 +89,10 @@ const findAllEnrollment = async ({ page, limit, studentId, search } = {}) => {
     };
 };
 
-// find enrollments for a specific student
 const findByStudentId = async (studentId, options = {}) => {
     return await findAllEnrollment({ ...options, studentId });
 };
 
-// create enrollment
 const createEnrollment = async (studentId, courseId) => {
     let sId = studentId;
     let cId = courseId;
@@ -122,7 +117,6 @@ const createEnrollment = async (studentId, courseId) => {
 
     return saved.rows[0];
 };
-
 
 const getCourseCapacityStatus = async (courseId, client = pool) => {
     const isClient = client !== pool;
@@ -182,7 +176,6 @@ const createEnrollmentWithCapacityCheck = async (studentId, courseId) => {
     }
 };
 
-// drop enrollment
 const dropEnrollment = async (id) => {
     const query = `DELETE FROM enrollments WHERE id = $1 RETURNING *`;
     const values = [id];

@@ -1,8 +1,6 @@
 const courseService = require("../services/courses.service");
 const AppError = require('../utils/AppError');
 
-
-//create , read, update , delete courses
 const createCourse = async(req , res, next) =>{
     try{
         const saved = await courseService.createCourse(req.body , req.user.id);
@@ -31,7 +29,6 @@ const getAllCourses = async(req, res, next) =>{
         next(error);
     }
 };
-
 
 const getCourseById = async(req, res, next) => {
     try{
@@ -77,7 +74,6 @@ const deleteCourse = async(req, res ,next) => {
         next(error);
     }
 };
-
 
 module.exports = {
     createCourse,

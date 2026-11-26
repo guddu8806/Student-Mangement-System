@@ -9,7 +9,7 @@ export default function ProfileAcademicInfo({ enrollments = [] }) {
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900">
-      <div className="mb-5 flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3 dark:border-slate-800">
         <div>
           <h2 className="text-base font-bold text-gray-900 dark:text-white">
             Academic Information
@@ -26,7 +26,7 @@ export default function ProfileAcademicInfo({ enrollments = [] }) {
         </Link>
       </div>
 
-      <div className="mb-6 grid grid-cols-2 gap-4">
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="rounded-xl border border-slate-100 bg-slate-50/60 p-4 dark:border-slate-800/60 dark:bg-slate-800/40">
           <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
             Total Enrolled Courses
@@ -68,22 +68,22 @@ export default function ProfileAcademicInfo({ enrollments = [] }) {
             {enrollments.map((item) => (
               <div
                 key={item.id ?? item.enrollment_id}
-                className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/40 p-3.5 transition hover:border-violet-200 dark:border-slate-800 dark:bg-slate-800/30"
+                className="flex flex-col gap-2 rounded-xl border border-slate-100 bg-slate-50/40 p-3.5 transition hover:border-violet-200 dark:border-slate-800 dark:bg-slate-800/30 sm:flex-row sm:items-center sm:justify-between"
               >
-                <div>
-                  <div className="flex items-center gap-2">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
                     {item.course_code && (
-                      <span className="rounded-md bg-violet-100 px-2 py-0.5 text-[11px] font-bold text-violet-700 dark:bg-violet-950/80 dark:text-violet-300">
+                      <span className="shrink-0 rounded-md bg-violet-100 px-2 py-0.5 text-[11px] font-bold text-violet-700 dark:bg-violet-950/80 dark:text-violet-300">
                         {item.course_code}
                       </span>
                     )}
-                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+                    <h4 className="truncate text-sm font-semibold text-gray-900 dark:text-white">
                       {item.course_name}
                     </h4>
                   </div>
                 </div>
 
-                <span className="rounded-lg bg-white px-2.5 py-1 text-xs font-semibold text-violet-700 shadow-2xs dark:bg-slate-900 dark:text-violet-300">
+                <span className="self-start shrink-0 rounded-lg bg-white px-2.5 py-1 text-xs font-semibold text-violet-700 shadow-2xs dark:bg-slate-900 dark:text-violet-300 sm:self-auto">
                   {item.credits} Credits
                 </span>
               </div>

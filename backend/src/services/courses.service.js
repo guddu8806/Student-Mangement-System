@@ -4,8 +4,6 @@ const AppError = require('../utils/AppError');
 const { validateCourse, updateCourseValidation } = require('../validators/course.validator');
 const activityLogService = require("./activityLog.service");
 
-//  create, view, update, and delete courses. 
-
 const createCourse = async (courseData ,performedByUserId) => {
     const errors = validateCourse(courseData);
     if (Object.keys(errors).length > 0) {
@@ -88,7 +86,7 @@ const deleteCourse = async (id ,performedByUserId) => {
     const course_id = Number(id);
     if (!Number.isInteger(course_id) || course_id <= 0) {
         throw new AppError("Invalid course ID", 400);
-    }   
+    }
 
     const course = await courseRepository.findById(course_id);
     if (!course) {
@@ -121,7 +119,7 @@ const deleteCourse = async (id ,performedByUserId) => {
 
 module.exports = {
     createCourse,
-    getAllCourses,  
+    getAllCourses,
     getCourseById,
     updateCourse,
     deleteCourse

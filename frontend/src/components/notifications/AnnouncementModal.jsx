@@ -17,7 +17,6 @@ const AnnouncementModal = ({ isOpen, onClose }) => {
     const [selectedTag, setSelectedTag] = useState("General");
     const [statusMsg, setStatusMsg] = useState({ error: "", success: "" });
 
-    // TanStack Query Hooks
     const { data: courses = [] } = useDashboardCourses();
     const sendMutation = useSendAnnouncement();
     const sending = sendMutation.isPending;
@@ -56,7 +55,7 @@ const AnnouncementModal = ({ isOpen, onClose }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-            <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-900">
+            <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-900">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-slate-800">
                     <div className="flex items-center gap-2.5 text-violet-600 dark:text-violet-400">
                         <Megaphone size={20} />
